@@ -18,7 +18,7 @@ function Sidebar({ catalog, currentId, onSelect, onHome, isOpen, onClose }) {
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <button className="brand-button" onClick={onHome} aria-label="回到首页">
-            <span className="logo-text">Modern LLM Notebook</span>
+            <span className="logo-text">MODERN LLM NOTEBOOK</span>
           </button>
         </div>
 
