@@ -21,6 +21,7 @@ function NotebookViewer({ notebook, meta, loading }) {
   const notebookContentRef = useRef(null)
   const [toc, setToc] = useState([])
   const [activeHeading, setActiveHeading] = useState(null)
+  const [visible, setVisible] = useState(false)
 
   // Extract TOC from notebook HTML
   useEffect(() => {
@@ -61,11 +62,31 @@ function NotebookViewer({ notebook, meta, loading }) {
     return () => observer.disconnect()
   }, [notebook?.html])
 
-  // Scroll to top when notebook changes
+  // Smooth scroll to top + fade in when notebook changes
   useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.scrollTop = 0
+    setVisible(false)
+    const scroller = contentRef.current
+    if (!scroller) return
+
+    const start = scroller.scrollTop
+    const duration = 500
+    let startTime = null
+    const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t))
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = easeOutExpo(progress)
+      scroller.scrollTop = start * (1 - eased)
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      } else {
+        // fade in after scroll settles
+        requestAnimationFrame(() => setVisible(true))
+      }
     }
+    requestAnimationFrame(animate)
   }, [notebook?.id])
 
   const handleTocClick = (id) => {
@@ -151,7 +172,7 @@ function NotebookViewer({ notebook, meta, loading }) {
 
       <div className="viewer-body">
         <div
-          className="notebook-content"
+          className={`notebook-content${visible ? ' visible' : ''}`}
           ref={notebookContentRef}
           dangerouslySetInnerHTML={{ __html: notebook.html }}
         />

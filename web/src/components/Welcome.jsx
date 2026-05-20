@@ -32,6 +32,7 @@ const NOTEBOOK_TITLES = {
 function Welcome({ catalog, onSelect }) {
   const [lang, setLang] = useState('zh')
 
+  // Group by part
   const groups = {}
   for (const nb of catalog) {
     if (!groups[nb.part]) groups[nb.part] = []
@@ -42,89 +43,85 @@ function Welcome({ catalog, onSelect }) {
     en: {
       heroKicker: 'Executable field notes for modern language models',
       seriesLabel: 'Modern Notebook Series',
-      subtitle:
-        'A rigorous path through the systems ideas behind contemporary LLMs: representation, training, inference, evaluation, and deployment.',
+      subtitle: 'A rigorous path through the systems ideas behind contemporary LLMs: representation, training, inference, evaluation, and deployment.',
       badges: ['Mechanistic intuition', 'Minimal code', 'Paper-grounded', 'Observable behavior'],
-      stats: ['Executable notebooks', 'System chapters', 'Research anchors'],
+      stats: ['Executable notebooks', 'System layers', 'Research anchors'],
       sectionKicker: 'Curriculum',
       sectionTitle: 'Build the stack in the order the model experiences it.',
-      sectionText:
-        'Each chapter isolates one system layer, then reconnects it to the full model. Notebooks are designed to be read, run, modified, and verified.',
+      sectionText: 'Each section isolates one layer of the system, then reconnects it to the full model. The notebooks are designed to be read, run, modified, and tested.',
       notes: 'notes',
       parts: {
-        'Foundation': {
-          title: 'Representation Learning',
-          desc: 'From raw text through tokens, embeddings, and positional encoding to self-attention — assemble the first complete decoder-only transformer that turns characters into coherent next-token predictions.',
-          number: '01',
+        "Foundation": {
+          title: 'Foundation',
+          desc: 'Text, tokens, embeddings, position, attention, and the first complete decoder.',
+          eyebrow: 'Layer 01',
           focus: 'Representation',
         },
-        'Training Systems': {
+        "Training Systems": {
           title: 'Training Systems',
-          desc: 'Architecture improvements, mixture-of-experts routing, BERT-style encoding, loss landscapes, scaling laws, data engineering, LoRA fine-tuning, mid-training recipes, and RLHF alignment — the full engineering stack behind modern pretraining and adaptation.',
-          number: '02',
-          focus: 'Optimization & Alignment',
+          desc: 'The practical stack behind modern pretraining, adaptation, and alignment.',
+          eyebrow: 'Layer 02',
+          focus: 'Optimization',
         },
-        'Inference': {
-          title: 'Inference Systems',
-          desc: 'When a model leaves the training loop and becomes an interactive system: decoding strategies, KV-cache design, serving constraints, quantization, and speculative decoding for low-latency generation.',
-          number: '03',
-          focus: 'Generation & Serving',
+        "Inference": {
+          title: 'Inference',
+          desc: 'What changes when a model leaves training and becomes an interactive system.',
+          eyebrow: 'Layer 03',
+          focus: 'Serving',
         },
-        'Frontiers': {
-          title: 'Research Frontiers',
-          desc: 'Long-context extrapolation, chain-of-thought reasoning traces, and vision-language multimodal interfaces — how the boundaries of language model capability are being extended at the research edge.',
-          number: '04',
-          focus: 'Research Edge',
+        "Frontiers": {
+          title: 'Frontiers',
+          desc: 'Reasoning traces, long-context behavior, and multimodal model interfaces.',
+          eyebrow: 'Layer 04',
+          focus: 'Research edge',
         },
-        'Evaluation & Deployment': {
-          title: 'Evaluation & Production',
-          desc: 'How capability is rigorously measured, how large models are compressed through distillation, and how behavior is monitored and shipped to production with on-policy alignment.',
-          number: '05',
-          focus: 'Production Judgment',
+        "Evaluation & Deployment": {
+          title: 'Evaluation & Deployment',
+          desc: 'How capability is measured, compressed, monitored, and shipped.',
+          eyebrow: 'Layer 05',
+          focus: 'Production judgment',
         },
       },
     },
     zh: {
       heroKicker: '面向现代语言模型的可执行研究笔记',
       seriesLabel: 'Modern Notebook 系列',
-      subtitle:
-        '从表示、训练、推理、评测到部署，沿着模型系统真正运转的顺序，拆解当代 LLM 的核心机制。',
+      subtitle: '从表示、训练、推理、评测到部署，沿着模型系统真正运转的顺序，拆解当代 LLM 的核心机制。',
       badges: ['机制直觉', '最小实现', '论文锚点', '行为观察'],
-      stats: ['可执行笔记', '系统章节', '研究锚点'],
+      stats: ['可执行笔记', '系统层级', '研究锚点'],
       sectionKicker: '课程结构',
       sectionTitle: '按模型经历信息的顺序，重建整套技术栈。',
-      sectionText:
-        '每一章先隔离一个系统层，再把它接回完整模型。Notebook 既可以阅读，也可以运行、修改和验证。',
+      sectionText: '每一节先隔离一个系统层，再把它接回完整模型。Notebook 既可以阅读，也可以运行、修改和验证。',
       notes: '篇笔记',
       parts: {
-        'Foundation': {
-          title: '表示学习',
-          desc: '从文本切片开始，经过 token 化、embedding 向量、位置编码，到 self-attention 机制——组装出第一个完整的 decoder-only 模型，把字符序列变成连贯的下一个 token 预测。',
-          number: '01',
-          focus: '基础表示',
+        "Foundation": {
+          title: '基础表示',
+          desc: '从文本、token、embedding、位置到 attention，搭出第一个完整 decoder。',
+          eyebrow: '第 01 层',
+          focus: '表示学习',
         },
-        'Training Systems': {
+        "Training Systems": {
           title: '训练系统',
-          desc: '架构改进、MoE 混合专家路由、BERT 编码器设计、loss 函数与训练技巧、scaling laws 缩放规律、数据工程实践、LoRA 高效微调、mid-training 持续训练、RLHF 对齐——覆盖从预训练到适配的完整工程链路。',
-          number: '02',
+          desc: '理解预训练、数据、优化、参数高效微调与对齐背后的工程结构。',
+          eyebrow: '第 02 层',
           focus: '优化与对齐',
         },
-        'Inference': {
+        "Inference": {
           title: '推理系统',
-          desc: '当模型离开训练循环、成为交互式系统之后：解码策略选择、KV-cache 缓存设计、推理加速技术、模型量化，以及投机解码——在不过度牺牲质量的前提下压低延迟。',
-          number: '03',
+          desc: '当模型离开训练循环、成为交互式系统后，解码、缓存和服务约束如何改变设计。',
+          eyebrow: '第 03 层',
           focus: '生成与服务',
         },
-        'Frontiers': {
+        "Frontiers": {
           title: '前沿方向',
-          desc: '长上下文外推方法、chain-of-thought 思维链推理、视觉-语言多模态接口——语言模型的能力边界如何在研究前沿被不断扩展。',
-          number: '04',
+          desc: '长上下文、推理轨迹与多模态接口如何扩展语言模型的能力边界。',
+          eyebrow: '第 04 层',
           focus: '研究前沿',
         },
-        'Evaluation & Deployment': {
+        "Evaluation & Deployment": {
           title: '评测与部署',
-          desc: '如何严谨地衡量模型能力，如何通过知识蒸馏压缩大模型，如何在生产环境中监控模型行为，以及 on-policy distillation 如何把对齐带入部署流程。',
-          number: '05',
+          desc: '如何衡量能力、压缩行为、监控系统，并把模型稳定推向生产环境。',
+          eyebrow: '第 05 层',
           focus: '生产判断',
         },
       },
@@ -132,13 +129,12 @@ function Welcome({ catalog, onSelect }) {
   }
 
   const t = copy[lang]
-  const titleFor = (nb) =>
-    lang === 'en' ? NOTEBOOK_TITLES.en[nb.id] || nb.title : nb.title
+  const titleFor = (nb) => lang === 'en' ? NOTEBOOK_TITLES.en[nb.id] || nb.title : nb.title
 
   return (
     <div className="viewer">
       <div className="welcome">
-        {/* Hero */}
+        {/* ─── Hero ──────────────────────────────────────── */}
         <section className="hero">
           <div className="hero-sheen" />
           <div className="language-switch">
@@ -161,8 +157,12 @@ function Welcome({ catalog, onSelect }) {
           </div>
           <p className="hero-kicker">{t.heroKicker}</p>
           <p className="hero-series">{t.seriesLabel}</p>
-          <h1 className="hero-title">Modern LLM Notebook</h1>
-          <p className="hero-subtitle">{t.subtitle}</p>
+          <h1 className="hero-title">
+            Modern LLM Notebook
+          </h1>
+          <p className="hero-subtitle">
+            {t.subtitle}
+          </p>
           <div className="hero-badges">
             {t.badges.map((badge, index) => (
               <span key={badge} className="hero-badge-group">
@@ -173,7 +173,7 @@ function Welcome({ catalog, onSelect }) {
           </div>
         </section>
 
-        {/* Stats */}
+        {/* ─── Stats ─────────────────────────────────────── */}
         <section className="stats">
           <Metric value="22" label={t.stats[0]} />
           <div className="stat-divider" />
@@ -182,45 +182,41 @@ function Welcome({ catalog, onSelect }) {
           <Metric value="20+" label={t.stats[2]} />
         </section>
 
-        {/* Curriculum */}
+        {/* ─── Parts ─────────────────────────────────────── */}
         <section className="section-intro">
           <p className="section-kicker">{t.sectionKicker}</p>
           <h2>{t.sectionTitle}</h2>
-          <p>{t.sectionText}</p>
+          <p>
+            {t.sectionText}
+          </p>
+        </section>
+        <section className="parts">
+          {Object.entries(groups).map(([partName, notebooks]) => (
+            <section key={partName} className="part-section">
+              <div className="part-section-copy">
+                <div className="part-eyebrow">
+                  <span>{t.parts[partName]?.eyebrow || 'Layer'}</span>
+                  <span>{t.parts[partName]?.focus || 'Systems'}</span>
+                </div>
+                <h2 className="part-name">{t.parts[partName]?.title || partName}</h2>
+                <p className="part-desc">{t.parts[partName]?.desc || ''}</p>
+              </div>
+              <div className="part-notebooks">
+                {notebooks.map((nb) => (
+                  <NotebookButton
+                    key={nb.id}
+                    number={nb.id.split('-')[0]}
+                    title={titleFor(nb)}
+                    onClick={() => onSelect(nb.id)}
+                  />
+                ))}
+              </div>
+              <div className="part-section-count">{notebooks.length} {t.notes}</div>
+            </section>
+          ))}
         </section>
 
-        <section className="chapters">
-          {Object.entries(groups).map(([partName, notebooks]) => {
-            const p = t.parts[partName] || {}
-            return (
-              <section key={partName} className="chapter-card">
-                <div className="chapter-header">
-                  <div className="chapter-header-top">
-                    <span className="chapter-number">{p.number || '--'}</span>
-                    <span className="chapter-focus">{p.focus || partName}</span>
-                  </div>
-                  <h3 className="chapter-title">{p.title || partName}</h3>
-                  <p className="chapter-desc">{p.desc || ''}</p>
-                  <div className="chapter-meta">
-                    <span>{notebooks.length} {t.notes}</span>
-                  </div>
-                </div>
-                <div className="chapter-notebooks">
-                  {notebooks.map((nb) => (
-                    <NotebookButton
-                      key={nb.id}
-                      number={nb.id.split('-')[0]}
-                      title={titleFor(nb)}
-                      onClick={() => onSelect(nb.id)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )
-          })}
-        </section>
-
-        {/* Footer */}
+        {/* ─── Footer ────────────────────────────────────── */}
         <footer className="welcome-footer">
           <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
