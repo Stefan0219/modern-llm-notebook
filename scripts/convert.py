@@ -5,6 +5,7 @@ Usage: python scripts/convert.py
 """
 
 import ast
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -52,7 +53,7 @@ TITLE_MAP = {
 
 
 def clean_html(html):
-    """Extract notebook content, remove scripts/styles."""
+    """Extract notebook content, remove scripts/styles, inject heading IDs."""
     html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL)
     html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL)
     html = re.sub(r'<link[^>]*>', '', html)
@@ -60,45 +61,83 @@ def clean_html(html):
     html = re.sub(r'</?html[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'</?head[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'</?body[^>]*>', '', html, flags=re.IGNORECASE)
-    match = re.search(r'<div[^>]*id=["\']notebook["\'][^>]*>(.*?)</div>\s*$', html, re.DOTALL)
+    html = re.sub(r'</?main[^>]*>', '', html, flags=re.IGNORECASE)
+
+    # Ensure all h2/h3 have stable IDs for TOC linking
+    heading_counter = {}
+
+    def ensure_heading_id(m):
+        tag = m.group(1)
+        attrs = m.group(2) or ""
+        inner = m.group(3)
+        # Already has id (e.g. from nbconvert anchor-link) — keep it
+        if re.search(r'\bid\s*=', attrs):
+            return m.group(0)
+        text = re.sub(r'<[^>]+>', '', inner).strip()
+        base = hashlib.md5(text.encode('utf-8')).hexdigest()[:8]
+        if base in heading_counter:
+            heading_counter[base] += 1
+            h_id = f"h-{base}-{heading_counter[base]}"
+        else:
+            heading_counter[base] = 0
+            h_id = f"h-{base}"
+        return f'<{tag} id="{h_id}"{attrs}>{inner}</{tag}>'
+
+    html = re.sub(r'<(h[23])([^>]*)>(.*?)</\1>', ensure_heading_id, html, flags=re.DOTALL)
+
+    match = re.search(r'<div[^>]*id=["\']notebook["\'][^>]*>(.*)</div>', html, re.DOTALL)
     if match:
         return match.group(1).strip()
     return html.strip()
 
 
 def extract_symbols(source):
-    """Parse Python source with AST, return (class_names, function_names)."""
+    """Parse Python source with AST.
+    Returns (class_names, function_names, import_aliases).
+    """
     try:
         tree = ast.parse(source)
     except SyntaxError:
-        return set(), set()
+        return set(), set(), set()
 
     classes = set()
     functions = set()
+    aliases = set()
+
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
             classes.add(node.name)
         elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             functions.add(node.name)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                name = alias.asname or alias.name.split('.')[0]
+                aliases.add(name)
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                name = alias.asname or alias.name
+                aliases.add(name)
 
-    return classes, functions
+    return classes, functions, aliases
 
 
 def collect_notebook_symbols(nb):
     """Walk all code cells in a notebook, collect all user-defined symbols."""
     all_classes = set()
     all_functions = set()
+    all_aliases = set()
     for cell in nb.cells:
         if cell.cell_type == "code":
-            c, f = extract_symbols(cell.source)
+            c, f, a = extract_symbols(cell.source)
             all_classes.update(c)
             all_functions.update(f)
-    return all_classes, all_functions
+            all_aliases.update(a)
+    return all_classes, all_functions, all_aliases
 
 
-def enrich_tokens(html, class_names, function_names):
-    """Post-process Pygments HTML: tag user-defined classes/functions."""
-    if not class_names and not function_names:
+def enrich_tokens(html, class_names, function_names, aliases):
+    """Post-process Pygments HTML: tag user-defined classes/functions/import aliases."""
+    if not class_names and not function_names and not aliases:
         return html
 
     def replace_token(m):
@@ -114,6 +153,8 @@ def enrich_tokens(html, class_names, function_names):
             cls_list.append("user-class")
         elif text in function_names and "user-function" not in cls_list:
             cls_list.append("user-function")
+        elif text in aliases and "user-alias" not in cls_list:
+            cls_list.append("user-alias")
 
         return f'<span class="{" ".join(cls_list)}">{text}</span>'
 
@@ -150,11 +191,11 @@ def convert():
             nb = nbformat.read(str(nb_path), as_version=4)
             title = TITLE_MAP.get(nb_path.stem, nb_path.stem)
 
-            # AST analysis: collect all user-defined classes/functions across cells
-            all_classes, all_functions = collect_notebook_symbols(nb)
+            # AST analysis: collect all user-defined classes/functions/aliases across cells
+            all_classes, all_functions, all_aliases = collect_notebook_symbols(nb)
 
             html, _ = exporter.from_notebook_node(nb)
-            html = enrich_tokens(html, all_classes, all_functions)
+            html = enrich_tokens(html, all_classes, all_functions, all_aliases)
             content = clean_html(html)
 
             nb_data = {

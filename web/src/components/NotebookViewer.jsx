@@ -6,13 +6,12 @@ function extractToc(html) {
   temp.innerHTML = html
   const headings = temp.querySelectorAll('h2, h3')
   const toc = []
-  headings.forEach((h, i) => {
+  headings.forEach((h) => {
     const clone = h.cloneNode(true)
     clone.querySelectorAll('.anchor-link').forEach((link) => link.remove())
     const text = clone.textContent.trim()
     if (!text) return
-    const id = `toc-${i}`
-    toc.push({ id, text, level: h.tagName === 'H2' ? 2 : 3 })
+    toc.push({ id: h.id, text, level: h.tagName === 'H2' ? 2 : 3 })
   })
   return toc
 }
@@ -33,32 +32,21 @@ function NotebookViewer({ notebook, meta, loading }) {
     setToc(items)
   }, [notebook?.html])
 
-  // Inject IDs into rendered headings and track scroll
+  // Track active heading on scroll
   useEffect(() => {
-    if (!notebook?.html || !contentRef.current) {
-      console.log('TOC init skipped: no html or contentRef')
-      return
-    }
+    if (!notebook?.html || !contentRef.current) return
 
     const el = notebookContentRef.current
-    if (!el) {
-      console.log('TOC init: notebookContentRef.current is null')
-      return
-    }
+    if (!el) return
 
-    // Attach stable TOC targets inside the rendered notebook only.
     const headings = el.querySelectorAll('h2, h3')
-    console.log(`TOC init: found ${headings.length} headings in notebook HTML`)
-    headings.forEach((h, i) => {
-      h.dataset.tocId = `toc-${i}`
-    })
+    if (headings.length === 0) return
 
-    // Track active heading on scroll
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setActiveHeading(entry.target.dataset.tocId)
+            setActiveHeading(entry.target.id)
           }
         })
       },
@@ -70,10 +58,7 @@ function NotebookViewer({ notebook, meta, loading }) {
     )
 
     headings.forEach((h) => observer.observe(h))
-    return () => {
-      console.log('TOC disconnect')
-      observer.disconnect()
-    }
+    return () => observer.disconnect()
   }, [notebook?.html])
 
   // Scroll to top when notebook changes
@@ -84,44 +69,24 @@ function NotebookViewer({ notebook, meta, loading }) {
   }, [notebook?.id])
 
   const handleTocClick = (id) => {
-    console.log('handleTocClick called with id:', id)
     const scroller = contentRef.current
-    const content = notebookContentRef.current
-    console.log('scroller:', scroller)
-    console.log('content:', content)
-    
-    if (!content) {
-      console.log('Error: content is null')
-      return
-    }
-    if (!scroller) {
-      console.log('Error: scroller is null')
-      return
-    }
+    if (!scroller) return
 
-    const el = content.querySelector(`[data-toc-id="${id}"]`)
-    console.log('Found element:', el)
-    if (!el) {
-      // Let's print all data-toc-id attributes in the content to see what exists
-      const allWithIds = content.querySelectorAll('[data-toc-id]')
-      console.log(`Available elements with data-toc-id:`, Array.from(allWithIds).map(x => `${x.tagName}: ${x.dataset.tocId} (${x.textContent.substring(0, 20)})`))
-      return
-    }
+    const safeId = typeof CSS !== 'undefined' && CSS.escape
+      ? CSS.escape(id)
+      : id.replace(/(["'\\!#$%&()*+,./:;<=>?@[\]^`{|}~])/g, '\\$1')
+    const el = scroller.querySelector(`#${safeId}`)
+    if (!el) return
 
     const scrollerRect = scroller.getBoundingClientRect()
     const elRect = el.getBoundingClientRect()
-    console.log('scrollerRect:', scrollerRect)
-    console.log('elRect:', elRect)
-
     const distance = elRect.top - scrollerRect.top
     const targetScrollTop = scroller.scrollTop + distance
-    console.log('distance:', distance, 'scroller.scrollTop:', scroller.scrollTop, 'targetScrollTop:', targetScrollTop)
 
     scroller.scrollTo({
       top: Math.max(targetScrollTop - 24, 0),
       behavior: 'smooth',
     })
-    console.log('scroller.scrollTop after scrollTo command (might be async due to smooth scroll):', scroller.scrollTop)
     setActiveHeading(id)
   }
 
@@ -157,8 +122,17 @@ function NotebookViewer({ notebook, meta, loading }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1.77 8.7C.63 9.82 0 11.32 0 12.93s.63 3.1 1.77 4.22L4.9 13.9c-.38-.5-.6-1.12-.6-1.78 0-.66.22-1.28.6-1.78L1.77 8.7z" fill="#F9AB00"/>
+            <path d="M12 22.6c1.63 0 3.15-.62 4.28-1.74l-3.15-3.15a2.99 2.99 0 01-2.26.9 2.99 2.99 0 01-2.26-.9L5.46 20.86C6.59 21.98 8.1 22.6 9.74 22.6H12z" fill="#E8710A"/>
+            <path d="M1.77 8.7L4.9 11.9c.37-.5.91-.85 1.54-1.01V6.34A5.76 5.76 0 002.48 8.7H1.77z" fill="#F9AB00"/>
+            <path d="M12 1.4c-1.63 0-3.15.62-4.28 1.74l3.15 3.15c.57-.44 1.28-.7 2.02-.7.74 0 1.45.26 2.02.7l3.15-3.15C15.13 2.02 13.62 1.4 12 1.4z" fill="#E8710A"/>
+            <path d="M12 22.6h2.26c1.64 0 3.15-.62 4.28-1.74l-3.13-3.13c-.57.44-1.28.7-2.02.7-.74 0-1.45-.26-2.02-.7l-3.15 3.15C8.85 21.98 10.37 22.6 12 22.6z" fill="#F9AB00"/>
+            <path d="M17.68 14.9c.38.5.6 1.12.6 1.78 0 .66-.22 1.28-.6 1.78l3.15 3.15C21.97 20.5 22.6 19 22.6 17.38c0-1.61-.63-3.1-1.77-4.22l-3.15 3.14z" fill="#E8710A"/>
+            <path d="M17.68 14.9l3.15-3.14a5.76 5.76 0 00-3.96-2.36v4.54c.63.16 1.17.51 1.54 1.01l.27-.05z" fill="#F9AB00"/>
+            <path d="M17.68 9.1l3.15-3.14C19.7 4.83 18.19 4.21 16.55 4.21H12c1.63 0 3.15.62 4.28 1.74l1.4 3.15z" fill="#E8710A"/>
+            <path d="M12 4.21c.74 0 1.45.26 2.02.7l1.4-3.15A5.76 5.76 0 0012 0c-1.63 0-3.15.62-4.28 1.74l1.4 3.15c.57-.44 1.28-.7 2.02-.7z" fill="#F9AB00"/>
+            <path d="M6.44 10.89c-.63.16-1.17.51-1.54 1.01l-1.4-3.15a5.76 5.76 0 00-1.73 2.36l3.15 3.14 1.52-3.36z" fill="#E8710A"/>
           </svg>
           在 Colab 中打开
         </a>
