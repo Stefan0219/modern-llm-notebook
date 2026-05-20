@@ -1,0 +1,13 @@
+{
+  "name": "modern-llm-notebook",
+  "version": "1.0.0",
+  "description": "Jupyter Notebooks for modern LLMs with React web interface",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install --prefix web",
+    "dev": "npm run dev --prefix web",
+    "build": "npm run build --prefix web",
+    "preview": "npm run preview --prefix web",
+    "convert": "npm run convert --prefix web"
+  }
+}

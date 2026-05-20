@@ -64,13 +64,29 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/sanbuphy/modern-llm-notebook.git
+git clone https://github.com/walkinglabs/modern-llm-notebook.git
 cd modern-llm-notebook
 pip install -r requirements.txt
 jupyter notebook notebooks/part1-foundation/01-tokenizer-basics.ipynb
 ```
 
 **要求**: Python 3.9+, PyTorch 2.0+, 16GB RAM。大部分 Notebook 在 CPU 上即可运行，部分训练章节建议使用 GPU。
+
+### 网页端阅读器 (Optional Web Viewer)
+
+如果你想通过更美观的网页界面阅读这些 Notebook，我们提供了一个基于 React 和 Vite 的网页端阅读器：
+
+```bash
+# 安装网页端依赖
+npm install
+
+# 启动开发服务器（会自动转换 Notebook 并在浏览器打开）
+npm run dev
+
+# 或者构建静态页面并预览
+npm run build
+npm run preview
+```
 
 ---
 
@@ -215,10 +231,10 @@ Top-2 mask -> Expert 0 and Expert 1 activated
 
 ## License
 
-[MIT License](LICENSE)
+This course is released under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 
 ---
 
 <p align="center">
-  <sub>Maintained by <a href="https://github.com/sanbuphy">sanbuphy</a> &middot; If this helps you learn LLMs, consider giving it a star.</sub>
+  <sub>Maintained by <a href="https://github.com/walkinglabs">walkinglabs</a> &middot; If this helps you learn LLMs, consider giving it a star.</sub>
 </p>

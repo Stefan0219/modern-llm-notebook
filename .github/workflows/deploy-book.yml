@@ -1,4 +1,4 @@
-name: Deploy Jupyter Book to GitHub Pages
+name: Deploy Web App to GitHub Pages
 
 on:
   push:
@@ -25,19 +25,34 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install jupyter-book
           pip install -r requirements.txt
+          pip install nbformat nbconvert
 
-      - name: Build Jupyter Book
-        run: jupyter-book build .
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build web app
+        working-directory: web
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _build/html
+          path: docs
 
   deploy:
     needs: build

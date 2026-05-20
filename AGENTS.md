@@ -1,4 +1,4 @@
-# CLAUDE.md — Modern LLM Notebook 项目规范
+# AGENTS.md — Modern LLM Notebook 项目规范
 
 ## 项目定位
 

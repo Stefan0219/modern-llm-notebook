@@ -19,7 +19,22 @@ venv/
 
 # OS
 .DS_Store
+._*
 Thumbs.db
 
 # Jupyter
 .jupyter/
+
+/.quarto/
+**/*.quarto_ipynb
+
+# Web
+web/node_modules/
+web/.vite/
+web/.vite-temp/
+web/dist/
+web/public/data/
+web/public/notebooks/
+
+# Auto-generated web builds
+docs/
