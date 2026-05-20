@@ -644,7 +644,7 @@ a { color: var(--accent); text-decoration: none; }
 
 .part-bridge {
   max-width: 720px;
-  margin: 36px auto 40px;
+  margin: 24px auto;
   text-align: center;
 }
 
