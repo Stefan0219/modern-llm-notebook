@@ -78,16 +78,32 @@ function NotebookViewer({ notebook, meta, loading }) {
     const el = scroller.querySelector(`#${safeId}`)
     if (!el) return
 
+    setActiveHeading(id)
+
     const scrollerRect = scroller.getBoundingClientRect()
     const elRect = el.getBoundingClientRect()
-    const distance = elRect.top - scrollerRect.top
-    const targetScrollTop = scroller.scrollTop + distance
+    const offset = elRect.top - scrollerRect.top
+    const target = scroller.scrollTop + offset - 32
 
-    scroller.scrollTo({
-      top: Math.max(targetScrollTop - 24, 0),
-      behavior: 'smooth',
-    })
-    setActiveHeading(id)
+    const start = scroller.scrollTop
+    const delta = target - start
+    const duration = 520
+
+    let startTime = null
+    const easeInOutCubic = (t) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = easeInOutCubic(progress)
+      scroller.scrollTop = start + delta * eased
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    requestAnimationFrame(animate)
   }
 
   if (loading) {

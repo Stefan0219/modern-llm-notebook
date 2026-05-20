@@ -32,7 +32,6 @@ const NOTEBOOK_TITLES = {
 function Welcome({ catalog, onSelect }) {
   const [lang, setLang] = useState('zh')
 
-  // Group by part
   const groups = {}
   for (const nb of catalog) {
     if (!groups[nb.part]) groups[nb.part] = []
@@ -139,7 +138,7 @@ function Welcome({ catalog, onSelect }) {
   return (
     <div className="viewer">
       <div className="welcome">
-        {/* ─── Hero ──────────────────────────────────────── */}
+        {/* Hero */}
         <section className="hero">
           <div className="hero-sheen" />
           <div className="language-switch">
@@ -174,7 +173,7 @@ function Welcome({ catalog, onSelect }) {
           </div>
         </section>
 
-        {/* ─── Stats ─────────────────────────────────────── */}
+        {/* Stats */}
         <section className="stats">
           <Metric value="22" label={t.stats[0]} />
           <div className="stat-divider" />
@@ -183,7 +182,7 @@ function Welcome({ catalog, onSelect }) {
           <Metric value="20+" label={t.stats[2]} />
         </section>
 
-        {/* ─── Chapter sections ──────────────────────────── */}
+        {/* Curriculum */}
         <section className="section-intro">
           <p className="section-kicker">{t.sectionKicker}</p>
           <h2>{t.sectionTitle}</h2>
@@ -221,7 +220,7 @@ function Welcome({ catalog, onSelect }) {
           })}
         </section>
 
-        {/* ─── Footer ────────────────────────────────────── */}
+        {/* Footer */}
         <footer className="welcome-footer">
           <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
