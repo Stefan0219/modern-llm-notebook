@@ -87,17 +87,17 @@ function NotebookViewer({ notebook, meta, loading }) {
 
     const start = scroller.scrollTop
     const delta = target - start
-    const duration = 520
+    const duration = 750
 
     let startTime = null
-    const easeInOutCubic = (t) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+    // easeOutExpo — starts quick, very gradual deceleration
+    const easeOutExpo = (t) => (t === 1) ? 1 : 1 - Math.pow(2, -10 * t)
 
     const animate = (currentTime) => {
       if (!startTime) startTime = currentTime
       const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
-      const eased = easeInOutCubic(progress)
+      const eased = easeOutExpo(progress)
       scroller.scrollTop = start + delta * eased
       if (progress < 1) {
         requestAnimationFrame(animate)
