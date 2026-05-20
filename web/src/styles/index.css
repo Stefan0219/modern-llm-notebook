@@ -642,6 +642,16 @@ a { color: var(--accent); text-decoration: none; }
   line-height: 1.72;
 }
 
+.part-bridge {
+  max-width: 680px;
+  margin: 28px auto 32px;
+  color: var(--text-tertiary);
+  font-size: 15px;
+  font-weight: 430;
+  line-height: 1.72;
+  text-align: center;
+}
+
 .part-notebooks {
   display: flex;
   flex-direction: column;

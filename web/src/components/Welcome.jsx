@@ -82,6 +82,12 @@ function Welcome({ catalog, onSelect }) {
           focus: 'Production judgment',
         },
       },
+      bridges: [
+        "Build the skeleton — then teach it to learn. From raw text to a complete decoder, each step is isolated, hand-calculated, and wired back in.",
+        "A trained model is just a weight file. The next chapters transform it into an interactive system — decoding, caching, quantizing, and serving under real constraints.",
+        "Inference works — now push the limits. Long-context extrapolation, chain-of-thought reasoning, and multimodal interfaces extend what these models can do.",
+        "Capability without measurement is guesswork. These final chapters cover rigorous evaluation, knowledge distillation, and production alignment.",
+      ],
     },
     zh: {
       heroKicker: '面向现代语言模型的可执行研究笔记',
@@ -95,36 +101,42 @@ function Welcome({ catalog, onSelect }) {
       notes: '篇笔记',
       parts: {
         "Foundation": {
-          title: '基础表示',
+          title: '表示学习',
           desc: '从文本、token、embedding、位置到 attention，搭出第一个完整 decoder。',
-          eyebrow: '第 01 层',
-          focus: '表示学习',
+          eyebrow: '第 01 章',
+          focus: '基础表示',
         },
         "Training Systems": {
           title: '训练系统',
           desc: '理解预训练、数据、优化、参数高效微调与对齐背后的工程结构。',
-          eyebrow: '第 02 层',
+          eyebrow: '第 02 章',
           focus: '优化与对齐',
         },
         "Inference": {
           title: '推理系统',
           desc: '当模型离开训练循环、成为交互式系统后，解码、缓存和服务约束如何改变设计。',
-          eyebrow: '第 03 层',
+          eyebrow: '第 03 章',
           focus: '生成与服务',
         },
         "Frontiers": {
           title: '前沿方向',
           desc: '长上下文、推理轨迹与多模态接口如何扩展语言模型的能力边界。',
-          eyebrow: '第 04 层',
+          eyebrow: '第 04 章',
           focus: '研究前沿',
         },
         "Evaluation & Deployment": {
           title: '评测与部署',
           desc: '如何衡量能力、压缩行为、监控系统，并把模型稳定推向生产环境。',
-          eyebrow: '第 05 层',
+          eyebrow: '第 05 章',
           focus: '生产判断',
         },
       },
+      bridges: [
+        '先搭骨架，再教它学习。从文本切片到完整 decoder，每一步都先隔离、手算、验证，然后接回整体。',
+        '训好的模型只是一个权重文件。接下来把它变成真正的交互式系统——解码、缓存、量化、服务，每一步都在真实约束下设计。',
+        '推理管线跑通了，但大模型的能力远不止于此。长上下文、思维链推理、多模态接口——这些前沿方向在扩展模型的边界。',
+        '有能力不代表可交付。最后这几篇聚焦评测、蒸馏和线上对齐：严谨地衡量、压缩，然后稳定推向生产。',
+      ],
     },
   }
 
@@ -191,28 +203,33 @@ function Welcome({ catalog, onSelect }) {
           </p>
         </section>
         <section className="parts">
-          {Object.entries(groups).map(([partName, notebooks]) => (
-            <section key={partName} className="part-section">
-              <div className="part-section-copy">
-                <div className="part-eyebrow">
-                  <span>{t.parts[partName]?.eyebrow || 'Layer'}</span>
-                  <span>{t.parts[partName]?.focus || 'Systems'}</span>
+          {Object.entries(groups).map(([partName, notebooks], idx) => (
+            <div key={partName}>
+              <section className="part-section">
+                <div className="part-section-copy">
+                  <div className="part-eyebrow">
+                    <span>{t.parts[partName]?.eyebrow || 'Layer'}</span>
+                    <span>{t.parts[partName]?.focus || 'Systems'}</span>
+                  </div>
+                  <h2 className="part-name">{t.parts[partName]?.title || partName}</h2>
+                  <p className="part-desc">{t.parts[partName]?.desc || ''}</p>
                 </div>
-                <h2 className="part-name">{t.parts[partName]?.title || partName}</h2>
-                <p className="part-desc">{t.parts[partName]?.desc || ''}</p>
-              </div>
-              <div className="part-notebooks">
-                {notebooks.map((nb) => (
-                  <NotebookButton
-                    key={nb.id}
-                    number={nb.id.split('-')[0]}
-                    title={titleFor(nb)}
-                    onClick={() => onSelect(nb.id)}
-                  />
-                ))}
-              </div>
-              <div className="part-section-count">{notebooks.length} {t.notes}</div>
-            </section>
+                <div className="part-notebooks">
+                  {notebooks.map((nb) => (
+                    <NotebookButton
+                      key={nb.id}
+                      number={nb.id.split('-')[0]}
+                      title={titleFor(nb)}
+                      onClick={() => onSelect(nb.id)}
+                    />
+                  ))}
+                </div>
+                <div className="part-section-count">{notebooks.length} {t.notes}</div>
+              </section>
+              {t.bridges && idx < t.bridges.length && (
+                <p className="part-bridge">{t.bridges[idx]}</p>
+              )}
+            </div>
           ))}
         </section>
 
