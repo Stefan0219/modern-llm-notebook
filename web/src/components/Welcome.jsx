@@ -83,10 +83,10 @@ function Welcome({ catalog, onSelect }) {
         },
       },
       bridges: [
-        "Build the skeleton — then teach it to learn. From raw text to a complete decoder, each step is isolated, hand-calculated, and wired back in.",
-        "A trained model is just a weight file. The next chapters transform it into an interactive system — decoding, caching, quantizing, and serving under real constraints.",
-        "Inference works — now push the limits. Long-context extrapolation, chain-of-thought reasoning, and multimodal interfaces extend what these models can do.",
-        "Capability without measurement is guesswork. These final chapters cover rigorous evaluation, knowledge distillation, and production alignment.",
+        { title: 'Build the skeleton — then teach it to learn.', desc: 'From raw text to a complete decoder, each step is isolated, hand-calculated, and wired back in.' },
+        { title: 'From weights to an interactive system.', desc: 'Decoding, caching, quantizing, and serving under real constraints.' },
+        { title: 'Inference works — now push the limits.', desc: 'Long-context extrapolation, chain-of-thought reasoning, and multimodal interfaces extend what these models can do.' },
+        { title: 'Capability without measurement is guesswork.', desc: 'Rigorous evaluation, knowledge distillation, and production alignment.' },
       ],
     },
     zh: {
@@ -132,10 +132,10 @@ function Welcome({ catalog, onSelect }) {
         },
       },
       bridges: [
-        '先搭骨架，再教它学习。从文本切片到完整 decoder，每一步都先隔离、手算、验证，然后接回整体。',
-        '训好的模型只是一个权重文件。接下来把它变成真正的交互式系统——解码、缓存、量化、服务，每一步都在真实约束下设计。',
-        '推理管线跑通了，但大模型的能力远不止于此。长上下文、思维链推理、多模态接口——这些前沿方向在扩展模型的边界。',
-        '有能力不代表可交付。最后这几篇聚焦评测、蒸馏和线上对齐：严谨地衡量、压缩，然后稳定推向生产。',
+        { title: '先搭骨架，再教它学习。', desc: '从文本切片到完整 decoder，每一步都先隔离、手算、验证，然后接回整体。' },
+        { title: '从权重文件到交互系统。', desc: '解码、缓存、量化、服务，每一步都在真实约束下设计。' },
+        { title: '推理跑通后，继续推边界。', desc: '长上下文、思维链推理、多模态接口——这些前沿方向在扩展模型的能力边界。' },
+        { title: '有能力，更要可交付。', desc: '评测、蒸馏、线上对齐：严谨地衡量、压缩，然后稳定推向生产。' },
       ],
     },
   }
@@ -227,7 +227,10 @@ function Welcome({ catalog, onSelect }) {
                 <div className="part-section-count">{notebooks.length} {t.notes}</div>
               </section>
               {t.bridges && idx < t.bridges.length && (
-                <p className="part-bridge">{t.bridges[idx]}</p>
+                <div className="part-bridge">
+                  <h3 className="part-bridge-title">{t.bridges[idx].title}</h3>
+                  <p className="part-bridge-desc">{t.bridges[idx].desc}</p>
+                </div>
               )}
             </div>
           ))}
