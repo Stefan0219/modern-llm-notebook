@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern LLM Notebook — 从零实现大语言模型</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #fff;
+    --text: #1a1a1a;
+    --text-secondary: #555;
+    --border: #e5e5e5;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --tag-bg: #eff6ff;
+    --tag-text: #1e40af;
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 48px 0 32px; text-align: center;
+  }
+  header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+  header p { color: var(--text-secondary); margin-top: 8px; font-size: 1rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+  header .badges { margin-top: 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  header .badge {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    background: var(--tag-bg); color: var(--tag-text); font-size: 0.8rem; font-weight: 500;
+  }
+
+  /* Nav */
+  nav {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 12px 0; position: sticky; top: 0; z-index: 10;
+  }
+  nav .container { display: flex; gap: 24px; overflow-x: auto; }
+  nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
+  nav a:hover { color: var(--accent); }
+
+  /* Sections */
+  section { padding: 48px 0; }
+  section:nth-child(even) { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  section h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.01em; }
+
+  /* Quick Start */
+  .quickstart { background: var(--code-bg); color: var(--code-text); border-radius: 8px; padding: 20px 24px; font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace; font-size: 0.85rem; line-height: 1.8; overflow-x: auto; }
+  .quickstart .c { color: #64748b; }
+
+  /* Learning Map */
+  .learning-map { font-family: monospace; font-size: 0.75rem; line-height: 1.5; background: var(--code-bg); color: var(--code-text); border-radius: 8px; padding: 24px; overflow-x: auto; }
+
+  /* Parts */
+  .part { margin-bottom: 40px; }
+  .part-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 4px; }
+  .part-subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { font-weight: 600; color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:hover { background: #f8fafc; }
+
+  .nb-link { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .nb-link:hover { text-decoration: underline; }
+
+  /* Colab button */
+  .colab-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 6px;
+    background: #f8fafc; border: 1px solid var(--border);
+    color: var(--text-secondary); text-decoration: none; font-size: 0.75rem;
+    transition: all 0.15s;
+  }
+  .colab-btn:hover { background: #fff5e6; border-color: #f59e0b; color: #d97706; }
+  .colab-btn svg { width: 14px; height: 14px; }
+
+  /* Papers grid */
+  .papers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .paper-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .paper-card .title { font-weight: 600; font-size: 0.9rem; }
+  .paper-card .meta { color: var(--text-secondary); font-size: 0.8rem; margin-top: 4px; }
+
+  /* Footer */
+  footer { text-align: center; padding: 32px 0; color: var(--text-secondary); font-size: 0.85rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 640px) {
+    header h1 { font-size: 1.5rem; }
+    table { font-size: 0.8rem; }
+    th, td { padding: 8px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>Modern LLM Notebook</h1>
+    <p>21 个 Jupyter Notebook，手写核心算法，从零理解大语言模型的完整技术栈。直觉理解 → 手算验证 → 代码实现 → 实验观察。</p>
+    <div class="badges">
+      <span class="badge">21 Notebooks</span>
+      <span class="badge">5 Parts</span>
+      <span class="badge">20+ Papers</span>
+      <span class="badge">PyTorch 2.0+</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="container">
+    <a href="#quickstart">Quick Start</a>
+    <a href="#map">Learning Map</a>
+    <a href="#part1">Part 1</a>
+    <a href="#part2">Part 2</a>
+    <a href="#part3">Part 3</a>
+    <a href="#part4">Part 4</a>
+    <a href="#part5">Part 5</a>
+    <a href="#papers">Papers</a>
+  </div>
+</nav>
+
+<section id="quickstart">
+  <div class="container">
+    <h2>Quick Start</h2>
+    <pre class="quickstart"><span class="c"># 克隆仓库</span>
+git clone https://github.com/sanbuphy/modern-llm-notebook.git
+cd modern-llm-notebook
+
+<span class="c"># 安装依赖</span>
+pip install -r requirements.txt
+
+<span class="c"># 从第一个 Notebook 开始</span>
+jupyter notebook notebooks/part1-foundation/01-tokenizer-basics.ipynb</pre>
+    <p style="margin-top:12px;color:var(--text-secondary);font-size:0.85rem;">要求: Python 3.9+, PyTorch 2.0+, 16GB RAM。每个 Notebook 自包含，可独立运行。</p>
+  </div>
+</section>
+
+<section id="map">
+  <div class="container">
+    <h2>Learning Map</h2>
+    <pre class="learning-map">                        Modern LLM Full Stack
+                              │
+    ┌─────────────────────────┼─────────────────────────┐
+    │                         │                         │
+    ▼                         ▼                         ▼
+┌──────────┐          ┌──────────────┐          ┌──────────────┐
+│ Part 1   │          │  Part 2       │          │  Part 3       │
+│ Foundation│ ───────→│  Training     │ ───────→│  Inference    │
+│ 01-04    │          │  05-12        │          │  13-15        │
+└──────────┘          └──────────────┘          └──────────────┘
+  Tokenizer                                         KV Cache
+  BPE                    RMSNorm / SwiGLU            FlashAttention
+  Embedding              MoE Router                  vLLM / PagedAttn
+  Position Encoding      BERT / MLM                  Speculative Dec.
+  Mini-GPT               Scaling Laws                Beam Search
+                         Data Pipeline
+                         LoRA / RLHF / DPO
+                              │
+                    ┌─────────┴─────────┐
+                    ▼                   ▼
+             ┌──────────────┐   ┌──────────────┐
+             │  Part 4      │   │  Part 5       │
+             │  Frontiers   │   │  Production   │
+             │  16-18       │   │  19-21        │
+             └──────────────┘   └──────────────┘
+               Long Context      Evaluation
+               CoT / Thinking    Distillation
+               VLM (Flamingo)    On-Policy Dist.</pre>
+  </div>
+</section>
+
+<section id="part1">
+  <div class="container">
+    <h2>Part 1 — Foundation</h2>
+    <p class="part-subtitle">从 Tokenizer 到 Mini-GPT，理解数据流的完整链路。</p>
+    <table>
+      <thead><tr><th>#</th><th>Notebook</th><th>核心内容</th><th style="width:100px"></th></tr></thead>
+      <tbody>
+        <tr><td>01</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/01-tokenizer-basics.ipynb">Tokenizer Basics</a></td><td>字符级/词级分词、BPE 概念</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/01-tokenizer-basics.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>02</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/02-bpe-tokenizer.ipynb">BPE Tokenizer</a></td><td>BPE 训练/编码/解码，merge rules</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/02-bpe-tokenizer.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>03</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/03-embedding-position.ipynb">Embedding &amp; Position</a></td><td>Token Embedding + Sinusoidal Position Encoding</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/03-embedding-position.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>04</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/04-mini-gpt.ipynb">Mini-GPT</a></td><td>Multi-Head Attention, Transformer Block, 完整 GPT</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part1-foundation/04-mini-gpt.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="part2">
+  <div class="container">
+    <h2>Part 2 — Training</h2>
+    <p class="part-subtitle">从架构优化到人类对齐的完整训练管线。</p>
+    <table>
+      <thead><tr><th>#</th><th>Notebook</th><th>核心内容</th><th style="width:100px"></th></tr></thead>
+      <tbody>
+        <tr><td>05</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/05-architecture-refinements.ipynb">Architecture Refinements</a></td><td>RMSNorm, SwiGLU, RoPE, Pre-Norm (LLaMA 风格)</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/05-architecture-refinements.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>06</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/06-moe.ipynb">Mixture of Experts</a></td><td>MoE 路由、top-k 选择、负载均衡</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/06-moe.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>07</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/07-bert-encoder.ipynb">BERT Encoder</a></td><td>Encoder-only 架构、双向注意力、MLM</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/07-bert-encoder.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>08</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/08-training-loss.ipynb">Training &amp; Loss</a></td><td>训练循环、loss 曲线、梯度累积</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/08-training-loss.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>09</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/09-scaling-laws.ipynb">Scaling Laws</a></td><td>Kaplan -> Chinchilla -> 过度训练, FLOPs 估算</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/09-scaling-laws.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>10</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/10-data-engineering.ipynb">Data Engineering</a></td><td>HTML 清洗、质量过滤、MinHash 去重、数据混合</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/10-data-engineering.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>11</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/11-lora.ipynb">LoRA</a></td><td>低秩适应、A*B 分解、merge 推理</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/11-lora.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>12</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/12-rlhf-alignment.ipynb">RLHF Alignment</a></td><td>Reward Model、PPO Clip、DPO</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part2-training/12-rlhf-alignment.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="part3">
+  <div class="container">
+    <h2>Part 3 — Inference</h2>
+    <p class="part-subtitle">生成策略与推理加速的核心技术。</p>
+    <table>
+      <thead><tr><th>#</th><th>Notebook</th><th>核心内容</th><th style="width:100px"></th></tr></thead>
+      <tbody>
+        <tr><td>13</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part3-inference/13-generation.ipynb">Generation</a></td><td>Greedy, Temperature, Top-K, Top-P, Beam Search</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part3-inference/13-generation.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>14</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part3-inference/14-inference-acceleration.ipynb">Inference Acceleration</a></td><td>KV Cache, FlashAttention, vLLM/PagedAttention</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part3-inference/14-inference-acceleration.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>15</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part3-inference/15-speculative-decoding.ipynb">Speculative Decoding</a></td><td>Draft Model -> Target Model 验证, Medusa</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part3-inference/15-speculative-decoding.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="part4">
+  <div class="container">
+    <h2>Part 4 — Frontiers</h2>
+    <p class="part-subtitle">2024-2025 年 LLM 的前沿方向。</p>
+    <table>
+      <thead><tr><th>#</th><th>Notebook</th><th>核心内容</th><th style="width:100px"></th></tr></thead>
+      <tbody>
+        <tr><td>16</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part4-frontiers/16-long-context.ipynb">Long Context</a></td><td>RoPE 频率分析、PI、NTK、YaRN</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part4-frontiers/16-long-context.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>17</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part4-frontiers/17-cot-thinking.ipynb">CoT &amp; Thinking</a></td><td>Chain-of-Thought, Self-Consistency, 思维链训练</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part4-frontiers/17-cot-thinking.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>18</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part4-frontiers/18-vlm.ipynb">Vision-Language Models</a></td><td>Patch Embedding, Cross-Attention, Flamingo Gating</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part4-frontiers/18-vlm.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="part5">
+  <div class="container">
+    <h2>Part 5 — Production</h2>
+    <p class="part-subtitle">评测、压缩、部署——把模型推向生产环境。</p>
+    <table>
+      <thead><tr><th>#</th><th>Notebook</th><th>核心内容</th><th style="width:100px"></th></tr></thead>
+      <tbody>
+        <tr><td>19</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part5-production/19-evaluation.ipynb">Evaluation</a></td><td>lm-eval, LLM-as-Judge, 5 种复合评分方法</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part5-production/19-evaluation.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>20</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part5-production/20-distillation.ipynb">Distillation</a></td><td>Logit 蒸馏、数据蒸馏、特征蒸馏</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part5-production/20-distillation.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+        <tr><td>21</td><td><a class="nb-link" href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/notebooks/part5-production/21-opd.ipynb">On-Policy Distillation</a></td><td>Exposure Bias, Forward/Reverse KL, k1/k2/k3 估计器</td><td><a class="colab-btn" href="https://colab.research.google.com/github/sanbuphy/modern-llm-notebook/blob/main/notebooks/part5-production/21-opd.ipynb" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 4.2c-.2 0-.4.1-.6.2L8.6 8.1c-.3.2-.6.5-.6.9v6c0 .4.3.7.6.9l7.3 3.7c.2.1.4.2.6.2.5 0 .9-.4.9-.9V5.1c-.1-.5-.5-.9-1-.9zm-.9 9.6l-5.8-2.9V9.7l5.8-2.9v7zM24 12c0 6.6-5.4 12-12 12S0 18.6 0 12 5.4 0 12 0s12 5.4 12 12zm-1 0c0-6.1-4.9-11-11-11S1 5.9 1 12s4.9 11 11 11 11-4.9 11-11z"/></svg> Colab</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="papers">
+  <div class="container">
+    <h2>Papers Covered</h2>
+    <p class="part-subtitle">本教程直接对应的核心论文，每个都手写了实现或模拟。</p>
+    <div class="papers-grid">
+      <div class="paper-card"><span class="title">Attention Is All You Need</span><br><span class="meta">Vaswani et al., 2017 &middot; Notebook 04</span></div>
+      <div class="paper-card"><span class="title">BERT</span><br><span class="meta">Devlin et al., 2019 &middot; Notebook 07</span></div>
+      <div class="paper-card"><span class="title">LLaMA</span><br><span class="meta">Touvron et al., 2023 &middot; Notebook 05</span></div>
+      <div class="paper-card"><span class="title">Scaling Laws</span><br><span class="meta">Kaplan et al., 2020 &middot; Notebook 09</span></div>
+      <div class="paper-card"><span class="title">Chinchilla</span><br><span class="meta">Hoffmann et al., 2022 &middot; Notebook 09</span></div>
+      <div class="paper-card"><span class="title">LoRA</span><br><span class="meta">Hu et al., 2022 &middot; Notebook 11</span></div>
+      <div class="paper-card"><span class="title">RLHF / PPO</span><br><span class="meta">Ouyang et al., 2022 &middot; Notebook 12</span></div>
+      <div class="paper-card"><span class="title">DPO</span><br><span class="meta">Rafailov et al., 2023 &middot; Notebook 12</span></div>
+      <div class="paper-card"><span class="title">FlashAttention</span><br><span class="meta">Dao et al., 2022 &middot; Notebook 14</span></div>
+      <div class="paper-card"><span class="title">vLLM</span><br><span class="meta">Kwon et al., 2023 &middot; Notebook 14</span></div>
+      <div class="paper-card"><span class="title">Speculative Decoding</span><br><span class="meta">Leviathan et al., 2023 &middot; Notebook 15</span></div>
+      <div class="paper-card"><span class="title">RoPE / YaRN</span><br><span class="meta">Su et al., 2023 / Peng et al., 2023 &middot; Notebook 16</span></div>
+      <div class="paper-card"><span class="title">Chain-of-Thought</span><br><span class="meta">Wei et al., 2022 &middot; Notebook 17</span></div>
+      <div class="paper-card"><span class="title">DeepSeek-R1</span><br><span class="meta">DeepSeek, 2025 &middot; Notebook 17</span></div>
+      <div class="paper-card"><span class="title">Flamingo / LLaVA</span><br><span class="meta">Alayrac et al., 2022 / Liu et al., 2023 &middot; Notebook 18</span></div>
+      <div class="paper-card"><span class="title">LLM-as-Judge</span><br><span class="meta">Zheng et al., 2023 &middot; Notebook 19</span></div>
+      <div class="paper-card"><span class="title">Knowledge Distillation</span><br><span class="meta">Hinton et al., 2015 &middot; Notebook 20</span></div>
+      <div class="paper-card"><span class="title">On-Policy Distillation</span><br><span class="meta">2024-2025 &middot; Notebook 21</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><a href="https://github.com/sanbuphy/modern-llm-notebook">GitHub</a> &middot; <a href="https://github.com/sanbuphy/modern-llm-notebook/blob/main/LICENSE">MIT License</a></p>
+    <p style="margin-top:8px;">Maintained by <a href="https://github.com/sanbuphy">sanbuphy</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
