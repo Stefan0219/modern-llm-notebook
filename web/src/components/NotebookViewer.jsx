@@ -295,14 +295,9 @@ function NotebookViewer({ notebook, meta, loading }) {
         <div className="viewer-part">{meta?.part}</div>
         <h1 className="viewer-title">{meta?.title}</h1>
         <div className="viewer-launches">
-          {launchLinks.map((link) => (
-            <a
-              key={link.id}
-              className={`viewer-launch viewer-launch-${link.id}`}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+          {launchLinks.map((link) => {
+            const content = (
+              <>
               <span className="viewer-launch-icon" aria-hidden="true">
                 {link.id === 'modelscope' && 'MS'}
                 {link.id === 'baidu-xinghe' && '星'}
@@ -317,8 +312,34 @@ function NotebookViewer({ notebook, meta, loading }) {
                 )}
               </span>
               {link.label}
-            </a>
-          ))}
+              </>
+            )
+
+            if (link.disabled) {
+              return (
+                <span
+                  key={link.id}
+                  className={`viewer-launch viewer-launch-${link.id} disabled`}
+                  aria-disabled="true"
+                  title="Coming soon"
+                >
+                  {content}
+                </span>
+              )
+            }
+
+            return (
+              <a
+                key={link.id}
+                className={`viewer-launch viewer-launch-${link.id}`}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {content}
+              </a>
+            )
+          })}
         </div>
       </div>
 

@@ -45,11 +45,13 @@ export function getNotebookLaunchLinks(meta, notebookId) {
       id: 'modelscope',
       label: '在 ModelScope 打开',
       href: getNotebookModelScopeUrl(meta, notebookId),
+      disabled: true,
     },
     {
       id: 'baidu-xinghe',
       label: '在百度星河社区打开',
       href: getNotebookBaiduXingheUrl(meta, notebookId),
+      disabled: true,
     },
   ]
 }
