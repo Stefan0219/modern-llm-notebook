@@ -1,6 +1,6 @@
 # Modern LLM Notebook
 
-**从零实现大语言模型核心组件的完整教程 — 21 个 Jupyter Notebook，手写核心算法，从 Tokenizer 到 On-Policy Distillation。**
+**从零实现大语言模型核心组件的完整教程 — 23 个 Jupyter Notebook，手写核心算法，从 Tokenizer 到 On-Policy Distillation。**
 
 ---
 
@@ -21,7 +21,7 @@
 ┌──────────┐          ┌──────────────┐          ┌──────────────┐
 │ Part 1   │          │  Part 2       │          │  Part 3       │
 │ Foundation│ ───────>│  Training     │ ───────>│  Inference    │
-│ 01-04    │          │  05-12        │          │  13-15        │
+│ 01-05    │          │  06-14        │          │  15-17        │
 └──────────┘          └──────────────┘          └──────────────┘
                               │
                     ┌─────────┴─────────┐
@@ -29,7 +29,7 @@
              ┌──────────────┐   ┌──────────────┐
              │  Part 4       │   │  Part 5       │
              │  Frontiers    │   │  Production   │
-             │  16-18        │   │  19-21        │
+             │  18-20        │   │  21-23        │
              └──────────────┘   └──────────────┘
 ```
 
@@ -50,11 +50,11 @@ jupyter notebook notebooks/part1-foundation/01-tokenizer-basics.ipynb
 
 | Part | 范围 | 你会写出 |
 |:---|:---|:---|
-| **Part 1 — Foundation** | 01-04 | Tokenizer, BPE, Embedding, Mini-GPT |
-| **Part 2 — Training** | 05-12 | RMSNorm/SwiGLU, MoE, BERT, Scaling Laws, Data Pipeline, LoRA, RLHF/DPO |
-| **Part 3 — Inference** | 13-15 | KV Cache, FlashAttention, Speculative Decoding |
-| **Part 4 — Frontiers** | 16-18 | Long Context (YaRN), Chain-of-Thought, Vision-Language Models |
-| **Part 5 — Production** | 19-21 | Evaluation, Distillation, On-Policy Distillation |
+| **Part 1 — Foundation** | 01-05 | Tokenizer, BPE, Embedding, Transformer Block, Mini-GPT |
+| **Part 2 — Training** | 06-14 | RMSNorm/SwiGLU, MoE, BERT, Scaling Laws, Data Pipeline, LoRA, RLHF/DPO |
+| **Part 3 — Inference** | 15-17 | KV Cache, FlashAttention, Speculative Decoding |
+| **Part 4 — Frontiers** | 18-20 | Long Context (YaRN), Chain-of-Thought, Vision-Language Models |
+| **Part 5 — Production** | 21-23 | Evaluation, Distillation, On-Policy Distillation |
 
 ## 教学特色
 

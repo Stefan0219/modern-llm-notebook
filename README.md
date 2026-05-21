@@ -1,7 +1,7 @@
 # Modern LLM Notebook — 从零实现大语言模型的完整教程
 
 <p align="center">
-  <strong>21 Jupyter Notebooks &middot; 手写核心算法 &middot; 从 Tokenizer 到 On-Policy Distillation</strong>
+  <strong>23 Jupyter Notebooks &middot; 手写核心算法 &middot; 从 Tokenizer 到 On-Policy Distillation</strong>
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@
 ┌──────────┐          ┌──────────────┐          ┌──────────────┐
 │ Part 1   │          │  Part 2       │          │  Part 3       │
 │ Foundation│ ───────>│  Training     │ ───────>│  Inference    │
-│ 01-04    │          │  05-12        │          │  13-15        │
+│ 01-05    │          │  06-14        │          │  15-17        │
 └──────────┘          └──────────────┘          └──────────────┘
   Tokenizer                                          KV Cache
   BPE                     RMSNorm / SwiGLU           FlashAttention
@@ -50,7 +50,7 @@
              ┌──────────────┐   ┌──────────────┐
              │  Part 4       │   │  Part 5       │
              │  Frontiers    │   │  Production   │
-             │  16-18        │   │  19-21        │
+             │  18-20        │   │  21-23        │
              └──────────────┘   └──────────────┘
                Long Context       Evaluation
                CoT / Thinking     Distillation
@@ -101,7 +101,8 @@ npm run preview
 | 01 | [Tokenizer Basics](notebooks/part1-foundation/01-tokenizer-basics.ipynb) | 为什么需要 Tokenizer？字符级/词级分词 | `CharTokenizer`, `WordTokenizer` |
 | 02 | [BPE Tokenizer](notebooks/part1-foundation/02-bpe-tokenizer.ipynb) | BPE 训练/编码/解码，merge rules 可视化 | `BPETokenizer` 完整实现 |
 | 03 | [Embedding & Position](notebooks/part1-foundation/03-embedding-position.ipynb) | Token Embedding + Sinusoidal Position Encoding | `TokenEmbedding`, t-SNE 可视化 |
-| 04 | [Mini-GPT](notebooks/part1-foundation/04-mini-gpt.ipynb) | 从零组装一个 GPT 模型 | `MultiHeadAttention`, `TransformerBlock`, `MiniGPT` |
+| 04 | [Attention & Transformer Block](notebooks/part1-foundation/04-transformer-block.ipynb) | RNN 的问题、Self-Attention、Transformer Block | `MultiHeadAttention`, `TransformerBlock` |
+| 05 | [Mini-GPT](notebooks/part1-foundation/05-mini-gpt.ipynb) | 对照 GPT-2 / Karpathy 写法，组装一个 GPT 骨架 | `MiniGPT`, `lm_head`, special tokens |
 
 ### Part 2: Training — 训练管线
 
@@ -109,14 +110,15 @@ npm run preview
 
 | # | Notebook | 核心内容 | 手写实现 |
 |:---:|:---|:---|:---|
-| 05 | [Architecture Refinements](notebooks/part2-training/05-architecture-refinements.ipynb) | LLaMA 的改进: RMSNorm, SwiGLU, RoPE, Pre-Norm | `RMSNorm`, `FeedForward_SwiGLU`, `LLaMABlock` |
-| 06 | [Mixture of Experts](notebooks/part2-training/06-moe.ipynb) | MoE 路由机制、top-k 选择、负载均衡 | `MoELayer`, Router Gate |
-| 07 | [BERT Encoder](notebooks/part2-training/07-bert-encoder.ipynb) | Encoder-only 架构、双向注意力、MLM | `MiniBERT`, 分类头 |
-| 08 | [Training & Loss](notebooks/part2-training/08-training-loss.ipynb) | 训练循环、loss 曲线、梯度累积 | 完整训练循环 |
-| 09 | [Scaling Laws](notebooks/part2-training/09-scaling-laws.ipynb) | Kaplan -> Chinchilla -> 过度训练, FLOPs 估算 | C~6PD, M~20P |
-| 10 | [Data Engineering](notebooks/part2-training/10-data-engineering.ipynb) | HTML 清洗、质量过滤、MinHash 去重、数据混合 | SHA256/MinHash 去重 |
-| 11 | [LoRA](notebooks/part2-training/11-lora.ipynb) | 低秩适应、A*B 分解、merge 推理 | `LoraLinear`, `apply_lora_to_attention` |
-| 12 | [RLHF Alignment](notebooks/part2-training/12-rlhf-alignment.ipynb) | Reward Model、PPO Clip、DPO | Bradley-Terry loss, PPO clip, DPO loss |
+| 06 | [Architecture Refinements](notebooks/part2-training/06-architecture-refinements.ipynb) | LLaMA 的改进: RMSNorm, SwiGLU, RoPE, Pre-Norm | `RMSNorm`, `FeedForward_SwiGLU`, `LLaMABlock` |
+| 07 | [Mixture of Experts](notebooks/part2-training/07-moe.ipynb) | MoE 路由机制、top-k 选择、负载均衡 | `MoELayer`, Router Gate |
+| 08 | [BERT Encoder](notebooks/part2-training/08-bert-encoder.ipynb) | Encoder-only 架构、双向注意力、MLM | `MiniBERT`, 分类头 |
+| 09 | [Training & Loss](notebooks/part2-training/09-training-loss.ipynb) | 训练循环、loss 曲线、梯度累积 | 完整训练循环 |
+| 10 | [Scaling Laws](notebooks/part2-training/10-scaling-laws.ipynb) | Kaplan -> Chinchilla -> 过度训练, FLOPs 估算 | C~6PD, M~20P |
+| 11 | [Data Engineering](notebooks/part2-training/11-data-engineering.ipynb) | HTML 清洗、质量过滤、MinHash 去重、数据混合 | SHA256/MinHash 去重 |
+| 12 | [LoRA](notebooks/part2-training/12-lora.ipynb) | 低秩适应、A*B 分解、merge 推理 | `LoraLinear`, `apply_lora_to_attention` |
+| 13 | [Mid-Training & CPT](notebooks/part2-training/13-midtraining-cpt.ipynb) | 继续预训练、领域适配、CPT 直觉 | 数据混合、loss 观察 |
+| 14 | [RLHF Alignment](notebooks/part2-training/14-rlhf-alignment.ipynb) | Reward Model、PPO Clip、DPO | Bradley-Terry loss, PPO clip, DPO loss |
 
 ### Part 3: Inference — 推理优化
 
@@ -124,9 +126,9 @@ npm run preview
 
 | # | Notebook | 核心内容 | 手写实现 |
 |:---:|:---|:---|:---|
-| 13 | [Generation](notebooks/part3-inference/13-generation.ipynb) | Greedy, Temperature, Top-K, Top-P, Beam Search | `generate_greedy`, `top_p_filter`, `beam_search` |
-| 14 | [Inference Acceleration](notebooks/part3-inference/14-inference-acceleration.ipynb) | KV Cache, FlashAttention, vLLM/PagedAttention | `AttentionWithKVCache` |
-| 15 | [Speculative Decoding](notebooks/part3-inference/15-speculative-decoding.ipynb) | Draft Model -> Target Model 验证, Medusa | `speculative_accept` |
+| 15 | [Generation](notebooks/part3-inference/15-generation.ipynb) | Greedy, Temperature, Top-K, Top-P, Beam Search | `generate_greedy`, `top_p_filter`, `beam_search` |
+| 16 | [Inference Acceleration](notebooks/part3-inference/16-inference-acceleration.ipynb) | KV Cache, FlashAttention, vLLM/PagedAttention | `AttentionWithKVCache` |
+| 17 | [Speculative Decoding](notebooks/part3-inference/17-speculative-decoding.ipynb) | Draft Model -> Target Model 验证, Medusa | `speculative_accept` |
 
 ### Part 4: Frontiers — 前沿技术
 
@@ -134,9 +136,9 @@ npm run preview
 
 | # | Notebook | 核心内容 | 手写实现 |
 |:---:|:---|:---|:---|
-| 16 | [Long Context](notebooks/part4-frontiers/16-long-context.ipynb) | RoPE 频率分析、PI、NTK、YaRN | `ExtrapolatableRoPE`, Needle-in-Haystack |
-| 17 | [CoT & Thinking](notebooks/part4-frontiers/17-cot-thinking.ipynb) | Chain-of-Thought, Self-Consistency, 思维链训练 | `generate_coldstart_data`, RL reward function |
-| 18 | [Vision-Language Models](notebooks/part4-frontiers/18-vlm.ipynb) | Patch Embedding, Cross-Attention, Flamingo Gating | `PatchEmbedding`, `FlamingoGatedCrossAttnBlock` |
+| 18 | [Long Context](notebooks/part4-frontiers/18-long-context.ipynb) | RoPE 频率分析、PI、NTK、YaRN | `ExtrapolatableRoPE`, Needle-in-Haystack |
+| 19 | [CoT & Thinking](notebooks/part4-frontiers/19-cot-thinking.ipynb) | Chain-of-Thought, Self-Consistency, 思维链训练 | `generate_coldstart_data`, RL reward function |
+| 20 | [Vision-Language Models](notebooks/part4-frontiers/20-vlm.ipynb) | Patch Embedding, Cross-Attention, Flamingo Gating | `PatchEmbedding`, `FlamingoGatedCrossAttnBlock` |
 
 ### Part 5: Production — 工程落地
 
@@ -144,9 +146,9 @@ npm run preview
 
 | # | Notebook | 核心内容 | 手写实现 |
 |:---:|:---|:---|:---|
-| 19 | [Evaluation](notebooks/part5-production/19-evaluation.ipynb) | lm-eval, LLM-as-Judge, 5 种复合评分方法 | 雷达图、胜率矩阵、RAGAS |
-| 20 | [Distillation](notebooks/part5-production/20-distillation.ipynb) | Logit 蒸馏、数据蒸馏、特征蒸馏 | 温度对软标签的影响 |
-| 21 | [On-Policy Distillation](notebooks/part5-production/21-opd.ipynb) | Exposure Bias, Forward/Reverse KL, k1/k2/k3 估计器 | OPSD, 21 篇论文分类法 |
+| 21 | [Evaluation](notebooks/part5-production/21-evaluation.ipynb) | lm-eval, LLM-as-Judge, 5 种复合评分方法 | 雷达图、胜率矩阵、RAGAS |
+| 22 | [Distillation](notebooks/part5-production/22-distillation.ipynb) | Logit 蒸馏、数据蒸馏、特征蒸馏 | 温度对软标签的影响 |
+| 23 | [On-Policy Distillation](notebooks/part5-production/23-opd.ipynb) | Exposure Bias, Forward/Reverse KL, k1/k2/k3 估计器 | OPSD, 21 篇论文分类法 |
 
 ---
 
@@ -204,7 +206,7 @@ npm run preview
 **手算验证。** 每个核心算法先用具体数字手动计算一遍，确保理解每一步的数学含义，再用代码实现。
 
 ```
-# 示例 — 来自 06-moe:
+# 示例 — 来自 07-moe:
 Input x = [1.0, 0.5]
 Router weights = [[0.8, 0.2], [0.3, 0.7]]
 Gate logits = x @ Router = [0.9, 1.7]

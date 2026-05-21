@@ -16,6 +16,7 @@ REPO = Path(__file__).resolve().parent.parent
 NOTEBOOKS_DIR = REPO / "notebooks"
 WEB_DIR = REPO / "web"
 OUTPUT_DIR = WEB_DIR / "public" / "data" / "notebooks"
+CODE_PREVIEW_LINES = 28
 
 PARTS = [
     ("part1-foundation", "Foundation", "Represent text, position, and attention as executable systems."),
@@ -28,32 +29,38 @@ PARTS = [
 # Clean display titles (overrides notebook content)
 TITLE_MAP = {
     "01-tokenizer-basics": "Tokenizer 基础",
-    "02-bpe-tokenizer": "BPE 分词器",
+    "02-bpe-tokenizer": "BPE Tokenizer",
     "03-embedding-position": "Embedding 与位置编码",
-    "04-mini-gpt": "Mini-GPT",
-    "05-architecture-refinements": "架构改进",
-    "06-moe": "MoE 混合专家",
-    "07-bert-encoder": "BERT 编码器",
-    "08-training-loss": "训练与 Loss",
-    "09-scaling-laws": "Scaling Laws",
-    "10-data-engineering": "数据工程",
-    "11-lora": "LoRA",
-    "12-midtraining-cpt": "Mid-Training & CPT",
-    "13-rlhf-alignment": "RLHF 对齐",
-    "13-generation": "生成策略",
-    "14-inference-acceleration": "推理加速",
-    "15-speculative-decoding": "投机解码",
-    "16-long-context": "长上下文",
-    "17-cot-thinking": "CoT 思维链",
-    "18-vlm": "视觉语言模型",
-    "19-evaluation": "模型评测",
-    "20-distillation": "知识蒸馏",
-    "21-opd": "On-Policy Distillation",
+    "04-transformer-block": "Attention 与 Transformer Block",
+    "05-mini-gpt": "实现自己的第一个 GPT",
+    "06-architecture-refinements": "架构改进",
+    "07-moe": "MoE 混合专家",
+    "08-bert-encoder": "BERT 编码器",
+    "09-training-loss": "训练与 Loss",
+    "10-scaling-laws": "Scaling Laws",
+    "11-data-engineering": "数据工程",
+    "12-lora": "LoRA",
+    "13-midtraining-cpt": "Mid-Training & CPT",
+    "14-rlhf-alignment": "RLHF 对齐",
+    "15-generation": "生成策略",
+    "16-inference-acceleration": "推理加速",
+    "17-speculative-decoding": "投机解码",
+    "18-long-context": "长上下文",
+    "19-cot-thinking": "CoT 思维链",
+    "20-vlm": "视觉语言模型",
+    "21-evaluation": "模型评测",
+    "22-distillation": "知识蒸馏",
+    "23-opd": "On-Policy Distillation",
 }
 
 
 def clean_html(html):
     """Extract notebook content, remove scripts/styles, inject heading IDs."""
+    html = re.sub(
+        r'(?m)^.*UserWarning: Glyph .*missing from font\(s\).*\n(?:^\s+.*\n?)?',
+        '',
+        html,
+    )
     html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL)
     html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL)
     html = re.sub(r'<link[^>]*>', '', html)
@@ -84,11 +91,159 @@ def clean_html(html):
         return f'<{tag} id="{h_id}"{attrs}>{inner}</{tag}>'
 
     html = re.sub(r'<(h[23])([^>]*)>(.*?)</\1>', ensure_heading_id, html, flags=re.DOTALL)
+    html = add_code_folds(html)
+    html = add_output_folds(html)
 
     match = re.search(r'<div[^>]*id=["\']notebook["\'][^>]*>(.*)</div>', html, re.DOTALL)
     if match:
         return match.group(1).strip()
     return html.strip()
+
+
+def add_code_folds(html):
+    """Wrap nbconvert code input blocks in default-closed disclosure elements."""
+    input_start = '<div class="input">'
+    search_from = 0
+    chunks = []
+    code_index = 0
+
+    while True:
+        start = html.find(input_start, search_from)
+        if start == -1:
+            chunks.append(html[search_from:])
+            break
+
+        chunks.append(html[search_from:start])
+        input_end = find_matching_div_end(html, start)
+        if input_end == -1:
+            chunks.append(html[start:])
+            break
+
+        input_html = html[start:input_end]
+        if 'class="code-header"' in input_html or 'class="input_area"' not in input_html:
+            chunks.append(input_html)
+        else:
+            line_count, line_label = get_code_line_info(input_html)
+            should_preview = line_count > CODE_PREVIEW_LINES
+            toggle_id = f"code-expand-{code_index}"
+            inner = input_html[len(input_start):-6]
+            inner = re.sub(
+                r'<div class="input_area">',
+                '<div class="input_area code-preview">' if should_preview else '<div class="input_area">',
+                inner,
+                count=1,
+            )
+            input_class = 'input code-input-expandable' if should_preview else 'input'
+            chunks.append(
+                f'<div class="{input_class}">'
+                + '<div class="code-header">'
+                + '<span class="code-fold-title">代码</span>'
+                + f'<span class="code-fold-meta">{line_label}</span>'
+                + '</div>'
+                + (
+                    f'<input class="code-expand-toggle" id="{toggle_id}" type="checkbox" />'
+                    if should_preview else ''
+                )
+                + inner
+                + (
+                    '<div class="code-expand-label">'
+                    + f'<span class="code-expand-more">展开全部 {line_label}</span>'
+                    + '<span class="code-expand-less">收起代码</span>'
+                    + '</div>'
+                    if should_preview else ''
+                )
+                + '</div>'
+            )
+            code_index += 1
+        search_from = input_end
+
+    return ''.join(chunks)
+
+
+def add_output_folds(html):
+    """Wrap long textual output blocks in independent preview expanders."""
+    output_start = '<div class="output">'
+    search_from = 0
+    chunks = []
+    output_index = 0
+
+    while True:
+        start = html.find(output_start, search_from)
+        if start == -1:
+            chunks.append(html[search_from:])
+            break
+
+        chunks.append(html[search_from:start])
+        output_end = find_matching_div_end(html, start)
+        if output_end == -1:
+            chunks.append(html[start:])
+            break
+
+        output_html = html[start:output_end]
+        line_count = count_output_lines(output_html)
+        if 'class="output-expandable' in output_html or line_count <= CODE_PREVIEW_LINES:
+            chunks.append(output_html)
+        else:
+            line_label = f"{line_count} 行"
+            toggle_id = f"output-expand-{output_index}"
+            inner = output_html[len(output_start):-6]
+            chunks.append(
+                '<div class="output output-expandable output-preview">'
+                + f'<input class="output-expand-toggle" id="{toggle_id}" type="checkbox" />'
+                + inner
+                + '<div class="output-expand-label">'
+                + f'<span class="output-expand-more">展开全部输出 {line_label}</span>'
+                + '<span class="output-expand-less">收起输出</span>'
+                + '</div>'
+                + '</div>'
+            )
+            output_index += 1
+        search_from = output_end
+
+    return ''.join(chunks)
+
+
+def find_matching_div_end(html, div_start):
+    """Return the index just after the matching closing </div>."""
+    tag_re = re.compile(r'</?div\b[^>]*>', re.IGNORECASE)
+    depth = 0
+    for match in tag_re.finditer(html, div_start):
+        tag = match.group(0)
+        if tag.startswith('</'):
+            depth -= 1
+            if depth == 0:
+                return match.end()
+        else:
+            depth += 1
+    return -1
+
+
+def get_code_line_info(input_html):
+    """Count source lines from a rendered code input block."""
+    match = re.search(r'<pre>(.*?)</pre>', input_html, flags=re.DOTALL)
+    if not match:
+        return 0, "空代码块"
+
+    source = re.sub(r'<[^>]+>', '', match.group(1))
+    source = source.strip('\n')
+    if not source:
+        return 0, "空代码块"
+    line_count = source.count('\n') + 1
+    return line_count, f"{line_count} 行"
+
+
+def count_output_lines(output_html):
+    """Count lines in textual nbconvert output."""
+    matches = re.findall(r'<pre[^>]*>(.*?)</pre>', output_html, flags=re.DOTALL)
+    if not matches:
+        return 0
+
+    count = 0
+    for match in matches:
+        text = re.sub(r'<[^>]+>', '', match).strip('\n')
+        if text:
+            count += text.count('\n') + 1
+    return count
 
 
 def extract_symbols(source):
