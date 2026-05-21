@@ -872,6 +872,16 @@ a { color: var(--accent); text-decoration: none; }
   background: #fff;
 }
 
+.viewer-launch.disabled,
+.viewer-launch.disabled:hover {
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--text-tertiary);
+  box-shadow: var(--shadow-xs);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 .viewer-launch-modelscope:hover {
   border-color: rgba(0, 113, 227, 0.42);
   color: var(--accent);
@@ -882,6 +892,13 @@ a { color: var(--accent); text-decoration: none; }
   border-color: rgba(38, 120, 255, 0.44);
   color: #185abc;
   box-shadow: 0 4px 14px rgba(38, 120, 255, 0.12);
+}
+
+.viewer-launch-modelscope.disabled:hover,
+.viewer-launch-baidu-xinghe.disabled:hover {
+  border-color: var(--border);
+  color: var(--text-tertiary);
+  box-shadow: var(--shadow-xs);
 }
 
 .viewer-launch-colab:hover {
