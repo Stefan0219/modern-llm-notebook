@@ -90,6 +90,12 @@ function NotebookViewer({ notebook, meta, loading }) {
       return
     }
 
+    if (window.MathJax?.typesetPromise) {
+      window.MathJax.typesetPromise([content]).catch((error) => {
+        console.warn('MathJax typeset failed', error)
+      })
+    }
+
     updateActiveHeading()
     const syncTimer = window.setInterval(updateActiveHeading, 120)
     window.addEventListener('resize', requestActiveHeadingUpdate)

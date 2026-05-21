@@ -93,11 +93,29 @@ function slugify(text, fallback) {
 }
 
 function inlineMarkdown(text) {
-  let html = escapeHtml(text)
+  const mathSegments = []
+  const protectMath = (match) => {
+    const token = `@@MATH_${mathSegments.length}@@`
+    mathSegments.push(match)
+    return token
+  }
+
+  let protectedText = String(text)
+    .replace(/\$\$[\s\S]+?\$\$/g, protectMath)
+    .replace(/\\\[[\s\S]+?\\\]/g, protectMath)
+    .replace(/\\\(.+?\\\)/g, protectMath)
+    .replace(/(^|[^\\$])\$([^$\n]+?)\$/g, (match, prefix, body) => {
+      return `${prefix}${protectMath(`$${body}$`)}`
+    })
+
+  let html = escapeHtml(protectedText)
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>')
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+  mathSegments.forEach((segment, index) => {
+    html = html.replace(`@@MATH_${index}@@`, segment)
+  })
   return html
 }
 

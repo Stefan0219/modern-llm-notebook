@@ -1,0 +1,6 @@
+[submodule "external/karpathy/nanoGPT"]
+	path = external/karpathy/nanoGPT
+	url = https://github.com/karpathy/nanoGPT.git
+[submodule "external/karpathy/minGPT"]
+	path = external/karpathy/minGPT
+	url = https://github.com/karpathy/minGPT.git
