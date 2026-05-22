@@ -319,6 +319,23 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before getting started.
 
 ## ⭐ Star History
 
+<a href="https://www.star-history.com/#walkinglabs/modern-llm-notebook&Date">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://api.star-history.com/svg?repos=walkinglabs/modern-llm-notebook&type=Date&theme=dark"
+    >
+    <source
+      media="(prefers-color-scheme: light)"
+      srcset="https://api.star-history.com/svg?repos=walkinglabs/modern-llm-notebook&type=Date"
+    >
+    <img
+      alt="Star history chart"
+      src="https://api.star-history.com/svg?repos=walkinglabs/modern-llm-notebook&type=Date"
+    >
+  </picture>
+</a>
+
 If this project helps you finally understand an LLM concept from the inside, consider giving it a
 star. It helps more learners discover the course.
 

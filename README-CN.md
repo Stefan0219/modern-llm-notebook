@@ -305,6 +305,23 @@ modern-llm-notebook/
 
 ## ⭐ Star History
 
+<a href="https://www.star-history.com/#walkinglabs/modern-llm-notebook&Date">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://api.star-history.com/svg?repos=walkinglabs/modern-llm-notebook&type=Date&theme=dark"
+    >
+    <source
+      media="(prefers-color-scheme: light)"
+      srcset="https://api.star-history.com/svg?repos=walkinglabs/modern-llm-notebook&type=Date"
+    >
+    <img
+      alt="Star history chart"
+      src="https://api.star-history.com/svg?repos=walkinglabs/modern-llm-notebook&type=Date"
+    >
+  </picture>
+</a>
+
 如果这个项目帮你把 LLM 的某个概念真正想明白了，欢迎点一个 Star。
 它会帮助更多正在入门现代大模型的中文开发者看到这套教程。
 
