@@ -1,7 +1,11 @@
 # Modern LLM Notebook
 
 <p align="center">
-  <strong>从零手写现代大语言模型核心组件的中文 Notebook 教程</strong>
+  <strong>A hands-on notebook course for building modern LLM components from scratch</strong>
+</p>
+
+<p align="center">
+  <a href="README-CN.md"><strong>中文文档</strong></a>
 </p>
 
 <p align="center">
@@ -17,130 +21,134 @@
 </p>
 
 <p align="center">
-  <a href="#-为什么做这个项目">为什么做这个项目</a> ·
-  <a href="#-你会学到什么">你会学到什么</a> ·
-  <a href="#-快速开始">快速开始</a> ·
-  <a href="#-课程路线">课程路线</a> ·
-  <a href="#-notebook-目录">Notebook 目录</a> ·
-  <a href="#-贡献">贡献</a>
+  <a href="#-why-this-project-exists">Why</a> ·
+  <a href="#-what-you-will-learn">What You Will Learn</a> ·
+  <a href="#-quick-start">Quick Start</a> ·
+  <a href="#-learning-map">Learning Map</a> ·
+  <a href="#-notebook-index">Notebook Index</a> ·
+  <a href="#-contributing">Contributing</a>
 </p>
 
 ---
 
-你是不是也有过这种感觉：
+Have you ever felt this while learning LLMs?
 
-> Transformer、BPE、RoPE、MoE、RLHF、Speculative Decoding 到处都在讲，  
-> 但很多资料要么只给公式，要么直接调库，真正“从数字算到代码”的教程很少。
+> Everyone talks about Transformer, BPE, RoPE, MoE, RLHF, and Speculative Decoding,  
+> but many resources either jump straight into equations or hide everything behind libraries.
 
-**Modern LLM Notebook** 想解决的就是这个困惑。
+**Modern LLM Notebook** is built for the missing middle.
 
-这是一套面向中文读者的 Jupyter Notebook 教程。它不教你“如何调用 GPT API”，而是带你把
-现代大语言模型的关键部件一层层拆开：先建立直觉，再手算一个小例子，然后用 PyTorch / NumPy
-写出可运行代码，最后通过实验观察它为什么有效。
+This is a Jupyter Notebook course that takes modern large language models apart piece by piece.
+For each core idea, you first build intuition, then verify it with small hand calculations, then
+implement it with PyTorch / NumPy, and finally run experiments to see what actually happens.
 
-适合你，如果你：
+This project is for you if you:
 
-- 有 Python 基础，想真正理解 LLM 内部原理
-- 看过一些 Transformer 文章，但总觉得概念没有落地
-- 想从 Tokenizer 一路学到 RLHF、长上下文、VLM 和蒸馏
-- 不满足于 `from transformers import ...`，想亲手实现核心算法
+- Know basic Python and want to understand what happens inside an LLM
+- Have read Transformer explanations but still feel the concepts are floating
+- Want a path from Tokenizer to RLHF, long context, VLMs, and distillation
+- Prefer implementing the core algorithm over calling `from transformers import ...`
 
-## ✨ 为什么做这个项目
+## ✨ Why This Project Exists
 
-很多 LLM 教程有两个常见问题。
+Many LLM tutorials have two common problems.
 
-第一个问题是**太抽象**：一上来就是公式和论文名，读者还没知道这个概念要解决什么问题。
+The first problem is **too much abstraction**. They start with formulas and paper names before
+explaining what problem a concept is trying to solve.
 
-第二个问题是**太封装**：直接调用成熟库当然方便，但你很难看清 Token 是怎么变成向量的，
-Self-Attention 为什么能“看见上下文”，KV Cache 又为什么能让生成变快。
+The second problem is **too much encapsulation**. Libraries are useful, but if everything is one
+function call, it is hard to see how text becomes tokens, how tokens become vectors, why
+Self-Attention can read context, or why KV Cache makes generation faster.
 
-所以这个项目坚持一个教学循环：
+So this course follows a simple teaching loop:
 
 ```text
-直觉理解 -> 手算验证 -> 代码实现 -> 实验观察
+Intuition -> Hand Calculation -> Code -> Experiment
 ```
 
-例如讲 BPE Tokenizer 时，不会只告诉你“它会合并高频字符对”，而是会先拿一个小语料手动数频率：
+For example, when introducing BPE Tokenizer, we do not just say "merge frequent pairs." We start
+with a tiny corpus and count the pairs by hand:
 
 ```text
 low, lower, newest, widest
 
-第一次合并：('l', 'o') -> 'lo'
-第二次合并：('lo', 'w') -> 'low'
+First merge:  ('l', 'o') -> 'lo'
+Second merge: ('lo', 'w') -> 'low'
 
-你会亲眼看到：词不是凭空变成 Token 的，而是被统计规律一点点压缩出来的。
+Now you can see that tokens are not magic. They are compression patterns learned from text.
 ```
 
-## 🧠 你会学到什么
+## 🧠 What You Will Learn
 
-这个项目覆盖一条相对完整的现代 LLM 学习路径：
+The course covers a practical modern LLM learning path:
 
-| 模块 | 你会真正弄懂的问题 | 会手写的东西 |
+| Module | Question you will answer | What you will implement |
 |:---|:---|:---|
-| Tokenizer | 文本为什么不能直接喂给模型？ | 字符级、词级、BPE Tokenizer |
-| Embedding | Token ID 怎么变成向量？ | Token Embedding、Position Encoding |
-| Transformer | Attention 到底在“注意”什么？ | Multi-Head Attention、Transformer Block |
-| GPT / BERT | Decoder-only 和 Encoder-only 差在哪？ | Mini-GPT、MiniBERT、MLM |
-| 训练 | Loss、梯度、数据质量如何影响模型？ | 训练循环、Scaling Laws、数据过滤 |
-| 高效架构 | LLaMA、MoE 为什么这样设计？ | RMSNorm、SwiGLU、RoPE、MoE Router |
-| 对齐 | RLHF / DPO 在优化什么？ | Reward Model、PPO Clip、DPO Loss |
-| 推理 | 生成为什么慢？如何加速？ | KV Cache、Top-p、Beam Search、Speculative Decoding |
-| 前沿 | 长上下文、CoT、VLM 怎么接进来？ | RoPE 外推、思维链采样、Cross-Attention |
-| 生产 | 如何评测、压缩、蒸馏模型？ | LLM-as-Judge、蒸馏、On-Policy Distillation |
+| Tokenizer | Why can't models read raw text directly? | Character, word, and BPE tokenizers |
+| Embedding | How does a token ID become a vector? | Token Embedding, Position Encoding |
+| Transformer | What does Attention actually attend to? | Multi-Head Attention, Transformer Block |
+| GPT / BERT | How are decoder-only and encoder-only models different? | Mini-GPT, MiniBERT, MLM |
+| Training | How do loss, gradients, and data quality shape a model? | Training loop, Scaling Laws, data filtering |
+| Efficient architectures | Why are LLaMA and MoE designed this way? | RMSNorm, SwiGLU, RoPE, MoE Router |
+| Alignment | What do RLHF and DPO optimize? | Reward Model, PPO Clip, DPO Loss |
+| Inference | Why is generation slow, and how can it be faster? | KV Cache, Top-p, Beam Search, Speculative Decoding |
+| Frontiers | How do long context, reasoning, and VLMs fit in? | RoPE extrapolation, CoT sampling, Cross-Attention |
+| Production | How do we evaluate, compress, and distill models? | LLM-as-Judge, distillation, On-Policy Distillation |
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 克隆项目
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/walkinglabs/modern-llm-notebook.git
 cd modern-llm-notebook
 ```
 
-### 2. 安装 Python 依赖
+### 2. Install Python dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. 打开第一个 Notebook
+### 3. Open the first notebook
 
 ```bash
 jupyter notebook notebooks/part1-foundation/01-tokenizer-basics.ipynb
 ```
 
-推荐环境：
+Recommended environment:
 
 - Python 3.9+
 - PyTorch 2.0+
 - NumPy / Matplotlib / Jupyter
 - 16GB RAM
 
-大部分 Notebook 可以在 CPU 上运行；训练和实验较重的章节建议使用 GPU。
+Most notebooks run on CPU. Heavier training experiments are better with a GPU.
 
-## 🌐 网页端阅读器
+## 🌐 Web Viewer
 
-如果你更喜欢像课程网站一样阅读 Notebook，可以启动内置的 React / Vite 阅读器：
+If you prefer reading the notebooks in a course-like web interface, start the built-in
+React / Vite viewer:
 
 ```bash
 npm install
 npm run dev
 ```
 
-构建静态网站：
+Build and preview the static site:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-只转换 Notebook：
+Convert notebooks only:
 
 ```bash
 npm run convert
 ```
 
-## 🗺 课程路线
+## 🗺 Learning Map
 
 ```text
 Modern LLM Notebook
@@ -153,7 +161,7 @@ Modern LLM Notebook
 │   └── Mini-GPT
 │
 ├── Part 2 · Training
-│   ├── LLaMA 架构优化
+│   ├── LLaMA architecture refinements
 │   ├── MoE
 │   ├── BERT / MLM
 │   ├── Training Loop / Loss
@@ -179,101 +187,106 @@ Modern LLM Notebook
     └── On-Policy Distillation
 ```
 
-每个 Notebook 都尽量自包含：你可以按顺序学习，也可以直接跳到你关心的主题。
+Each notebook is designed to be self-contained. You can follow the full path or jump directly to
+the topic you care about.
 
-## 📚 Notebook 目录
+## 📚 Notebook Index
 
-### Part 1：Foundation · 基础组件
+### Part 1: Foundation
 
-从一句文本开始，走完整个 GPT 数据流：文本 -> Token -> 向量 -> Attention -> logits。
+Start with a single sentence and follow the full GPT data flow: text -> tokens -> vectors ->
+attention -> logits.
 
-| # | Notebook | 核心问题 | 手写实现 |
+| # | Notebook | Core question | Implementation |
 |:---:|:---|:---|:---|
-| 01 | [Tokenizer Basics](notebooks/part1-foundation/01-tokenizer-basics.ipynb) | 为什么需要 Tokenizer？ | `CharTokenizer`, `WordTokenizer` |
-| 02 | [BPE Tokenizer](notebooks/part1-foundation/02-bpe-tokenizer.ipynb) | BPE 如何从语料里学词表？ | `BPETokenizer` |
-| 03 | [Embedding & Position](notebooks/part1-foundation/03-embedding-position.ipynb) | Token ID 如何变成向量？ | `TokenEmbedding`, Position Encoding |
-| 04 | [Attention & Transformer Block](notebooks/part1-foundation/04-transformer-block.ipynb) | Self-Attention 如何聚合上下文？ | `MultiHeadAttention`, `TransformerBlock` |
-| 05 | [Mini-GPT](notebooks/part1-foundation/05-mini-gpt.ipynb) | GPT 骨架如何组装起来？ | `MiniGPT`, `lm_head` |
+| 01 | [Tokenizer Basics](notebooks/part1-foundation/01-tokenizer-basics.ipynb) | Why do we need a tokenizer? | `CharTokenizer`, `WordTokenizer` |
+| 02 | [BPE Tokenizer](notebooks/part1-foundation/02-bpe-tokenizer.ipynb) | How does BPE learn a vocabulary? | `BPETokenizer` |
+| 03 | [Embedding & Position](notebooks/part1-foundation/03-embedding-position.ipynb) | How does a token ID become a vector? | `TokenEmbedding`, Position Encoding |
+| 04 | [Attention & Transformer Block](notebooks/part1-foundation/04-transformer-block.ipynb) | How does Self-Attention aggregate context? | `MultiHeadAttention`, `TransformerBlock` |
+| 05 | [Mini-GPT](notebooks/part1-foundation/05-mini-gpt.ipynb) | How is a GPT-style model assembled? | `MiniGPT`, `lm_head` |
 
-### Part 2：Training · 训练管线
+### Part 2: Training
 
-从模型结构优化到数据、训练、微调和人类偏好对齐。
+Move from architecture refinements to data, training, fine-tuning, and preference alignment.
 
-| # | Notebook | 核心问题 | 手写实现 |
+| # | Notebook | Core question | Implementation |
 |:---:|:---|:---|:---|
-| 06 | [Architecture Refinements](notebooks/part2-training/06-architecture-refinements.ipynb) | LLaMA 做了哪些结构改进？ | `RMSNorm`, `SwiGLU`, `RoPE` |
-| 07 | [Mixture of Experts](notebooks/part2-training/07-moe.ipynb) | MoE Router 如何选择专家？ | `MoELayer`, Router Gate |
-| 08 | [BERT Encoder](notebooks/part2-training/08-bert-encoder.ipynb) | BERT 为什么能双向理解文本？ | `MiniBERT`, MLM Head |
-| 09 | [Training & Loss](notebooks/part2-training/09-training-loss.ipynb) | 模型如何通过 loss 学会预测？ | 训练循环、梯度累积 |
-| 10 | [Scaling Laws](notebooks/part2-training/10-scaling-laws.ipynb) | 参数、数据、算力如何权衡？ | FLOPs 估算、Chinchilla 直觉 |
-| 11 | [Data Engineering](notebooks/part2-training/11-data-engineering.ipynb) | 好数据为什么比大数据更重要？ | 清洗、过滤、MinHash 去重 |
-| 12 | [LoRA](notebooks/part2-training/12-lora.ipynb) | 低秩微调为什么省显存？ | `LoraLinear`, merge 推理 |
-| 13 | [Mid-Training & CPT](notebooks/part2-training/13-midtraining-cpt.ipynb) | 继续预训练如何做领域适配？ | 数据混合、loss 观察 |
-| 14 | [RLHF Alignment](notebooks/part2-training/14-rlhf-alignment.ipynb) | 偏好数据如何变成优化目标？ | Reward Model、PPO、DPO |
+| 06 | [Architecture Refinements](notebooks/part2-training/06-architecture-refinements.ipynb) | What did LLaMA change architecturally? | `RMSNorm`, `SwiGLU`, `RoPE` |
+| 07 | [Mixture of Experts](notebooks/part2-training/07-moe.ipynb) | How does an MoE router choose experts? | `MoELayer`, Router Gate |
+| 08 | [BERT Encoder](notebooks/part2-training/08-bert-encoder.ipynb) | Why can BERT read bidirectionally? | `MiniBERT`, MLM Head |
+| 09 | [Training & Loss](notebooks/part2-training/09-training-loss.ipynb) | How does a model learn from loss? | Training loop, gradient accumulation |
+| 10 | [Scaling Laws](notebooks/part2-training/10-scaling-laws.ipynb) | How do parameters, data, and compute trade off? | FLOPs estimates, Chinchilla intuition |
+| 11 | [Data Engineering](notebooks/part2-training/11-data-engineering.ipynb) | Why is good data more important than just more data? | Cleaning, filtering, MinHash deduplication |
+| 12 | [LoRA](notebooks/part2-training/12-lora.ipynb) | Why does low-rank fine-tuning save memory? | `LoraLinear`, merge for inference |
+| 13 | [Mid-Training & CPT](notebooks/part2-training/13-midtraining-cpt.ipynb) | How does continued pretraining adapt a model? | Data mixing, loss observation |
+| 14 | [RLHF Alignment](notebooks/part2-training/14-rlhf-alignment.ipynb) | How do preferences become an objective? | Reward Model, PPO, DPO |
 
-### Part 3：Inference · 推理优化
+### Part 3: Inference
 
-从“模型会生成”到“模型生成得更快、更可控”。
+Go from "the model can generate" to "the model generates faster and more controllably."
 
-| # | Notebook | 核心问题 | 手写实现 |
+| # | Notebook | Core question | Implementation |
 |:---:|:---|:---|:---|
-| 15 | [Generation](notebooks/part3-inference/15-generation.ipynb) | Greedy、Top-p、Beam Search 差在哪？ | `generate_greedy`, `top_p_filter`, `beam_search` |
-| 16 | [Inference Acceleration](notebooks/part3-inference/16-inference-acceleration.ipynb) | KV Cache 为什么能加速生成？ | `AttentionWithKVCache` |
-| 17 | [Speculative Decoding](notebooks/part3-inference/17-speculative-decoding.ipynb) | 小模型如何帮大模型提速？ | `speculative_accept` |
+| 15 | [Generation](notebooks/part3-inference/15-generation.ipynb) | How are Greedy, Top-p, and Beam Search different? | `generate_greedy`, `top_p_filter`, `beam_search` |
+| 16 | [Inference Acceleration](notebooks/part3-inference/16-inference-acceleration.ipynb) | Why does KV Cache speed up generation? | `AttentionWithKVCache` |
+| 17 | [Speculative Decoding](notebooks/part3-inference/17-speculative-decoding.ipynb) | How can a small model speed up a large model? | `speculative_accept` |
 
-### Part 4：Frontiers · 前沿方向
+### Part 4: Frontiers
 
-把现代模型的热门能力拆成可以理解、可以实验的小模块。
+Break modern model capabilities into small pieces you can reason about and experiment with.
 
-| # | Notebook | 核心问题 | 手写实现 |
+| # | Notebook | Core question | Implementation |
 |:---:|:---|:---|:---|
-| 18 | [Long Context](notebooks/part4-frontiers/18-long-context.ipynb) | RoPE 如何扩展到长上下文？ | `ExtrapolatableRoPE` |
-| 19 | [CoT & Thinking](notebooks/part4-frontiers/19-cot-thinking.ipynb) | 思维链为什么能提升推理？ | Self-Consistency、reward function |
-| 20 | [Vision-Language Models](notebooks/part4-frontiers/20-vlm.ipynb) | 图像信息如何接入语言模型？ | `PatchEmbedding`, Cross-Attention |
+| 18 | [Long Context](notebooks/part4-frontiers/18-long-context.ipynb) | How can RoPE extend to long context? | `ExtrapolatableRoPE` |
+| 19 | [CoT & Thinking](notebooks/part4-frontiers/19-cot-thinking.ipynb) | Why can reasoning traces improve answers? | Self-Consistency, reward function |
+| 20 | [Vision-Language Models](notebooks/part4-frontiers/20-vlm.ipynb) | How does visual information enter an LLM? | `PatchEmbedding`, Cross-Attention |
 
-### Part 5：Production · 工程落地
+### Part 5: Production
 
-理解模型走向真实产品前，还需要哪些评测、压缩和蒸馏技术。
+Understand the evaluation, compression, and distillation work needed before models become products.
 
-| # | Notebook | 核心问题 | 手写实现 |
+| # | Notebook | Core question | Implementation |
 |:---:|:---|:---|:---|
-| 21 | [Evaluation](notebooks/part5-production/21-evaluation.ipynb) | 如何判断一个模型真的更好？ | 雷达图、胜率矩阵、RAGAS |
-| 22 | [Distillation](notebooks/part5-production/22-distillation.ipynb) | 大模型知识如何迁移给小模型？ | 温度软标签、logit distillation |
-| 23 | [On-Policy Distillation](notebooks/part5-production/23-opd.ipynb) | 蒸馏如何减少 exposure bias？ | OPSD、KL 估计器分类 |
+| 21 | [Evaluation](notebooks/part5-production/21-evaluation.ipynb) | How do we tell whether a model is actually better? | Radar charts, win-rate matrices, RAGAS |
+| 22 | [Distillation](notebooks/part5-production/22-distillation.ipynb) | How does a small model learn from a large model? | Soft labels, logit distillation |
+| 23 | [On-Policy Distillation](notebooks/part5-production/23-opd.ipynb) | How can distillation reduce exposure bias? | OPSD, KL estimator taxonomy |
 
-## 🧪 教学特色
+## 🧪 Teaching Style
 
-**先定义，再展开。** 第一次出现 Token、Embedding、Self-Attention 这类词时，会先给中文定义，
-再给具体例子，最后才进入公式。
+**Define first, then expand.** When terms like Token, Embedding, or Self-Attention appear for the
+first time, the notebook gives a plain definition, a concrete example, and only then the formula.
 
-**手算优先。** 核心算法会先用小数字算一遍，让你知道每个中间量代表什么。
+**Hand calculations first.** Core algorithms are verified with small numbers before the code.
 
-**代码直白。** 教学代码不追求复杂工程抽象，优先让变量名、注释和 `print()` 输出解释清楚。
+**Readable teaching code.** The code favors direct variable names, short cells, Chinese comments in
+the notebooks, and `print()` output that explains the key observation.
 
-**实验可复现。** 随机实验会设置 `np.random.seed(42)` 或 `torch.manual_seed(42)`，避免你每次运行看到不同结果。
+**Reproducible experiments.** Random experiments use `np.random.seed(42)` or `torch.manual_seed(42)`
+so results stay stable across runs.
 
-**不依赖黑盒库。** 核心实现只使用 PyTorch、NumPy、Matplotlib 和标准库，不用 `transformers` 替代手写过程。
+**No black-box shortcuts.** Core implementations use PyTorch, NumPy, Matplotlib, and the standard
+library. The course does not replace core learning steps with `transformers`.
 
-## 📄 覆盖的经典论文
+## 📄 Papers and Ideas Covered
 
-本教程会把这些论文中的关键想法拆成可运行的小实验：
+The course turns ideas from these papers and systems into runnable mini-experiments:
 
-| 论文 / 技术 | 对应主题 |
+| Paper / idea | Topic |
 |:---|:---|
-| Attention Is All You Need | Multi-Head Attention、Position Encoding |
-| BERT | Encoder-only、Masked Language Modeling |
-| LLaMA | RMSNorm、SwiGLU、RoPE、Pre-Norm |
-| Scaling Laws / Chinchilla | 参数、数据、算力的权衡 |
+| Attention Is All You Need | Multi-Head Attention, Position Encoding |
+| BERT | Encoder-only models, Masked Language Modeling |
+| LLaMA | RMSNorm, SwiGLU, RoPE, Pre-Norm |
+| Scaling Laws / Chinchilla | Parameter, data, and compute trade-offs |
 | LoRA | Low-Rank Adaptation |
-| RLHF / PPO / DPO | 人类偏好对齐 |
-| FlashAttention / vLLM | 推理加速与显存管理 |
-| Speculative Decoding | Draft-then-verify 生成加速 |
-| RoPE / YaRN | 长上下文外推 |
-| Chain-of-Thought | 推理路径与 Self-Consistency |
-| Flamingo / LLaVA | Vision-Language Model |
-| Knowledge Distillation / OPD | 模型压缩与蒸馏 |
+| RLHF / PPO / DPO | Preference alignment |
+| FlashAttention / vLLM | Inference acceleration and memory management |
+| Speculative Decoding | Draft-then-verify generation |
+| RoPE / YaRN | Long-context extrapolation |
+| Chain-of-Thought | Reasoning traces and Self-Consistency |
+| Flamingo / LLaVA | Vision-Language Models |
+| Knowledge Distillation / OPD | Model compression and distillation |
 
-## 🧩 项目结构
+## 🧩 Repository Structure
 
 ```text
 modern-llm-notebook/
@@ -283,36 +296,36 @@ modern-llm-notebook/
 │   ├── part3-inference/
 │   ├── part4-frontiers/
 │   └── part5-production/
-├── web/                 # React / Vite 网页端阅读器
-├── docs/                # 静态网站构建产物
-├── scripts/             # Notebook 转换等脚本
+├── web/                 # React / Vite web viewer
+├── docs/                # Static site build output
+├── scripts/             # Notebook conversion scripts
 ├── requirements.txt
 ├── package.json
-└── README.md
+├── README.md
+└── README-CN.md
 ```
 
-## 🤝 贡献
+## 🤝 Contributing
 
-欢迎贡献。尤其欢迎这几类改进：
+Contributions are welcome. Good first contributions include:
 
-- 修复 Notebook 中的错误、过时 API 或运行问题
-- 改进解释、补充更清晰的手算过程
-- 增加可视化、练习题或实验观察
-- 补充新主题，例如 Mamba、Jamba、Agent、RAG、推理服务部署
-- 改进网页端阅读体验
+- Fixing notebook bugs, stale APIs, or reproducibility issues
+- Improving explanations and hand-calculation sections
+- Adding visualizations, exercises, or experimental observations
+- Adding new topics such as Mamba, Jamba, Agents, RAG, or inference serving
+- Improving the web reading experience
 
-开始前建议先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before getting started.
 
 ## ⭐ Star History
 
-如果这个项目帮你把 LLM 的某个概念真正想明白了，欢迎点一个 Star。
-它会帮助更多正在入门现代大模型的中文开发者看到这套教程。
+If this project helps you finally understand an LLM concept from the inside, consider giving it a
+star. It helps more learners discover the course.
 
 ## 📜 License
 
-本项目采用
-[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](LICENSE)
-协议发布。
+This project is released under the
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](LICENSE).
 
 ---
 
