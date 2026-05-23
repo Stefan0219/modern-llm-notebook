@@ -109,7 +109,7 @@ comparison or utility work, but the teaching path keeps the core algorithms expl
 git clone https://github.com/walkinglabs/modern-llm-notebook.git
 cd modern-llm-notebook
 pip install -r requirements.txt
-jupyter notebook notebooks/part1-foundation/01-tokenizer-basics.ipynb
+jupyter notebook notebooks-en/part1-foundation/01-tokenizer-basics.ipynb
 ```
 
 Recommended environment:
@@ -193,49 +193,49 @@ topic without depending on hidden runtime state from earlier notebooks.
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 01 | [Tokenizer Basics](notebooks/part1-foundation/01-tokenizer-basics.ipynb) | Why do models need tokenizers? | Character and word tokenizers |
-| 02 | [BPE Tokenizer](notebooks/part1-foundation/02-bpe-tokenizer.ipynb) | How does BPE learn a vocabulary? | Merge rules, encode, decode |
-| 03 | [Embedding & Position](notebooks/part1-foundation/03-embedding-position.ipynb) | How do IDs become vectors? | Token embedding, position encoding |
-| 04 | [Attention & Transformer Block](notebooks/part1-foundation/04-transformer-block.ipynb) | How does attention move information? | MHA, residuals, normalization |
-| 05 | [Mini-GPT](notebooks/part1-foundation/05-mini-gpt.ipynb) | How does a GPT-style model fit together? | Decoder-only model, LM head |
+| 01 | [Tokenizer Basics](notebooks-en/part1-foundation/01-tokenizer-basics.ipynb) | Why do models need tokenizers? | Character and word tokenizers |
+| 02 | [BPE Tokenizer](notebooks-en/part1-foundation/02-bpe-tokenizer.ipynb) | How does BPE learn a vocabulary? | Merge rules, encode, decode |
+| 03 | [Embedding & Position](notebooks-en/part1-foundation/03-embedding-position.ipynb) | How do IDs become vectors? | Token embedding, position encoding |
+| 04 | [Attention & Transformer Block](notebooks-en/part1-foundation/04-transformer-block.ipynb) | How does attention move information? | MHA, residuals, normalization |
+| 05 | [Mini-GPT](notebooks-en/part1-foundation/05-mini-gpt.ipynb) | How does a GPT-style model fit together? | Decoder-only model, LM head |
 
 ### Part 2: Training
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 06 | [Architecture Refinements](notebooks/part2-training/06-architecture-refinements.ipynb) | What changed from the original Transformer to LLaMA-style blocks? | RMSNorm, SwiGLU, RoPE |
-| 07 | [Mixture of Experts](notebooks/part2-training/07-moe.ipynb) | How does sparse expert routing work? | Router gate, top-k experts |
-| 08 | [BERT Encoder](notebooks/part2-training/08-bert-encoder.ipynb) | Why can encoder-only models read bidirectionally? | MiniBERT, MLM head |
-| 09 | [Training & Loss](notebooks/part2-training/09-training-loss.ipynb) | How does a language model learn from prediction errors? | Training loop, loss, gradients |
-| 10 | [Scaling Laws](notebooks/part2-training/10-scaling-laws.ipynb) | How do model size, data, and compute trade off? | FLOPs estimates, Chinchilla intuition |
-| 11 | [Data Engineering](notebooks/part2-training/11-data-engineering.ipynb) | Why does data quality dominate model behavior? | Cleaning, filtering, MinHash |
-| 12 | [LoRA](notebooks/part2-training/12-lora.ipynb) | Why does low-rank adaptation work? | `LoraLinear`, merge for inference |
-| 13 | [Mid-Training & CPT](notebooks/part2-training/13-midtraining-cpt.ipynb) | How does continued pretraining adapt a model? | Data mixing, loss observation |
-| 14 | [RLHF Alignment](notebooks/part2-training/14-rlhf-alignment.ipynb) | How do preference signals become objectives? | Reward model, PPO, DPO |
+| 06 | [Architecture Refinements](notebooks-en/part2-training/06-architecture-refinements.ipynb) | What changed from the original Transformer to LLaMA-style blocks? | RMSNorm, SwiGLU, RoPE |
+| 07 | [Mixture of Experts](notebooks-en/part2-training/07-moe.ipynb) | How does sparse expert routing work? | Router gate, top-k experts |
+| 08 | [BERT Encoder](notebooks-en/part2-training/08-bert-encoder.ipynb) | Why can encoder-only models read bidirectionally? | MiniBERT, MLM head |
+| 09 | [Training & Loss](notebooks-en/part2-training/09-training-loss.ipynb) | How does a language model learn from prediction errors? | Training loop, loss, gradients |
+| 10 | [Scaling Laws](notebooks-en/part2-training/10-scaling-laws.ipynb) | How do model size, data, and compute trade off? | FLOPs estimates, Chinchilla intuition |
+| 11 | [Data Engineering](notebooks-en/part2-training/11-data-engineering.ipynb) | Why does data quality dominate model behavior? | Cleaning, filtering, MinHash |
+| 12 | [LoRA](notebooks-en/part2-training/12-lora.ipynb) | Why does low-rank adaptation work? | `LoraLinear`, merge for inference |
+| 13 | [Mid-Training & CPT](notebooks-en/part2-training/13-midtraining-cpt.ipynb) | How does continued pretraining adapt a model? | Data mixing, loss observation |
+| 14 | [RLHF Alignment](notebooks-en/part2-training/14-rlhf-alignment.ipynb) | How do preference signals become objectives? | Reward model, PPO, DPO |
 
 ### Part 3: Inference
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 15 | [Generation](notebooks/part3-inference/15-generation.ipynb) | How do decoding strategies change model behavior? | Greedy, top-k, top-p, beam search |
-| 16 | [Inference Acceleration](notebooks/part3-inference/16-inference-acceleration.ipynb) | Why is generation memory-bound? | KV Cache, FlashAttention, PagedAttention |
-| 17 | [Speculative Decoding](notebooks/part3-inference/17-speculative-decoding.ipynb) | How can a small model accelerate a large one? | Draft-then-verify acceptance |
+| 15 | [Generation](notebooks-en/part3-inference/15-generation.ipynb) | How do decoding strategies change model behavior? | Greedy, top-k, top-p, beam search |
+| 16 | [Inference Acceleration](notebooks-en/part3-inference/16-inference-acceleration.ipynb) | Why is generation memory-bound? | KV Cache, FlashAttention, PagedAttention |
+| 17 | [Speculative Decoding](notebooks-en/part3-inference/17-speculative-decoding.ipynb) | How can a small model accelerate a large one? | Draft-then-verify acceptance |
 
 ### Part 4: Frontiers
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 18 | [Long Context](notebooks/part4-frontiers/18-long-context.ipynb) | How do models extend beyond their training context length? | RoPE extrapolation, YaRN intuition |
-| 19 | [CoT & Thinking](notebooks/part4-frontiers/19-cot-thinking.ipynb) | Why can reasoning traces improve answers? | Self-Consistency, reward design |
-| 20 | [Vision-Language Models](notebooks/part4-frontiers/20-vlm.ipynb) | How does visual information enter a language model? | Patch embedding, cross-attention |
+| 18 | [Long Context](notebooks-en/part4-frontiers/18-long-context.ipynb) | How do models extend beyond their training context length? | RoPE extrapolation, YaRN intuition |
+| 19 | [CoT & Thinking](notebooks-en/part4-frontiers/19-cot-thinking.ipynb) | Why can reasoning traces improve answers? | Self-Consistency, reward design |
+| 20 | [Vision-Language Models](notebooks-en/part4-frontiers/20-vlm.ipynb) | How does visual information enter a language model? | Patch embedding, cross-attention |
 
 ### Part 5: Production
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 21 | [Evaluation](notebooks/part5-production/21-evaluation.ipynb) | How do we tell whether a model is better? | Win-rate matrices, RAGAS, judge metrics |
-| 22 | [Distillation](notebooks/part5-production/22-distillation.ipynb) | How does a small model learn from a large one? | Soft labels, temperature, logit distillation |
-| 23 | [On-Policy Distillation](notebooks/part5-production/23-opd.ipynb) | How can distillation reduce exposure bias? | OPSD, KL estimator taxonomy |
+| 21 | [Evaluation](notebooks-en/part5-production/21-evaluation.ipynb) | How do we tell whether a model is better? | Win-rate matrices, RAGAS, judge metrics |
+| 22 | [Distillation](notebooks-en/part5-production/22-distillation.ipynb) | How does a small model learn from a large one? | Soft labels, temperature, logit distillation |
+| 23 | [On-Policy Distillation](notebooks-en/part5-production/23-opd.ipynb) | How can distillation reduce exposure bias? | OPSD, KL estimator taxonomy |
 
 ## Quality Bar
 
@@ -274,6 +274,12 @@ The course connects implementation details to influential papers and production 
 ```text
 modern-llm-notebook/
 ├── notebooks/
+│   ├── part1-foundation/
+│   ├── part2-training/
+│   ├── part3-inference/
+│   ├── part4-frontiers/
+│   └── part5-production/
+├── notebooks-en/
 │   ├── part1-foundation/
 │   ├── part2-training/
 │   ├── part3-inference/

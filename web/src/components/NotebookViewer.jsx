@@ -25,6 +25,8 @@ function NotebookViewer({ notebook, meta, loading }) {
   const [toc, setToc] = useState([])
   const [activeHeading, setActiveHeading] = useState(null)
   const [visibleNotebookId, setVisibleNotebookId] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const lang = meta?.lang === 'en' ? 'en' : 'zh'
 
   const shouldReduceMotion = () => {
     return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -97,6 +99,11 @@ function NotebookViewer({ notebook, meta, loading }) {
     }
 
     updateActiveHeading()
+    content.querySelectorAll('.output_area img, .rendered_html img').forEach((img) => {
+      img.setAttribute('tabindex', '0')
+      img.setAttribute('role', 'button')
+      img.setAttribute('title', lang === 'en' ? 'Click to zoom' : '点击放大')
+    })
     const syncTimer = window.setInterval(updateActiveHeading, 120)
     window.addEventListener('resize', requestActiveHeadingUpdate)
 
@@ -109,6 +116,19 @@ function NotebookViewer({ notebook, meta, loading }) {
       }
     }
   }, [notebook?.id, notebook?.html, toc.length])
+
+  useEffect(() => {
+    if (!imagePreview) return undefined
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setImagePreview(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [imagePreview])
 
   // Reset scroll before paint, then fade the new notebook in.
   useLayoutEffect(() => {
@@ -198,6 +218,17 @@ function NotebookViewer({ notebook, meta, loading }) {
   }
 
   const handleNotebookClick = (event) => {
+    const image = event.target.closest('.output_area img, .rendered_html img')
+    if (image && notebookContentRef.current?.contains(image)) {
+      event.preventDefault()
+      event.stopPropagation()
+      setImagePreview({
+        src: image.currentSrc || image.src,
+        alt: image.alt || 'notebook output',
+      })
+      return
+    }
+
     const copyButton = event.target.closest('.code-copy-button')
     if (copyButton && notebookContentRef.current?.contains(copyButton)) {
       event.preventDefault()
@@ -265,12 +296,25 @@ function NotebookViewer({ notebook, meta, loading }) {
     toggle.checked = !toggle.checked
   }
 
+  const handleNotebookKeyDown = (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return
+
+    const image = event.target.closest?.('.output_area img, .rendered_html img')
+    if (!image || !notebookContentRef.current?.contains(image)) return
+
+    event.preventDefault()
+    setImagePreview({
+      src: image.currentSrc || image.src,
+      alt: image.alt || 'notebook output',
+    })
+  }
+
   if (loading) {
     return (
       <div className="viewer" ref={contentRef}>
         <div className="loading">
           <div className="spinner" />
-          <span>加载中...</span>
+          <span>{lang === 'en' ? 'Loading...' : '加载中...'}</span>
         </div>
       </div>
     )
@@ -280,7 +324,7 @@ function NotebookViewer({ notebook, meta, loading }) {
     return (
       <div className="viewer" ref={contentRef}>
         <div className="loading">
-          <span>选择一个 Notebook 开始学习</span>
+          <span>{lang === 'en' ? 'Choose a notebook to start learning' : '选择一个 Notebook 开始学习'}</span>
         </div>
       </div>
     )
@@ -349,13 +393,40 @@ function NotebookViewer({ notebook, meta, loading }) {
           className={`notebook-content${isVisible ? ' visible' : ''}`}
           ref={notebookContentRef}
           onClick={handleNotebookClick}
+          onKeyDown={handleNotebookKeyDown}
           dangerouslySetInnerHTML={{ __html: notebook.html }}
         />
+
+        {imagePreview && (
+          <div
+            className="image-lightbox"
+            role="dialog"
+            aria-modal="true"
+            aria-label={lang === 'en' ? 'Image preview' : '图片预览'}
+            onClick={() => setImagePreview(null)}
+          >
+            <button
+              className="image-lightbox-close"
+              type="button"
+              aria-label={lang === 'en' ? 'Close image preview' : '关闭图片预览'}
+              onClick={() => setImagePreview(null)}
+            >
+              ×
+            </button>
+            <div className="image-lightbox-scroll">
+              <img
+                src={imagePreview.src}
+                alt={imagePreview.alt}
+                onClick={(event) => event.stopPropagation()}
+              />
+            </div>
+          </div>
+        )}
 
         {toc.length > 0 && (
           <aside className={`toc${isVisible ? ' visible' : ''}`}>
             <div className="toc-sticky">
-              <div className="toc-title">大纲</div>
+              <div className="toc-title">{lang === 'en' ? 'Outline' : '大纲'}</div>
               <nav className="toc-nav">
                 {toc.map((item) => (
                   <button

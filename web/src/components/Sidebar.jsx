@@ -1,6 +1,16 @@
 import { GITHUB_REPO_URL } from '../config.js'
+import { SegmentedControl } from './ui.jsx'
 
-function Sidebar({ catalog, currentId, onSelect, onHome, isOpen, onClose }) {
+function Sidebar({
+  catalog,
+  currentId,
+  lang,
+  onLanguageChange,
+  onSelect,
+  onHome,
+  isOpen,
+  onClose,
+}) {
   // Group by part
   const groups = {}
   for (const nb of catalog) {
@@ -17,9 +27,22 @@ function Sidebar({ catalog, currentId, onSelect, onHome, isOpen, onClose }) {
 
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <button className="brand-button" onClick={onHome} aria-label="回到首页">
+          <button
+            className="brand-button"
+            onClick={onHome}
+            aria-label={lang === 'en' ? 'Back to home' : '回到首页'}
+          >
             <span className="logo-text">MODERN LLM NOTEBOOK</span>
           </button>
+          <SegmentedControl
+            value={lang}
+            ariaLabel="Language"
+            onChange={onLanguageChange}
+            options={[
+              { value: 'zh', label: '中文' },
+              { value: 'en', label: 'EN' },
+            ]}
+          />
         </div>
 
         <div className="sidebar-scroll">

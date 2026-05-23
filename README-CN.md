@@ -271,6 +271,12 @@ modern-llm-notebook/
 │   ├── part3-inference/
 │   ├── part4-frontiers/
 │   └── part5-production/
+├── notebooks-en/
+│   ├── part1-foundation/
+│   ├── part2-training/
+│   ├── part3-inference/
+│   ├── part4-frontiers/
+│   └── part5-production/
 ├── web/                 # React / Vite 网页阅读器
 ├── docs/                # 静态网站构建产物
 ├── scripts/             # Notebook 转换脚本

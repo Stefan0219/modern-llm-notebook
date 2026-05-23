@@ -5,16 +5,20 @@ export const GITHUB_BRANCH = 'main'
 export const GITHUB_REPO_URL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}`
 export const GITHUB_REPO_GIT_URL = `${GITHUB_REPO_URL}.git`
 
+function getNotebookRoot(meta) {
+  return meta?.lang === 'en' ? 'notebooks-en' : 'notebooks'
+}
+
 export function getNotebookGitHubUrl(meta, notebookId) {
-  return `${GITHUB_REPO_URL}/blob/${GITHUB_BRANCH}/notebooks/${meta?.partDir}/${notebookId}.ipynb`
+  return `${GITHUB_REPO_URL}/blob/${GITHUB_BRANCH}/${getNotebookRoot(meta)}/${meta?.partDir}/${notebookId}.ipynb`
 }
 
 export function getNotebookColabUrl(meta, notebookId) {
-  return `https://colab.research.google.com/github/${GITHUB_OWNER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/notebooks/${meta?.partDir}/${notebookId}.ipynb`
+  return `https://colab.research.google.com/github/${GITHUB_OWNER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/${getNotebookRoot(meta)}/${meta?.partDir}/${notebookId}.ipynb`
 }
 
 function getNotebookPath(meta, notebookId) {
-  return `notebooks/${meta?.partDir}/${notebookId}.ipynb`
+  return `${getNotebookRoot(meta)}/${meta?.partDir}/${notebookId}.ipynb`
 }
 
 function withNotebookParams(baseUrl, meta, notebookId) {
@@ -35,21 +39,22 @@ export function getNotebookBaiduXingheUrl(meta, notebookId) {
 }
 
 export function getNotebookLaunchLinks(meta, notebookId) {
+  const isEnglish = meta?.lang === 'en'
   return [
     {
       id: 'colab',
-      label: '在 Colab 打开',
+      label: isEnglish ? 'Open in Colab' : '在 Colab 打开',
       href: getNotebookColabUrl(meta, notebookId),
     },
     {
       id: 'modelscope',
-      label: '在 ModelScope 打开',
+      label: isEnglish ? 'Open in ModelScope' : '在 ModelScope 打开',
       href: getNotebookModelScopeUrl(meta, notebookId),
       disabled: true,
     },
     {
       id: 'baidu-xinghe',
-      label: '在百度星河社区打开',
+      label: isEnglish ? 'Open in Baidu Xinghe' : '在百度星河社区打开',
       href: getNotebookBaiduXingheUrl(meta, notebookId),
       disabled: true,
     },

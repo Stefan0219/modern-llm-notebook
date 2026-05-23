@@ -1,34 +1,5 @@
-import { useState } from 'react'
 import { GITHUB_REPO_URL } from '../config.js'
 import { Metric, NotebookButton, SegmentedControl } from './ui.jsx'
-
-const NOTEBOOK_TITLES = {
-  en: {
-    '01-tokenizer-basics': 'Tokenizer Basics',
-    '02-bpe-tokenizer': 'BPE Tokenizer',
-    '03-embedding-position': 'Embeddings & Position',
-    '04-transformer-block': 'Attention & Transformer Block',
-    '05-mini-gpt': 'Build Your First GPT',
-    '06-architecture-refinements': 'Architecture Refinements',
-    '07-moe': 'Mixture of Experts',
-    '08-bert-encoder': 'BERT Encoder',
-    '09-training-loss': 'Training & Loss',
-    '10-scaling-laws': 'Scaling Laws',
-    '11-data-engineering': 'Data Engineering',
-    '12-lora': 'LoRA',
-    '13-midtraining-cpt': 'Mid-Training & CPT',
-    '14-rlhf-alignment': 'RLHF Alignment',
-    '15-generation': 'Generation',
-    '16-inference-acceleration': 'Inference Acceleration',
-    '17-speculative-decoding': 'Speculative Decoding',
-    '18-long-context': 'Long Context',
-    '19-cot-thinking': 'CoT & Thinking',
-    '20-vlm': 'Vision-Language Models',
-    '21-evaluation': 'Evaluation',
-    '22-distillation': 'Distillation',
-    '23-opd': 'On-Policy Distillation',
-  },
-}
 
 const PART_TOUR_IDS = {
   Foundation: 'foundation',
@@ -38,9 +9,7 @@ const PART_TOUR_IDS = {
   'Evaluation & Deployment': 'production',
 }
 
-function Welcome({ catalog, onSelect, onStartTour }) {
-  const [lang, setLang] = useState('zh')
-
+function Welcome({ catalog, lang, onLanguageChange, onSelect, onStartTour }) {
   // Group by part
   const groups = {}
   for (const nb of catalog) {
@@ -150,7 +119,6 @@ function Welcome({ catalog, onSelect, onStartTour }) {
   }
 
   const t = copy[lang]
-  const titleFor = (nb) => lang === 'en' ? NOTEBOOK_TITLES.en[nb.id] || nb.title : nb.title
 
   return (
     <div className="viewer">
@@ -160,15 +128,15 @@ function Welcome({ catalog, onSelect, onStartTour }) {
           <div className="hero-sheen" />
           <div className="hero-actions">
             <button className="hero-guide-button" onClick={onStartTour}>
-              新手引导
+              {lang === 'en' ? 'Guided tour' : '新手引导'}
             </button>
             <SegmentedControl
               value={lang}
               ariaLabel="Language"
-              onChange={setLang}
+              onChange={onLanguageChange}
               options={[
-                { value: 'en', label: 'EN' },
                 { value: 'zh', label: '中文' },
+                { value: 'en', label: 'EN' },
               ]}
             />
           </div>
@@ -185,7 +153,11 @@ function Welcome({ catalog, onSelect, onStartTour }) {
             Modern LLM Notebook
           </h1>
           <p className="hero-maker">
-            由 <a href="https://walkinglabs.github.io/homepage/" target="_blank" rel="noopener noreferrer">Walking Lab 开源实验室</a> 制作
+            {lang === 'en' ? 'Created by ' : '由 '}
+            <a href="https://walkinglabs.github.io/homepage/" target="_blank" rel="noopener noreferrer">
+              Walking Lab
+            </a>
+            {lang === 'en' ? '' : ' 开源实验室制作'}
           </p>
           <p className="hero-subtitle">
             {t.subtitle}
@@ -234,7 +206,7 @@ function Welcome({ catalog, onSelect, onStartTour }) {
                     <NotebookButton
                       key={nb.id}
                       number={nb.id.split('-')[0]}
-                      title={titleFor(nb)}
+                      title={nb.title}
                       onClick={() => onSelect(nb.id)}
                     />
                   ))}

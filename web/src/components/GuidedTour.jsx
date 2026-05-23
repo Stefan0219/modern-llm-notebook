@@ -54,7 +54,7 @@ function getCardStyle(rect, placement) {
   }
 }
 
-function GuidedTour({ active, step, stepIndex, totalSteps, onNext, onPrev, onClose }) {
+function GuidedTour({ active, step, stepIndex, totalSteps, lang, onNext, onPrev, onClose }) {
   const [targetRect, setTargetRect] = useState(null)
   const rafRef = useRef(null)
   const mascotExpressions = [
@@ -183,7 +183,7 @@ function GuidedTour({ active, step, stepIndex, totalSteps, onNext, onPrev, onClo
       className="tour-layer"
       role="dialog"
       aria-modal="true"
-      aria-label="新手引导"
+      aria-label={lang === 'en' ? 'Guided tour' : '新手引导'}
       onClick={handleLayerClick}
     >
       <div className="tour-backdrop" />
@@ -213,13 +213,19 @@ function GuidedTour({ active, step, stepIndex, totalSteps, onNext, onPrev, onClo
         <h2>{step.title}</h2>
         <p>{step.body}</p>
         <div className="tour-actions">
-          <button className="tour-ghost" onClick={onClose}>跳过</button>
+          <button className="tour-ghost" onClick={onClose}>
+            {lang === 'en' ? 'Skip' : '跳过'}
+          </button>
           <div className="tour-action-group">
             {stepIndex > 0 && (
-              <button className="tour-secondary" onClick={onPrev}>上一步</button>
+              <button className="tour-secondary" onClick={onPrev}>
+                {lang === 'en' ? 'Back' : '上一步'}
+              </button>
             )}
             <button className="tour-primary" onClick={onNext}>
-              {isLast ? '开始学习' : step.nextLabel || '下一步'}
+              {isLast
+                ? (lang === 'en' ? 'Start learning' : '开始学习')
+                : step.nextLabel || (lang === 'en' ? 'Next' : '下一步')}
             </button>
           </div>
         </div>

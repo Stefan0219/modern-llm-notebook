@@ -1,4 +1,10 @@
-const notebookModules = import.meta.glob('../../../notebooks/**/*.ipynb', {
+const zhNotebookModules = import.meta.glob('../../../notebooks/**/*.ipynb', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+})
+
+const enNotebookModules = import.meta.glob('../../../notebooks-en/**/*.ipynb', {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -13,29 +19,56 @@ const PARTS = [
 ]
 
 const TITLE_MAP = {
-  '01-tokenizer-basics': 'Tokenizer 基础',
-  '02-bpe-tokenizer': 'BPE Tokenizer',
-  '03-embedding-position': 'Embedding 与位置编码',
-  '04-transformer-block': 'Attention 与 Transformer Block',
-  '05-mini-gpt': '实现自己的第一个 GPT',
-  '06-architecture-refinements': '架构改进',
-  '07-moe': 'MoE 混合专家',
-  '08-bert-encoder': 'BERT 编码器',
-  '09-training-loss': '训练与 Loss',
-  '10-scaling-laws': 'Scaling Laws',
-  '11-data-engineering': '数据工程',
-  '12-lora': 'LoRA',
-  '13-midtraining-cpt': 'Mid-Training & CPT',
-  '14-rlhf-alignment': 'RLHF 对齐',
-  '15-generation': '生成策略',
-  '16-inference-acceleration': '推理加速',
-  '17-speculative-decoding': '投机解码',
-  '18-long-context': '长上下文',
-  '19-cot-thinking': 'CoT 思维链',
-  '20-vlm': '视觉语言模型',
-  '21-evaluation': '模型评测',
-  '22-distillation': '知识蒸馏',
-  '23-opd': 'On-Policy Distillation',
+  zh: {
+    '01-tokenizer-basics': 'Tokenizer 基础',
+    '02-bpe-tokenizer': 'BPE Tokenizer',
+    '03-embedding-position': 'Embedding 与位置编码',
+    '04-transformer-block': 'Attention 与 Transformer Block',
+    '05-mini-gpt': '实现自己的第一个 GPT',
+    '06-architecture-refinements': '架构改进',
+    '07-moe': 'MoE 混合专家',
+    '08-bert-encoder': 'BERT 编码器',
+    '09-training-loss': '训练与 Loss',
+    '10-scaling-laws': 'Scaling Laws',
+    '11-data-engineering': '数据工程',
+    '12-lora': 'LoRA',
+    '13-midtraining-cpt': 'Mid-Training & CPT',
+    '14-rlhf-alignment': 'RLHF 对齐',
+    '15-generation': '生成策略',
+    '16-inference-acceleration': '推理加速',
+    '17-speculative-decoding': '投机解码',
+    '18-long-context': '长上下文',
+    '19-cot-thinking': 'CoT 思维链',
+    '20-vlm': '视觉语言模型',
+    '21-evaluation': '模型评测',
+    '22-distillation': '知识蒸馏',
+    '23-opd': 'On-Policy Distillation',
+  },
+  en: {
+    '01-tokenizer-basics': 'Tokenizer Basics',
+    '02-bpe-tokenizer': 'BPE Tokenizer',
+    '03-embedding-position': 'Embeddings & Position',
+    '04-transformer-block': 'Attention & Transformer Block',
+    '05-mini-gpt': 'Build Your First GPT',
+    '06-architecture-refinements': 'Architecture Refinements',
+    '07-moe': 'Mixture of Experts',
+    '08-bert-encoder': 'BERT Encoder',
+    '09-training-loss': 'Training & Loss',
+    '10-scaling-laws': 'Scaling Laws',
+    '11-data-engineering': 'Data Engineering',
+    '12-lora': 'LoRA',
+    '13-midtraining-cpt': 'Mid-Training & CPT',
+    '14-rlhf-alignment': 'RLHF Alignment',
+    '15-generation': 'Generation',
+    '16-inference-acceleration': 'Inference Acceleration',
+    '17-speculative-decoding': 'Speculative Decoding',
+    '18-long-context': 'Long Context',
+    '19-cot-thinking': 'CoT & Thinking',
+    '20-vlm': 'Vision-Language Models',
+    '21-evaluation': 'Evaluation',
+    '22-distillation': 'Distillation',
+    '23-opd': 'On-Policy Distillation',
+  },
 }
 
 const PYTHON_KEYWORDS = new Set([
@@ -53,9 +86,35 @@ const PYTHON_BUILTINS = new Set([
 
 const CODE_PREVIEW_LINES = 28
 
-const NOTEBOOKS = Object.entries(notebookModules)
+const UI_TEXT = {
+  zh: {
+    emptyCode: '空代码块',
+    code: '代码',
+    line: '行',
+    expandOutput: '展开全部输出',
+    collapseOutput: '收起输出',
+    expandCode: '展开全部',
+    collapseCode: '收起代码',
+  },
+  en: {
+    emptyCode: 'empty code block',
+    code: 'Code',
+    line: 'lines',
+    expandOutput: 'Show full output',
+    collapseOutput: 'Hide output',
+    expandCode: 'Show all',
+    collapseCode: 'Hide code',
+  },
+}
+
+function normalizeLang(lang) {
+  return lang === 'en' ? 'en' : 'zh'
+}
+
+function buildNotebookEntries(modules, rootDir) {
+  return Object.entries(modules)
   .map(([path, raw]) => {
-    const match = path.match(/notebooks\/([^/]+)\/([^/]+)\.ipynb$/)
+    const match = path.match(new RegExp(`${rootDir}/([^/]+)/([^/]+)\\.ipynb$`))
     if (!match) return null
     const [, partDir, id] = match
     return {
@@ -70,6 +129,12 @@ const NOTEBOOKS = Object.entries(notebookModules)
     if (a.order !== b.order) return a.order - b.order
     return a.id.localeCompare(b.id, 'en')
   })
+}
+
+const NOTEBOOKS_BY_LANG = {
+  zh: buildNotebookEntries(zhNotebookModules, 'notebooks'),
+  en: buildNotebookEntries(enNotebookModules, 'notebooks-en'),
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -466,13 +531,14 @@ function countOutputLines(output) {
   return text ? text.split(/\r?\n/).length : 0
 }
 
-function renderCodeCell(cell, symbols, index) {
+function renderCodeCell(cell, symbols, index, lang) {
+  const t = UI_TEXT[lang] || UI_TEXT.zh
   const source = normalizeSource(cell.source)
   const outputs = cell.outputs || []
   const outputHtml = outputs.map(renderOutput).join('')
   const outputLineCount = outputs.reduce((total, output) => total + countOutputLines(output), 0)
   const outputShouldPreview = outputLineCount > CODE_PREVIEW_LINES
-  const outputLineLabel = outputLineCount > 0 ? `${outputLineCount} 行` : ''
+  const outputLineLabel = outputLineCount > 0 ? `${outputLineCount} ${t.line}` : ''
   const outputToggleId = `output-expand-${index}`
   const outputBlock = outputHtml
     ? [
@@ -485,8 +551,8 @@ function renderCodeCell(cell, symbols, index) {
         outputShouldPreview
           ? [
               '<div class="output-expand-label">',
-              `<span class="output-expand-more">展开全部输出 ${outputLineLabel}</span>`,
-              '<span class="output-expand-less">收起输出</span>',
+              `<span class="output-expand-more">${t.expandOutput} ${outputLineLabel}</span>`,
+              `<span class="output-expand-less">${t.collapseOutput}</span>`,
               '</div>',
             ].join('')
           : '',
@@ -495,7 +561,7 @@ function renderCodeCell(cell, symbols, index) {
       ].join('')
     : ''
   const lineCount = source ? source.split(/\r?\n/).length : 0
-  const lineLabel = lineCount > 0 ? `${lineCount} 行` : '空代码块'
+  const lineLabel = lineCount > 0 ? `${lineCount} ${t.line}` : t.emptyCode
   const shouldPreview = lineCount > CODE_PREVIEW_LINES
   const toggleId = `code-expand-${index}`
 
@@ -503,7 +569,7 @@ function renderCodeCell(cell, symbols, index) {
     `<div class="code_cell${shouldPreview ? ' code_cell-expandable' : ''}">`,
     `<div class="input${shouldPreview ? ' code-input-expandable' : ''}">`,
     '<div class="code-header">',
-    '<span class="code-fold-title">代码</span>',
+    `<span class="code-fold-title">${t.code}</span>`,
     '<div class="code-header-actions">',
     `<span class="code-fold-meta">${lineLabel}</span>`,
     '<button class="code-copy-button" type="button" aria-label="Copy code" title="Copy code">',
@@ -537,8 +603,8 @@ function renderCodeCell(cell, symbols, index) {
   if (shouldPreview) {
     blocks.push(
       '<div class="code-expand-label">',
-      `<span class="code-expand-more">展开全部 ${lineLabel}</span>`,
-      '<span class="code-expand-less">收起代码</span>',
+      `<span class="code-expand-more">${t.expandCode} ${lineLabel}</span>`,
+      `<span class="code-expand-less">${t.collapseCode}</span>`,
       '</div>'
     )
   }
@@ -552,45 +618,49 @@ function renderCodeCell(cell, symbols, index) {
   return blocks.join('')
 }
 
-function renderNotebook(nb) {
+function renderNotebook(nb, lang = 'zh') {
   const symbols = collectNotebookSymbols(nb)
   return nb.cells
     .map((cell, index) => {
       if (cell.cell_type === 'markdown') return renderMarkdown(normalizeSource(cell.source))
-      if (cell.cell_type === 'code') return renderCodeCell(cell, symbols, index)
+      if (cell.cell_type === 'code') return renderCodeCell(cell, symbols, index, lang)
       return ''
     })
     .join('\n')
 }
 
-function parseNotebook(entry) {
+function parseNotebook(entry, lang = 'zh') {
+  const safeLang = normalizeLang(lang)
   const nb = JSON.parse(entry.raw)
   const part = PARTS.find(([dir]) => dir === entry.partDir)?.[1] || entry.partDir
-  const title = TITLE_MAP[entry.id] || entry.id
+  const title = TITLE_MAP[safeLang][entry.id] || entry.id
   return {
     id: entry.id,
     title,
     part,
     partDir: entry.partDir,
-    html: renderNotebook(nb),
+    html: renderNotebook(nb, safeLang),
   }
 }
 
-export function getCatalog() {
-  return NOTEBOOKS.map((entry) => {
+export function getCatalog(lang = 'zh') {
+  const safeLang = normalizeLang(lang)
+  return NOTEBOOKS_BY_LANG[safeLang].map((entry) => {
     const part = PARTS.find(([dir]) => dir === entry.partDir)?.[1] || entry.partDir
     return {
       id: entry.id,
-      title: TITLE_MAP[entry.id] || entry.id,
+      title: TITLE_MAP[safeLang][entry.id] || entry.id,
       part,
       partDir: entry.partDir,
+      lang: safeLang,
     }
   })
 }
 
-export function getNotebook(id) {
-  const entry = NOTEBOOKS.find(item => item.id === id)
-  return entry ? parseNotebook(entry) : null
+export function getNotebook(id, lang = 'zh') {
+  const safeLang = normalizeLang(lang)
+  const entry = NOTEBOOKS_BY_LANG[safeLang].find(item => item.id === id)
+  return entry ? parseNotebook(entry, safeLang) : null
 }
 
 if (import.meta.hot) {
