@@ -39,6 +39,10 @@ models work from the inside. It implements the core mechanisms behind modern LLM
 readable, inspectable steps: tokenization, embeddings, attention, Transformer blocks, training
 loops, alignment, inference acceleration, long context, multimodality, evaluation, and distillation.
 
+The repository ships with a full English notebook mirror under `notebooks-en/`. The web viewer
+supports language switching from the home page and the notebook sidebar, so both the curriculum
+and the browsing experience stay bilingual end to end.
+
 The project is designed as an **educational reference implementation**. It is not a model zoo, not
 a production serving framework, and not a wrapper around hosted APIs. Its purpose is to make the
 internal machinery of LLMs legible to engineers who want to reason from first principles.
@@ -273,13 +277,13 @@ The course connects implementation details to influential papers and production 
 
 ```text
 modern-llm-notebook/
-├── notebooks/
+├── notebooks/           # Chinese source notebooks
 │   ├── part1-foundation/
 │   ├── part2-training/
 │   ├── part3-inference/
 │   ├── part4-frontiers/
 │   └── part5-production/
-├── notebooks-en/
+├── notebooks-en/        # English mirror notebooks
 │   ├── part1-foundation/
 │   ├── part2-training/
 │   ├── part3-inference/

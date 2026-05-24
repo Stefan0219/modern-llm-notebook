@@ -38,6 +38,9 @@ Modern LLM Notebook 是一套以 Jupyter Notebook 为主线的现代大语言模
 内部的核心机制拆成可以阅读、可以运行、可以检查的小步骤：Tokenizer、Embedding、Attention、
 Transformer Block、训练循环、对齐、推理加速、长上下文、多模态、评测和蒸馏。
 
+仓库现在同时维护中文与英文两套 Notebook。英文版位于 `notebooks-en/`，覆盖完整 23 章；
+网页阅读器在首页和 Notebook 侧边栏都支持语言切换，课程目录、Notebook 内容和运行输出都按语言展示。
+
 这个项目的定位是**教学型参考实现**。它不是模型权重仓库，不是生产推理框架，也不是托管 API
 的封装。它的目标是帮助工程师真正看懂 LLM 内部发生了什么，并且能从第一性原理解释关键设计。
 
@@ -265,13 +268,13 @@ Modern LLM Notebook
 
 ```text
 modern-llm-notebook/
-├── notebooks/
+├── notebooks/           # 中文源 Notebook
 │   ├── part1-foundation/
 │   ├── part2-training/
 │   ├── part3-inference/
 │   ├── part4-frontiers/
 │   └── part5-production/
-├── notebooks-en/
+├── notebooks-en/        # 英文镜像 Notebook
 │   ├── part1-foundation/
 │   ├── part2-training/
 │   ├── part3-inference/

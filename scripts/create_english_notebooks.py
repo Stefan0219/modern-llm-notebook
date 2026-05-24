@@ -28,17 +28,10 @@ PHRASE_MAP = {
     "助手": "assistant",
     "用户": "user",
     "老师": "teacher",
-    "我": "I",
-    "你": "you",
-    "是": "is",
-    "有": "has",
     "喜欢": "like",
     "讨厌": "dislike",
-    "知道": "know",
     "不知道": "do not know",
     "可以": "can",
-    "好": "good",
-    "坏": "bad",
     "不错": "nice",
     "谢谢": "thanks",
     "再见": "goodbye",
@@ -113,7 +106,183 @@ SUBSTRING_MAP = [
     ("未安装", "Not installed"),
     ("跳过", "skip"),
     ("安装", "install"),
+    ("字符级 token", "Character-level token"),
+    ("词级 token", "Word-level token"),
+    ("子词级 token", "Subword token"),
+    ("文本", "Text"),
+    ("ID序列", "ID sequence"),
+    ("按字符切", "split by character"),
+    ("按空格切", "split by spaces"),
+    ("查表给编号", "look up IDs"),
+    ("查表", "lookup"),
+    ("统计相邻 pair", "count adjacent pairs"),
+    ("继续统计，继续合并", "keep counting and merging"),
+    ("继续统计", "keep counting"),
+    ("继续合并", "keep merging"),
+    ("合并", "merge"),
+    ("初始：每个字符一个 token", "Start: one token per character"),
+    ("新 token", "new token"),
+    ("出现很多次", "appears many times"),
+    ("不在词表中", "is not in the vocabulary"),
+    ("报错", "error"),
+    ("原文", "Original"),
+    ("解码回来", "Decoded back"),
+    ("关键观察", "Key observation"),
+    ("前情回顾", "Previous recap"),
+    ("本 Part 目标", "Goal for this part"),
+    ("本节目标", "Goal for this section"),
+    ("这一节", "In this section"),
+    ("这一 Part", "In this part"),
+    ("先看", "First look at"),
+    ("再看", "Then look at"),
+    ("先说清楚", "First, clarify"),
+    ("先建立直觉", "Build intuition first"),
+    ("先从", "Start from"),
+    ("先给一个", "Start with a"),
+    ("先跑", "First run"),
+    ("先用", "First use"),
+    ("为什么", "Why"),
+    ("怎么", "How"),
+    ("为什么会", "Why does it"),
+    ("你可以先把", "You can think of"),
+    ("你可以", "You can"),
+    ("你只需要", "You only need to"),
+    ("你只需", "You only need to"),
+    ("想成", "as"),
+    ("搞清楚", "figure out"),
+    ("发生了什么", "what happens"),
+    ("读文字前发生了什么", "what happens before reading text"),
+    ("把一句话切成了什么", "what a sentence is split into"),
+    ("手写字符级、词级和子词级 tokenizer", "hand-build character-level, word-level, and subword tokenizers"),
+    ("真实 tokenizer", "a real tokenizer"),
+    ("大模型不会直接读取字符串", "A large model does not read strings directly"),
+    ("大Model不会直接读取字符串", "A large model does not read strings directly"),
+    ("大模型读文字前发生了什么", "what happens before a large model reads text"),
+    ("大Model读文字前发生了什么", "what happens before a large model reads text"),
+    ("文本变成 token ID", "text becomes token IDs"),
+    ("也能把 ID 拼回文本", "and can turn IDs back into text"),
+    ("序列会很长", "the sequence becomes long"),
+    ("词表会爆炸", "the vocabulary explodes"),
+    ("遇到 OOV", "run into OOV"),
+    ("常见片段合起来", "common pieces merge together"),
+    ("少见词拆开", "rare words are split apart"),
+    ("下一节 BPE 的方向", "the direction of the next BPE section"),
+    ("人手动约定的控制符号", "hand-designed control symbols"),
+    ("表示序列开始", "marks the start of a sequence"),
+    ("表示序列结束", "marks the end of a sequence"),
+    ("表示这里是补齐出来的位置", "marks a padding position"),
+    ("这个字符都变成一个 token", "each character becomes one token"),
+    ("每个字符都是一个 token", "each character is one token"),
+    ("每个单词都是一个 token", "each word is one token"),
+    ("遇到新词怎么办", "what happens when you meet a new word"),
+    ("遇生词容易崩溃", "a new word can make the system break"),
+    ("这就是下一节 BPE 的方向", "that is the direction of the next BPE section"),
+    ("这就是折中", "that is the compromise"),
+    ("你会看到", "you will see"),
+    ("这里先用英文", "We start with English here"),
+    ("等你看懂原理", "once you understand the idea"),
+    ("不是另一个世界", "it is not a different world"),
+    ("模型不会直接读取字符串", "The model does not read raw strings directly"),
+    ("输入的文本，会先被 tokenizer 切成 token，再映射成 token ID", "The input text is first split into tokens and then mapped to token IDs"),
+    ("下面先跑一个真实 tokenizer，看模型入口到底长什么样", "Let's first run a real tokenizer and see what the model input looks like"),
+    ("这里先用英文，因为空格边界很明显，适合观察", "We start with English because spaces make the boundaries easy to observe"),
+    ("等你看懂原理，中文只是切分规则更麻烦，不是另一个世界", "Once you understand the idea, Chinese is only a harder segmentation rule, not a different world"),
+    ("字符级 Tokenizer 的想法最朴素", "The character-level tokenizer is the simplest idea"),
+    ("词级 Tokenizer 的想法是", "The word-level tokenizer idea is"),
+    ("BPE Tokenizer", "BPE Tokenizer"),
+    ("核心思想", "Core idea"),
+    ("直觉", "Intuition"),
+    ("手算验证", "Manual check"),
+    ("代码实现", "Code implementation"),
+    ("实验观察", "Experiment"),
+    ("小结", "Summary"),
+    ("学习地图", "Learning map"),
+    ("关键概念速查", "Quick reference"),
+    ("确认你已经懂了这些", "Make sure you understand these"),
+    ("确认你已经搞懂了这些", "Make sure you have understood these"),
+    ("这 3 题分成两类", "These 3 exercises fall into two groups"),
+    ("现代用法", "Modern usage"),
+    ("加上 special tokens", "Add special tokens"),
+    ("padding 和 attention mask", "padding and attention masks"),
+    ("核心必须记住", "The core thing to remember"),
+    ("问题", "Problem"),
+    ("答案", "Answer"),
+    ("优点", "Pros"),
+    ("缺点", "Cons"),
+    ("一句话解释", "One-line explanation"),
+    ("核心贡献", "Core contribution"),
+    ("效果", "Result"),
+    ("总结", "Summary"),
+    ("练习", "Exercises"),
+    ("挑战", "Challenge"),
+    ("关键观察", "Key observation"),
+    ("关键区别", "Key difference"),
+    ("关键问题", "Key problem"),
+    ("关键洞察", "Key insight"),
+    ("注意", "Note"),
+    ("其中", "Among them"),
+    ("我们会", "We will"),
+    ("我们先", "First, we"),
+    ("我们再", "Then we"),
+    ("我们来", "Let's"),
+    ("所以", "So"),
+    ("因此", "So"),
+    ("如果", "If"),
+    ("也就是说", "In other words"),
+    ("比如", "For example"),
+    ("例如", "For example"),
+    ("同时", "at the same time"),
+    ("最后", "Finally"),
+    ("然后", "Then"),
+    ("这里", "Here"),
+    ("这个例子里", "In this example"),
+    ("在这里", "Here"),
+    ("不要", "Do not"),
+    ("不要直接", "Do not directly"),
+    ("可以", "can"),
+    ("需要", "need"),
+    ("知道", "know"),
+    ("理解", "understand"),
+    ("训练", "training"),
+    ("推理", "inference"),
+    ("评测", "evaluation"),
+    ("数据", "data"),
+    ("模型", "model"),
+    ("输入", "input"),
+    ("输出", "output"),
+    ("词表", "vocabulary"),
+    ("token", "token"),
+    ("tokenizer", "tokenizer"),
+    ("loss", "loss"),
+    ("batch", "batch"),
+    ("概率", "probability"),
+    ("分布", "distribution"),
+    ("结果", "result"),
+    ("观察", "observe"),
+    ("说明", "note"),
+    ("完成", "complete"),
+    ("定义", "define"),
+    ("实现", "implement"),
+    ("测试", "test"),
 ]
+
+FULL_LINE_MAP = {
+    "其中：": "Among them:",
+    "输出": "Output",
+    "## 学习地图": "## Learning Map",
+    "## 小结": "## Summary",
+    "## 关键概念速查": "## Quick Reference",
+    "### 关键概念速查": "### Quick Reference",
+    "## VLM 支线小结": "## VLM Side Summary",
+    "## OPD 支线小结": "## OPD Side Summary",
+    "### 1. 先从一个超级简单的例子开始": "### 1. Start with a super simple example",
+    "### 2. 训练数据和标签：一次 forward 算出所有位置的 loss": "### 2. Training data and labels: compute loss for every position in one forward pass",
+    "### 3. Loss 怎么算？— Cross-Entropy Loss": "### 3. How do we compute loss? - Cross-Entropy Loss",
+    "### 4. 回答核心问题：是 Token 级别训练还是句子级别？": "### 4. Answer the core question: token-level training or sentence-level training?",
+    "### 5. 一个 batch 里面多句话的训练": "### 5. Training multiple sentences in one batch",
+    "### 6. 完整的训练循环": "### 6. The full training loop",
+    "### 1. 先从一个超级简单的例子开始。": "### 1. Start with a super simple example.",
+}
 
 LESSONS = {
     "01-tokenizer-basics": {
@@ -454,46 +623,56 @@ def english_string_for(original, index):
         return "Real tokenizer: GPT-2 byte-level BPE"
     if "未能加载" in original:
         return "Could not load tiktoken. Install tiktoken to run the real tokenizer demo."
+    if "词表大小" in original:
+        return "Vocabulary size: "
+    if "语料库共" in original:
+        return "Corpus size:"
+    if "总字符数" in original:
+        return "Total characters:"
+    if "总词数" in original:
+        return "Total words (split by spaces):"
+    if "token 数" in original:
+        return "Number of tokens: "
+    if "当前词表" in original:
+        return "Current vocabulary:"
+    if "尝试编码" in original:
+        return "Trying to encode:"
+    if "结果" in original:
+        return "Result:"
+    if "词表里有" in original:
+        return "in the vocabulary"
+    if "不在词表中" in original:
+        return "not in the vocabulary"
+    if "字符级 Tokenizer 训练完成" in original:
+        return "Character-level tokenizer training finished"
+    if "词级 Tokenizer 训练完成" in original:
+        return "Word-level tokenizer training finished"
+    if "编码/解码测试" in original:
+        return "Encode/decode test"
+    if "原文" in original:
+        return "Original text: "
+    if "解码回来" in original:
+        return "Decoded text: "
+    if "每个字符都变成一个 token，没有压缩" in original:
+        return "Each character becomes one token, so there is no compression."
+    if "而在现实世界" in original:
+        return "In the real world, you can never pre-load every possible word into the vocabulary."
+    if "结论" in original:
+        return "Conclusion"
     if "原因" in original:
         return "Reason"
     if "逐个 token" in original:
         return "Inspect each token:"
-    if "token 数" in original:
-        return "Number of tokens"
-    if "语料库共" in original:
-        return "Corpus size"
-    if "总字符数" in original:
-        return "Total characters"
-    if "总词数" in original:
-        return "Total words (split by spaces)"
-    if "训练完成" in original:
-        return "Tokenizer training finished"
-    if "编码/解码测试" in original:
-        return "Encode/decode test"
     if "OOV" in original:
         return "OOV (Out Of Vocabulary) demo"
-    if "当前词表" in original:
-        return "Current vocabulary"
-    if "尝试编码" in original:
-        return "Trying to encode"
-    if "不在词表" in original:
-        return "not in vocabulary"
-    if "词表里有" in original:
-        return "in vocabulary"
     if "关键观察" in original:
         return "Key observation: inspect the values above and connect them to the idea in this cell."
     if "解释" in original:
         return "Explanation: the printed values show the main mechanism in this step."
-    if "结论" in original:
-        return "Conclusion: this small example shows the main trade-off."
-    if "原文" in original:
-        return "Original text"
-    if "解码" in original:
-        return "Decoded text"
+    if "训练完成" in original:
+        return "Training finished"
     if "词表" in original:
         return "Vocabulary"
-    if "训练" in original:
-        return "Training"
     if "损失" in original or "loss" in text:
         return "Loss"
     if "通过" in original:
@@ -509,7 +688,7 @@ def replace_string_token(token_text, token_index):
 
 def translate_code(source):
     if not has_cjk(source):
-        return source
+        return patch_translated_code(source)
 
     reader = io.StringIO(source).readline
     try:
@@ -526,10 +705,13 @@ def translate_code(source):
         line_offsets.append(0)
 
     replacements = []
+    fstring_middle = getattr(tokenize, "FSTRING_MIDDLE", None)
     for index, tok in enumerate(tokens):
         tok_type, tok_text, start, end, line = tok
         if tok_type == tokenize.COMMENT and has_cjk(tok_text):
             replacement = "# Teaching note: follow this line to see the main step."
+        elif tok_type == fstring_middle and has_cjk(tok_text):
+            replacement = english_string_for(tok_text, index)
         elif tok_type == tokenize.STRING and has_cjk(tok_text):
             replacement = replace_string_token(tok_text, index)
         else:
@@ -543,6 +725,221 @@ def translate_code(source):
     for start_offset, end_offset, replacement in reversed(replacements):
         translated = translated[:start_offset] + replacement + translated[end_offset:]
     translated = translated.replace("✅", "[ok]").replace("❌", "[x]")
+    return patch_translated_code(translated)
+
+
+def patch_translated_code(source):
+    """Apply small compatibility fixes after code text translation."""
+    source = source.replace(
+        "official_ids = tokenizer.apply_chat_template(messages, tokenize=True)",
+        "\n".join([
+            "official_ids_raw = tokenizer.apply_chat_template(messages, tokenize=True)",
+            "official_ids = (",
+            '    official_ids_raw["input_ids"]',
+            '    if hasattr(official_ids_raw, "keys") and "input_ids" in official_ids_raw',
+            "    else official_ids_raw",
+            ")",
+        ]),
+    )
+    source = source.replace(
+        r"numbers = re.findall(r'[\d.]+', reasoning)",
+        r"numbers = re.findall(r'\d+(?:\.\d+)?', reasoning)",
+    )
+    source = source.replace(
+        "for idx in top3:\n    print(",
+        "for idx in top3:\n    idx = int(idx)\n    print(",
+    )
+    source = guard_large_qwen_demo(source)
+    return source
+
+
+def guard_large_qwen_demo(source):
+    """Keep the Qwen3-8B demo opt-in so static notebook execution stays offline."""
+    marker = 'QWEN3_MODEL = "Qwen/Qwen3-8B"'
+    if marker not in source or 'RUN_LARGE_MODEL_DEMOS' in source:
+        return source
+
+    start_marker = (
+        "# ----------------------------------------------------------\n"
+        "# Teaching note: follow this line to see the main step.\n"
+        "# ----------------------------------------------------------\n"
+        f"{marker}"
+    )
+    end_marker = (
+        "\n\n# ----------------------------------------------------------\n"
+        "# Teaching note: follow this line to see the main step.\n"
+        "# ----------------------------------------------------------\n"
+        "anthropic_key"
+    )
+    start = source.find(start_marker)
+    end = source.find(end_marker, start)
+    if start == -1 or end == -1:
+        return source
+
+    replacement = "\n".join([
+        "# ----------------------------------------------------------",
+        "# Teaching note: follow this line to see the main step.",
+        "# ----------------------------------------------------------",
+        'QWEN3_MODEL = "Qwen/Qwen3-8B"',
+        'run_large_model_demo = os.environ.get("RUN_LARGE_MODEL_DEMOS") == "1"',
+        "",
+        "if run_large_model_demo:",
+        "    try:",
+        "        from transformers import AutoModelForCausalLM, AutoTokenizer",
+        "        import torch",
+        "",
+        '        print("Loading the Qwen3 thinking demo model. This can take a long time.")',
+        "        tokenizer = AutoTokenizer.from_pretrained(QWEN3_MODEL)",
+        "        model = AutoModelForCausalLM.from_pretrained(",
+        "            QWEN3_MODEL,",
+        '            torch_dtype="auto",',
+        '            device_map="auto",',
+        "        )",
+        "",
+        '        messages = [{"role": "user", "content": "357 x 289 = ?"}]',
+        "        text_on = tokenizer.apply_chat_template(",
+        "            messages,",
+        "            tokenize=False,",
+        "            enable_thinking=True,",
+        "        )",
+        '        inputs = tokenizer(text_on, return_tensors="pt").to(model.device)',
+        "        with torch.no_grad():",
+        "            outputs = model.generate(**inputs, max_new_tokens=1024)",
+        "        result = tokenizer.decode(outputs[0], skip_special_tokens=False)",
+        '        print("Thinking enabled output preview:")',
+        "        print(result[:300])",
+        "",
+        "        text_off = tokenizer.apply_chat_template(",
+        "            messages,",
+        "            tokenize=False,",
+        "            enable_thinking=False,",
+        "        )",
+        '        inputs = tokenizer(text_off, return_tensors="pt").to(model.device)',
+        "        with torch.no_grad():",
+        "            outputs = model.generate(**inputs, max_new_tokens=512)",
+        "        result = tokenizer.decode(outputs[0], skip_special_tokens=False)",
+        '        print("Thinking disabled output preview:")',
+        "        print(result[:300])",
+        "",
+        "    except Exception as e:",
+        '        print("The local Qwen3 demo did not run in this environment.")',
+        '        print("Reason:", e)',
+        '        print("To try it manually, install transformers/torch/accelerate and rerun with:")',
+        '        print("  RUN_LARGE_MODEL_DEMOS=1")',
+        "else:",
+        '    print("Skipped the local Qwen3-8B demo during notebook execution.")',
+        '    print("Why: this cell may download and run an 8B model, which is too heavy for static builds.")',
+        '    print("To run it manually, set RUN_LARGE_MODEL_DEMOS=1 and execute this cell again.")',
+    ])
+    return source[:start] + replacement + source[end:]
+
+
+def translate_text_blob(text):
+    if not has_cjk(text):
+        return text
+
+    translated = text
+    for source, target in sorted(FULL_LINE_MAP.items(), key=lambda item: len(item[0]), reverse=True):
+        translated = translated.replace(source, target)
+    for source, target in sorted(PHRASE_MAP.items(), key=lambda item: len(item[0]), reverse=True):
+        translated = translated.replace(source, target)
+    for source, target in sorted(SUBSTRING_MAP, key=lambda item: len(item[0]), reverse=True):
+        translated = translated.replace(source, target)
+
+    translated = translated.replace("：", ": ")
+    translated = translated.replace("；", "; ")
+    translated = translated.replace("（", "(").replace("）", ")")
+    translated = translated.replace("【", "[").replace("】", "]")
+    translated = translated.replace("，", ", ")
+    translated = translated.replace("。", ". ")
+    translated = translated.replace("！", "! ")
+    translated = translated.replace("？", "? ")
+    translated = translated.replace("《", "\"").replace("》", "\"")
+    translated = re.sub(r"(?<=[A-Za-z0-9])(?=[\u4e00-\u9fff])", " ", translated)
+    translated = re.sub(r"(?<=[\u4e00-\u9fff])(?=[A-Za-z0-9])", " ", translated)
+    translated = re.sub(r"\s+", " ", translated).strip()
+    translated = re.sub(r"\s+([.,!?;:])", r"\1", translated)
+    translated = re.sub(r"\s+\)", ")", translated)
+    translated = re.sub(r"\(\s+", "(", translated)
+    if has_cjk(translated):
+        return english_string_for(translated, 0)
+    return translated
+
+
+def translate_markdown_line(line):
+    if not line.strip():
+        return line
+
+    if line.startswith("```"):
+        return line
+
+    if line.lstrip().startswith("|"):
+        cells = line.split("|")
+        translated_cells = [translate_text_blob(cell) for cell in cells]
+        return "|".join(translated_cells)
+
+    prefix_match = re.match(r"^(\s*(?:#{1,6}\s*|>\s*|[-*]\s+|\d+\.\s+))(.+)$", line)
+    if prefix_match:
+        prefix, body = prefix_match.groups()
+        return prefix + translate_text_blob(body)
+
+    return translate_text_blob(line)
+
+
+def translate_markdown(source):
+    if isinstance(source, list):
+        source = "".join(source)
+    if not has_cjk(source):
+        return source
+
+    lines = source.splitlines(keepends=True)
+    translated_lines = []
+    for line in lines:
+        translated_lines.append(translate_markdown_line(line))
+    return "".join(translated_lines)
+
+
+def translate_output_text(text):
+    if isinstance(text, list):
+        text = "".join(text)
+    if not has_cjk(text):
+        return text
+    return "".join(translate_markdown_line(line) for line in text.splitlines(keepends=True))
+
+
+def translate_output(output):
+    if output.get("output_type") == "stream" and "text" in output:
+        translated = dict(output)
+        translated["text"] = translate_output_text(output.get("text", ""))
+        return translated
+
+    if output.get("output_type") in {"execute_result", "display_data"}:
+        translated = dict(output)
+        data = dict(output.get("data", {}))
+        if "text/plain" in data:
+            data["text/plain"] = translate_output_text(data["text/plain"])
+        if "text/html" in data and has_cjk(data["text/html"]):
+            data["text/html"] = translate_output_text(data["text/html"])
+        translated["data"] = data
+        return translated
+
+    return output
+
+
+def translate_markdown_cell(cell):
+    translated = dict(cell)
+    source = cell.get("source", "")
+    if isinstance(source, list):
+        source = "".join(source)
+    translated["source"] = translate_markdown(source).splitlines(keepends=True)
+    return translated
+
+
+def translate_code_cell(cell):
+    translated = dict(cell)
+    source = "".join(cell.get("source", []))
+    translated["source"] = translate_code(source).splitlines(keepends=True)
+    translated["outputs"] = [translate_output(output) for output in cell.get("outputs", [])]
     return translated
 
 
@@ -550,24 +947,25 @@ def build_english_notebook(source_path):
     part_dir = source_path.parent.name
     stem = source_path.stem
     notebook = json.loads(source_path.read_text(encoding="utf-8"))
-
-    code_cells = []
+    translated_cells = []
+    first_markdown_replaced = False
     for cell in notebook["cells"]:
-        if cell.get("cell_type") != "code":
-            continue
-        source = "".join(cell.get("source", []))
-        cell = dict(cell)
-        cell["source"] = translate_code(source).splitlines(keepends=True)
-        cell["outputs"] = []
-        cell["execution_count"] = None
-        code_cells.append(cell)
-
-    intro_cell = {
-        "cell_type": "markdown",
-        "metadata": {},
-        "source": lesson_markdown(stem, part_dir).splitlines(keepends=True),
-    }
-    notebook["cells"] = [intro_cell, *code_cells]
+        if cell.get("cell_type") == "markdown":
+            if not first_markdown_replaced:
+                intro_cell = {
+                    "cell_type": "markdown",
+                    "metadata": cell.get("metadata", {}),
+                    "source": lesson_markdown(stem, part_dir).splitlines(keepends=True),
+                }
+                translated_cells.append(intro_cell)
+                first_markdown_replaced = True
+            else:
+                translated_cells.append(translate_markdown_cell(cell))
+        elif cell.get("cell_type") == "code":
+            translated_cells.append(translate_code_cell(cell))
+        else:
+            translated_cells.append(cell)
+    notebook["cells"] = translated_cells
     return notebook
 
 
