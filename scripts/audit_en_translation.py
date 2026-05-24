@@ -16,8 +16,10 @@ Usage:
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import re
+import tokenize
 from pathlib import Path
 
 
@@ -33,23 +35,52 @@ PLACEHOLDER_PATTERNS = [
 ]
 
 
-TRIPLE_STR_RE = re.compile(r"('''.*?'''|\"\"\".*?\"\"\")", re.S)
-COMMENT_RE = re.compile(r"#.*")
-# Rough string-literal matcher (good enough for parity checks; not a parser).
-STRING_RE = re.compile(r"(?P<prefix>r?f?b?)(?P<quote>'([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")")
-
-
 def _sha(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()[:16]
 
 
 def normalize_code(src: str) -> str:
-    s = src
-    s = TRIPLE_STR_RE.sub("''", s)
-    s = COMMENT_RE.sub("", s)
-    s = STRING_RE.sub("''", s)
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
+    """
+    Normalize code for cross-language equivalence checks.
+
+    We remove:
+    - comments
+    - string literals (including docstrings)
+
+    Important: do NOT use naive regex stripping for comments. Python code often
+    contains '#' inside string literals (e.g. hex colors '#e74c3c'), which a
+    regex would incorrectly treat as a comment marker. We use `tokenize` to
+    stay correct.
+    """
+    out_parts: list[str] = []
+    try:
+        tokens = tokenize.generate_tokens(io.StringIO(src).readline)
+    except Exception:
+        # If tokenization fails, fall back to whitespace-collapsed raw text.
+        return re.sub(r"\s+", " ", src).strip()
+
+    # Python 3.12+ tokenizes f-strings into multiple token types (PEP 701).
+    # We want to drop literal text portions but keep expression tokens.
+    fstring_types = []
+    for name in ("FSTRING_START", "FSTRING_MIDDLE", "FSTRING_END"):
+        t = getattr(tokenize, name, None)
+        if isinstance(t, int):
+            fstring_types.append(t)
+
+    drop_types = {tokenize.STRING, tokenize.COMMENT, *fstring_types}
+
+    for tok_type, tok_str, *_ in tokens:
+        if tok_type in drop_types:
+            continue
+        if tok_type in (tokenize.NL, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT):
+            out_parts.append(" ")
+            continue
+        if tok_type == tokenize.ENDMARKER:
+            continue
+        out_parts.append(tok_str)
+        out_parts.append(" ")
+
+    return re.sub(r"\s+", " ", "".join(out_parts)).strip()
 
 
 def cell_text(cell) -> str:
@@ -164,4 +195,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
