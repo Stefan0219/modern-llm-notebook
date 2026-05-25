@@ -197,7 +197,13 @@ python scripts/execute_notebooks_en_no_kernel.py
 | 质量检查 | 英文覆盖、语法、输出语言、网页构建 |
 | 下一步重点 | Colab 体验、练习体系、CI 执行 Notebook、截图展示、社区 issue |
 
-后续规划见 [ROADMAP.md](ROADMAP.md)。
+### 近期路线图
+
+- 给每个 Notebook 补上经过测试的 Colab 入口和首次运行说明。
+- 给重点章节加入 2-3 个带 `assert` 检查的小练习。
+- 补充截图和网页阅读器 demo，让项目更容易被转发。
+- 把 CI 从结构检查扩展到代表性 Notebook 的实际执行。
+- 整理适合新贡献者参与的 issue：Notebook 打磨、图示、双语完善。
 
 ## 课程路线
 

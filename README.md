@@ -206,7 +206,13 @@ python scripts/execute_notebooks_en_no_kernel.py
 | Quality checks | English coverage, syntax, output-language checks, and web build |
 | Next focus | Colab polish, exercises, CI notebook execution, more screenshots, and community issues |
 
-See [ROADMAP.md](ROADMAP.md) for the next milestones and good first contributions.
+### Near-Term Roadmap
+
+- Add tested Colab links and first-run notes to every notebook.
+- Add 2-3 small exercises with `assert` checks to major chapters.
+- Add screenshots and a short web-reader demo to make the project easier to share.
+- Expand CI from structure checks to representative notebook execution.
+- Open beginner-friendly issues for notebook polish, diagrams, and bilingual improvements.
 
 ## Curriculum
 
