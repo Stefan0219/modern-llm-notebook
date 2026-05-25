@@ -1,18 +1,25 @@
 # Modern LLM Notebook
 
 <p align="center">
-  <strong>用 Notebook 从零实现现代 LLM 系统核心组件的教学型参考项目。</strong>
+  <strong>用 23 篇可运行 Jupyter Notebook，从零实现现代 LLM 系统。</strong>
 </p>
 
 <p align="center">
   <a href="README.md"><strong>English</strong></a>
   ·
   <a href="README-CN.md"><strong>中文文档</strong></a>
+  ·
+  <a href="https://walkinglabs.github.io/modern-llm-notebook/"><strong>在线阅读</strong></a>
+  ·
+  <a href="https://colab.research.google.com/github/walkinglabs/modern-llm-notebook/blob/main/notebooks/part1-foundation/01-tokenizer-basics.ipynb"><strong>Colab 开始</strong></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/walkinglabs/modern-llm-notebook/stargazers">
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/walkinglabs/modern-llm-notebook?style=social">
+  </a>
+  <a href="https://github.com/walkinglabs/modern-llm-notebook/actions/workflows/quality.yml">
+    <img alt="Quality checks" src="https://github.com/walkinglabs/modern-llm-notebook/actions/workflows/quality.yml/badge.svg">
   </a>
   <a href="https://github.com/walkinglabs/modern-llm-notebook/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue">
@@ -20,13 +27,16 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.9%2B-3776AB">
   <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C">
   <img alt="Notebooks" src="https://img.shields.io/badge/Notebooks-23-orange">
+  <img alt="Languages" src="https://img.shields.io/badge/Languages-English%20%7C%20Chinese-2ea44f">
 </p>
 
 <p align="center">
   <a href="#项目概览">项目概览</a> ·
+  <a href="#你会亲手做出什么">你会做出什么</a> ·
   <a href="#为什么做这个项目">为什么做这个项目</a> ·
   <a href="#包含什么">包含什么</a> ·
   <a href="#快速开始">快速开始</a> ·
+  <a href="#项目状态">项目状态</a> ·
   <a href="#课程路线">课程路线</a> ·
   <a href="#质量标准">质量标准</a> ·
   <a href="#贡献">贡献</a>
@@ -36,9 +46,9 @@
 
 ## 项目概览
 
-Modern LLM Notebook 是一套以 Jupyter Notebook 为主线的现代大语言模型课程。它把 LLM
-内部的核心机制拆成可以阅读、可以运行、可以检查的小步骤：Tokenizer、Embedding、Attention、
-Transformer Block、训练循环、对齐、推理加速、长上下文、多模态、评测和蒸馏。
+Modern LLM Notebook 是一套以 Jupyter Notebook 为主线的现代大语言模型课程。它不是把模型当成
+黑盒调用，而是用 PyTorch 亲手实现核心组件：Tokenizer、Embedding、Attention、Transformer Block、
+训练循环、MoE、LoRA、RLHF、解码、KV Cache、长上下文、VLM、评测、蒸馏和 On-Policy Distillation。
 
 仓库现在同时维护中文与英文两套 Notebook。英文版位于 `notebooks-en/`，覆盖完整 23 章；
 网页阅读器在首页和 Notebook 侧边栏都支持语言切换（也可以在 URL 里用 `?lang=en`），课程目录、Notebook 内容和运行输出都按语言展示。
@@ -54,6 +64,26 @@ Transformer Block、训练循环、对齐、推理加速、长上下文、多模
 
 这个契约很重要。读者不应该只知道“BPE 会合并高频字符对”或“KV Cache 会加速生成”，而应该能
 追踪中间数字，写出最小代码，并解释为什么会出现这种行为。
+
+## 你会亲手做出什么
+
+学完整条路线后，你会拥有一套“小而全”的现代 LLM 系统实现：
+
+| 阶段 | 你会实现 | 为什么重要 |
+|:---|:---|:---|
+| 文本到 token | 字符级、词级、BPE Tokenizer | 看清原始文本如何进入模型 |
+| token 到向量 | Token Embedding、Position Encoding | 理解模型到底在计算什么 |
+| Transformer 核心 | Self-Attention、Multi-Head Attention、Transformer Block、Mini-GPT | 亲手还原核心 forward pass |
+| 训练系统 | Cross-Entropy、batch、梯度流动、Scaling Laws 直觉 | 把 loss 曲线和模型行为连接起来 |
+| 适配与对齐 | LoRA、CPT、Reward Model、PPO/DPO 风格目标 | 理解 base model 如何变成 assistant |
+| 推理系统 | Sampling、Beam Search、KV Cache、Speculative Decoding | 明白为什么推理是系统工程问题 |
+| 前沿方向 | 长上下文、CoT 实验、VLM patch embedding 和 cross-attention | 把新论文拆成可运行的小实验 |
+| 生产闭环 | 评测、胜率矩阵、蒸馏、OPD | 学会衡量、压缩和改进模型行为 |
+
+```text
+raw text -> tokens -> embeddings -> attention -> Transformer -> Mini-GPT
+         -> training -> alignment -> inference -> evaluation -> distillation
+```
 
 ## 为什么做这个项目
 
@@ -155,6 +185,19 @@ code cells，并把输出写回到英文版 notebook 文件：
 ```bash
 python scripts/execute_notebooks_en_no_kernel.py
 ```
+
+## 项目状态
+
+| 模块 | 状态 |
+|:---|:---|
+| 中文 Notebook | 23/23 完整覆盖 |
+| 英文 Notebook | 23/23 完整覆盖，并已写入运行输出 |
+| 网页阅读器 | React / Vite，支持首页和侧边栏语言切换 |
+| 静态站点 | 通过 GitHub Pages 发布 |
+| 质量检查 | 英文覆盖、语法、输出语言、网页构建 |
+| 下一步重点 | Colab 体验、练习体系、CI 执行 Notebook、截图展示、社区 issue |
+
+后续规划见 [ROADMAP.md](ROADMAP.md)。
 
 ## 课程路线
 

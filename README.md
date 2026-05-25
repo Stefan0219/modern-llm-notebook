@@ -1,18 +1,25 @@
 # Modern LLM Notebook
 
 <p align="center">
-  <strong>An educational reference implementation of modern LLM systems, taught through notebooks.</strong>
+  <strong>Build modern LLMs from scratch through 23 runnable Jupyter Notebooks.</strong>
 </p>
 
 <p align="center">
   <a href="README.md"><strong>English</strong></a>
   ·
   <a href="README-CN.md"><strong>中文文档</strong></a>
+  ·
+  <a href="https://walkinglabs.github.io/modern-llm-notebook/"><strong>Read Online</strong></a>
+  ·
+  <a href="https://colab.research.google.com/github/walkinglabs/modern-llm-notebook/blob/main/notebooks-en/part1-foundation/01-tokenizer-basics.ipynb"><strong>Start in Colab</strong></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/walkinglabs/modern-llm-notebook/stargazers">
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/walkinglabs/modern-llm-notebook?style=social">
+  </a>
+  <a href="https://github.com/walkinglabs/modern-llm-notebook/actions/workflows/quality.yml">
+    <img alt="Quality checks" src="https://github.com/walkinglabs/modern-llm-notebook/actions/workflows/quality.yml/badge.svg">
   </a>
   <a href="https://github.com/walkinglabs/modern-llm-notebook/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue">
@@ -20,13 +27,16 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.9%2B-3776AB">
   <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C">
   <img alt="Notebooks" src="https://img.shields.io/badge/Notebooks-23-orange">
+  <img alt="Languages" src="https://img.shields.io/badge/Languages-English%20%7C%20Chinese-2ea44f">
 </p>
 
 <p align="center">
   <a href="#overview">Overview</a> ·
+  <a href="#what-you-will-build">What You Will Build</a> ·
   <a href="#why-this-project">Why</a> ·
   <a href="#what-is-included">What Is Included</a> ·
   <a href="#quick-start">Quick Start</a> ·
+  <a href="#project-status">Status</a> ·
   <a href="#curriculum">Curriculum</a> ·
   <a href="#quality-bar">Quality Bar</a> ·
   <a href="#contributing">Contributing</a>
@@ -36,10 +46,10 @@
 
 ## Overview
 
-Modern LLM Notebook is a structured, notebook-first curriculum for understanding how large language
-models work from the inside. It implements the core mechanisms behind modern LLMs in small,
-readable, inspectable steps: tokenization, embeddings, attention, Transformer blocks, training
-loops, alignment, inference acceleration, long context, multimodality, evaluation, and distillation.
+Modern LLM Notebook is a hands-on course for building modern LLM systems from the ground up in
+PyTorch. Instead of treating the model as a black box, you implement the core pieces yourself:
+tokenizers, embeddings, attention, Transformer blocks, training loops, MoE, LoRA, RLHF, decoding,
+KV Cache, long context, VLMs, evaluation, distillation, and on-policy distillation.
 
 The repository ships with a full English notebook mirror under `notebooks-en/`. The web viewer
 supports language switching from the home page and the notebook sidebar (or via `?lang=en` in the
@@ -58,6 +68,26 @@ intuition -> hand calculation -> implementation -> experiment
 That contract matters. A reader should not only know that BPE merges frequent pairs, or that KV
 Cache speeds up generation. They should be able to trace the numbers, write the minimal code, and
 explain why the behavior appears.
+
+## What You Will Build
+
+By the end, you will have implemented a compact version of the systems that power modern LLMs:
+
+| Stage | You build | Why it matters |
+|:---|:---|:---|
+| Text to tokens | Character, word, and BPE tokenizers | See exactly how raw text becomes model input |
+| Tokens to vectors | Token embeddings and position encodings | Understand what the model can compute over |
+| Transformer core | Self-Attention, Multi-Head Attention, Transformer blocks, Mini-GPT | Reconstruct the core forward pass |
+| Training system | Cross-Entropy, batching, gradient flow, scaling-law intuition | Connect loss curves to real model behavior |
+| Adaptation | LoRA, continued pretraining, reward modeling, PPO/DPO style objectives | Learn how base models become useful assistants |
+| Inference system | Sampling, beam search, KV Cache, speculative decoding | Understand why serving is a systems problem |
+| Frontiers | Long context, CoT experiments, VLM patch embeddings and cross-attention | Turn newer papers into small runnable examples |
+| Production loop | Evaluation, win-rate matrices, distillation, OPD | Measure, compress, and improve model behavior |
+
+```text
+raw text -> tokens -> embeddings -> attention -> Transformer -> Mini-GPT
+         -> training -> alignment -> inference -> evaluation -> distillation
+```
 
 ## Why This Project
 
@@ -164,6 +194,19 @@ notebooks:
 ```bash
 python scripts/execute_notebooks_en_no_kernel.py
 ```
+
+## Project Status
+
+| Area | Status |
+|:---|:---|
+| Chinese notebooks | Complete 23/23 |
+| English notebooks | Complete 23/23 with executed outputs |
+| Web reader | React / Vite app with language switching |
+| Static site | Published through GitHub Pages |
+| Quality checks | English coverage, syntax, output-language checks, and web build |
+| Next focus | Colab polish, exercises, CI notebook execution, more screenshots, and community issues |
+
+See [ROADMAP.md](ROADMAP.md) for the next milestones and good first contributions.
 
 ## Curriculum
 

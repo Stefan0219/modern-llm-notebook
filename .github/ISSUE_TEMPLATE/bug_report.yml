@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a broken notebook cell, incorrect output, or web reader bug.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is broken?
+      description: Describe the issue and what you expected to happen.
+    validations:
+      required: true
+  - type: input
+    id: notebook
+    attributes:
+      label: Notebook or page
+      description: Example: notebooks-en/part1-foundation/01-tokenizer-basics.ipynb
+    validations:
+      required: false
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include commands, cells, or browser steps.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, browser, CPU/GPU, and dependency versions if relevant.
+    validations:
+      required: false
+
