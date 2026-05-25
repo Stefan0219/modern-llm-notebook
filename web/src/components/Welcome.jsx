@@ -21,16 +21,16 @@ const PATH_STEP_STYLES = [
 ]
 
 const NOTEBOOK_BG = {
-  'nb-1': 'from-[#dbeafe] to-[#bfdbfe]',     // Tokenizer — classic blue
-  'nb-2': 'from-[#c7d2fe] to-[#e0e7ff]',     // Attention — blue-indigo blend
-  'nb-3': 'from-[#ddd6fe] to-[#ede9fe]',     // MoE — purple-lavender
-  'nb-4': 'from-[#e9d5ff] to-[#f3e8ff]',     // Training — violet-light purple
-  'nb-5': 'from-[#bfdbfe] to-[#93c5fd]',     // Mini-GPT — bolder blue
-  'nb-6': 'from-[#f5d0fe] to-[#f0abfc]',     // LoRA — pink-purple
-  'nb-7': 'from-[#a7f3d0] to-[#6ee7b7]',     // Generation — vivid emerald
-  'nb-8': 'from-[#fde68a] to-[#fcd34d]',     // CoT — warm amber
-  'nb-9': 'from-[#c4b5fd] to-[#a78bfa]',     // RLHF — deeper purple
-  'nb-10': 'from-[#fecdd3] to-[#fda4af]',    // Distillation — soft rose
+  'nb-1': 'from-[#eff6ff] to-[#dbeafe]',     // Tokenizer — soft blue gradient
+  'nb-2': 'from-[#eef2ff] to-[#c7d2fe]',     // Attention — indigo-blue
+  'nb-3': 'from-[#f5f3ff] to-[#ddd6fe]',     // MoE — lavender
+  'nb-4': 'from-[#faf5ff] to-[#e9d5ff]',     // Training — violet
+  'nb-5': 'from-[#dbeafe] to-[#93c5fd]',     // Mini-GPT — vivid blue
+  'nb-6': 'from-[#fdf4ff] to-[#f0abfc]',     // LoRA — fuchsia
+  'nb-7': 'from-[#ecfdf5] to-[#6ee7b7]',     // Generation — vivid emerald
+  'nb-8': 'from-[#fffbeb] to-[#fcd34d]',     // CoT — golden amber
+  'nb-9': 'from-[#ede9fe] to-[#a78bfa]',     // RLHF — deep purple
+  'nb-10': 'from-[#fff1f2] to-[#fda4af]',    // Distillation — rose
 }
 
 const NOTEBOOK_SVGS = {
@@ -402,7 +402,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
         </section>
 
         {/* FEATURES STRIP */}
-        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 bg-white rounded-2xl border border-black/10 shadow-sm p-3 sm:p-4 gap-3 sm:gap-4 lg:divide-x divide-slate-100/80">
+        <section data-tour="features" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 bg-white rounded-2xl border border-black/10 shadow-sm p-3 sm:p-4 gap-3 sm:gap-4 lg:divide-x divide-slate-100/80">
           {[
             { icon: <Monitor className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, bg: 'bg-[#ebf3ff] text-blue-600 border-blue-100/30', title: t.feature1, desc: t.feature1d },
             { icon: <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5]" />, bg: 'bg-[#ecfdf5] text-emerald-600 border-emerald-100/30', title: t.feature2, desc: t.feature2d },
@@ -460,7 +460,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
         </section>
 
         {/* RUNNABLE NOTEBOOKS */}
-        <section className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 md:p-6 space-y-4">
+        <section data-tour="notebooks" className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 md:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h2 className="text-[18px] md:text-[20px] font-bold text-slate-800">{t.runnableNotebooksTitle}</h2>
