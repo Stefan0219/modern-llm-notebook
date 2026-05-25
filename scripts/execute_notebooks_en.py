@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import traceback
 from pathlib import Path
 
 import nbformat
@@ -109,6 +110,8 @@ def main(argv: list[str]) -> int:
         except Exception as exc:
             print(f"\nFAILED: {rel}")
             print(f"{type(exc).__name__}: {exc}")
+            print("\nTraceback:")
+            print(traceback.format_exc())
             return 1
 
     print(f"\nDone. Executed {len(paths)} notebooks in-place.")

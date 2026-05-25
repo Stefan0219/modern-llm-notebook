@@ -39,7 +39,7 @@ Modern LLM Notebook 是一套以 Jupyter Notebook 为主线的现代大语言模
 Transformer Block、训练循环、对齐、推理加速、长上下文、多模态、评测和蒸馏。
 
 仓库现在同时维护中文与英文两套 Notebook。英文版位于 `notebooks-en/`，覆盖完整 23 章；
-网页阅读器在首页和 Notebook 侧边栏都支持语言切换，课程目录、Notebook 内容和运行输出都按语言展示。
+网页阅读器在首页和 Notebook 侧边栏都支持语言切换（也可以在 URL 里用 `?lang=en`），课程目录、Notebook 内容和运行输出都按语言展示。
 
 这个项目的定位是**教学型参考实现**。它不是模型权重仓库，不是生产推理框架，也不是托管 API
 的封装。它的目标是帮助工程师真正看懂 LLM 内部发生了什么，并且能从第一性原理解释关键设计。
@@ -108,6 +108,11 @@ pip install -r requirements.txt
 jupyter notebook notebooks/part1-foundation/01-tokenizer-basics.ipynb
 ```
 
+语言说明：
+
+- 中文版 Notebook：`notebooks/`
+- 英文版 Notebook：`notebooks-en/`（23/23 全量覆盖）
+
 推荐环境：
 
 - Python 3.9+
@@ -137,6 +142,16 @@ npm run preview
 
 ```bash
 npm run convert
+```
+
+### 在受限环境中批量执行 Notebook（英文版）
+
+有些沙箱/CI 环境会禁止打开本地 socket，这会导致标准的 Jupyter kernel 协议（以及 `nbclient`、
+`nbconvert --execute`）执行失败。为这种场景仓库提供了一个“无 kernel 执行器”，用纯 Python 顺序执行
+code cells，并把输出写回到英文版 notebook 文件：
+
+```bash
+python scripts/execute_notebooks_en_no_kernel.py
 ```
 
 ## 课程路线

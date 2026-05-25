@@ -69,16 +69,21 @@ def normalize_code(src: str) -> str:
 
     drop_types = {tokenize.STRING, tokenize.COMMENT, *fstring_types}
 
-    for tok_type, tok_str, *_ in tokens:
-        if tok_type in drop_types:
-            continue
-        if tok_type in (tokenize.NL, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT):
+    try:
+        for tok_type, tok_str, *_ in tokens:
+            if tok_type in drop_types:
+                continue
+            if tok_type in (tokenize.NL, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT):
+                out_parts.append(" ")
+                continue
+            if tok_type == tokenize.ENDMARKER:
+                continue
+            out_parts.append(tok_str)
             out_parts.append(" ")
-            continue
-        if tok_type == tokenize.ENDMARKER:
-            continue
-        out_parts.append(tok_str)
-        out_parts.append(" ")
+    except tokenize.TokenError:
+        # Some teaching cells intentionally contain incomplete code / placeholders.
+        # Fall back to a whitespace-collapsed raw string so the audit can continue.
+        return re.sub(r"\s+", " ", src).strip()
 
     return re.sub(r"\s+", " ", "".join(out_parts)).strip()
 

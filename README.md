@@ -40,8 +40,8 @@ readable, inspectable steps: tokenization, embeddings, attention, Transformer bl
 loops, alignment, inference acceleration, long context, multimodality, evaluation, and distillation.
 
 The repository ships with a full English notebook mirror under `notebooks-en/`. The web viewer
-supports language switching from the home page and the notebook sidebar, so both the curriculum
-and the browsing experience stay bilingual end to end.
+supports language switching from the home page and the notebook sidebar (or via `?lang=en` in the
+URL), so both the curriculum and the browsing experience stay bilingual end to end.
 
 The project is designed as an **educational reference implementation**. It is not a model zoo, not
 a production serving framework, and not a wrapper around hosted APIs. Its purpose is to make the
@@ -116,6 +116,11 @@ pip install -r requirements.txt
 jupyter notebook notebooks-en/part1-foundation/01-tokenizer-basics.ipynb
 ```
 
+Language note:
+
+- Chinese notebooks live in `notebooks/`
+- English notebooks live in `notebooks-en/` (complete 23/23 translation coverage)
+
 Recommended environment:
 
 - Python 3.9+
@@ -145,6 +150,17 @@ Convert notebooks only:
 
 ```bash
 npm run convert
+```
+
+### Executing notebooks in restricted environments
+
+Some sandboxed environments disallow opening local sockets, which breaks the standard Jupyter
+kernel protocol (and tools like `nbclient` / `nbconvert --execute`). For those cases we ship a
+no-kernel executor that runs code cells via plain Python and writes outputs back into the English
+notebooks:
+
+```bash
+python scripts/execute_notebooks_en_no_kernel.py
 ```
 
 ## Curriculum
@@ -289,6 +305,8 @@ modern-llm-notebook/
 │   ├── part3-inference/
 │   ├── part4-frontiers/
 │   └── part5-production/
+├── external/            # Upstream references (e.g. karpathy nanoGPT/minGPT)
+├── karpathy_models.py   # Thin import wrapper used by a few notebooks
 ├── web/                 # React / Vite web viewer
 ├── docs/                # Static site build output
 ├── scripts/             # Notebook conversion scripts

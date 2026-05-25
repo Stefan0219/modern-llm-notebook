@@ -25,6 +25,10 @@ Thumbs.db
 # Jupyter
 .jupyter/
 
+## Sandbox / agent caches (keep repo clean)
+.xdg_cache/
+.xdg_data/
+
 /.quarto/
 **/*.quarto_ipynb
 
