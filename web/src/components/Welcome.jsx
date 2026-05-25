@@ -21,16 +21,16 @@ const PATH_STEP_STYLES = [
 ]
 
 const NOTEBOOK_BG = {
-  'nb-1': 'from-[#eff6ff] to-[#dbeafe]',     // Tokenizer — soft blue gradient
-  'nb-2': 'from-[#eef2ff] to-[#c7d2fe]',     // Attention — indigo-blue
-  'nb-3': 'from-[#f5f3ff] to-[#ddd6fe]',     // MoE — lavender
-  'nb-4': 'from-[#faf5ff] to-[#e9d5ff]',     // Training — violet
-  'nb-5': 'from-[#dbeafe] to-[#93c5fd]',     // Mini-GPT — vivid blue
-  'nb-6': 'from-[#fdf4ff] to-[#f0abfc]',     // LoRA — fuchsia
-  'nb-7': 'from-[#ecfdf5] to-[#6ee7b7]',     // Generation — vivid emerald
-  'nb-8': 'from-[#fffbeb] to-[#fcd34d]',     // CoT — golden amber
-  'nb-9': 'from-[#ede9fe] to-[#a78bfa]',     // RLHF — deep purple
-  'nb-10': 'from-[#fff1f2] to-[#fda4af]',    // Distillation — rose
+  'nb-1': 'bg-[#dbeafe]',     // Tokenizer — blue
+  'nb-2': 'bg-[#c7d2fe]',     // Attention — indigo-blue
+  'nb-3': 'bg-[#ddd6fe]',     // MoE — lavender
+  'nb-4': 'bg-[#e9d5ff]',     // Training — violet
+  'nb-5': 'bg-[#93c5fd]',     // Mini-GPT — sky blue
+  'nb-6': 'bg-[#f0abfc]',     // LoRA — fuchsia
+  'nb-7': 'bg-[#6ee7b7]',     // Generation — emerald
+  'nb-8': 'bg-[#fcd34d]',     // CoT — amber
+  'nb-9': 'bg-[#a78bfa]',     // RLHF — purple
+  'nb-10': 'bg-[#fda4af]',    // Distillation — rose
 }
 
 const NOTEBOOK_SVGS = {
@@ -477,7 +477,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                   onClick={() => onSelect(nb.lessonId)}
                   className="shrink-0 w-[180px] sm:w-[200px] border border-black/10 rounded-[10px] overflow-hidden cursor-pointer transition-all duration-200 bg-white relative hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 group flex flex-col snap-start"
                 >
-                  <div className={`h-[90px] flex items-center justify-center relative overflow-hidden bg-gradient-to-br ${NOTEBOOK_BG[nb.id] || style.bg}`}>
+                  <div className={`h-[90px] flex items-center justify-center relative overflow-hidden ${NOTEBOOK_BG[nb.id] || 'bg-gradient-to-br ' + style.bg}`}>
                     {NOTEBOOK_SVGS[nb.id] || NOTEBOOK_SVGS['nb-1']}
                   </div>
                   <div className="p-3 bg-white flex-1 flex flex-col justify-between">
