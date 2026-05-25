@@ -195,15 +195,14 @@ python scripts/execute_notebooks_en_no_kernel.py
 | 网页阅读器 | React / Vite，支持首页和侧边栏语言切换 |
 | 静态站点 | 通过 GitHub Pages 发布 |
 | 质量检查 | 英文覆盖、语法、输出语言、网页构建 |
-| 下一步重点 | Colab 体验、练习体系、CI 执行 Notebook、截图展示、社区 issue |
+| 下一步重点 | 结合 CS336/CME295 深化内容、润色讲解、补齐可复现预训练流程、完善 eval benchmark |
 
 ### 近期路线图
 
-- 给每个 Notebook 补上经过测试的 Colab 入口和首次运行说明。
-- 给重点章节加入 2-3 个带 `assert` 检查的小练习。
-- 补充截图和网页阅读器 demo，让项目更容易被转发。
-- 把 CI 从结构检查扩展到代表性 Notebook 的实际执行。
-- 整理适合新贡献者参与的 issue：Notebook 打磨、图示、双语完善。
+1. 结合 CS336 和 CME295 补充内容，尤其是数据、训练、系统和评测部分。
+2. 润色现有 Notebook 的内容流畅度，让讲解从直觉、手算到代码更自然。
+3. 参考 SmolLM 的预训练过程，补一条从 0 到 1 可复现的小模型预训练流程。
+4. 完善 eval benchmark 的细致程度，包括 benchmark 设计、指标、judge prompt、结果聚合和失败案例分析。
 
 ## 课程路线
 

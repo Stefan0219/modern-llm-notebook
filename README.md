@@ -204,15 +204,14 @@ python scripts/execute_notebooks_en_no_kernel.py
 | Web reader | React / Vite app with language switching |
 | Static site | Published through GitHub Pages |
 | Quality checks | English coverage, syntax, output-language checks, and web build |
-| Next focus | Colab polish, exercises, CI notebook execution, more screenshots, and community issues |
+| Next focus | CS336/CME295-inspired depth, smoother writing, reproducible pretraining, and stronger eval benchmarks |
 
 ### Near-Term Roadmap
 
-- Add tested Colab links and first-run notes to every notebook.
-- Add 2-3 small exercises with `assert` checks to major chapters.
-- Add screenshots and a short web-reader demo to make the project easier to share.
-- Expand CI from structure checks to representative notebook execution.
-- Open beginner-friendly issues for notebook polish, diagrams, and bilingual improvements.
+1. Incorporate more material inspired by CS336 and CME295, especially around data, training, systems, and evaluation.
+2. Polish the flow of the existing notebooks so the explanations read more naturally from intuition to code.
+3. Add a reproducible 0-to-1 pretraining workflow inspired by SmolLM, from data preparation to a small trained model.
+4. Make the eval benchmark chapter more detailed, including benchmark design, metrics, judge prompts, result aggregation, and failure analysis.
 
 ## Curriculum
 
