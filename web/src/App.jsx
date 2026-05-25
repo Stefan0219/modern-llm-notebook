@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { flushSync } from 'react-dom'
+import { Menu } from 'lucide-react'
 import Sidebar from './components/Sidebar.jsx'
 import NotebookViewer from './components/NotebookViewer.jsx'
 import Welcome from './components/Welcome.jsx'
@@ -77,11 +78,10 @@ function App() {
   const [catalog, setCatalog] = useState(() => getCatalog(lang))
   const [currentId, setCurrentId] = useState(() => getInitialNotebookId())
   const [loading] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [tourActive, setTourActive] = useState(false)
   const [tourStepIndex, setTourStepIndex] = useState(0)
 
-  // Refresh catalog when Vite hot-updates notebook modules.
   useEffect(() => {
     setCatalog(getCatalog(lang))
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN'
@@ -145,17 +145,17 @@ function App() {
       {
         target: '[data-tour-part="foundation"]',
         title: '第一大章：Foundation',
-        body: '这一章解决“模型怎么读懂文本”。你会从 Tokenizer、Embedding、位置编码一路搭到 Mini-GPT。产出是：能自己手写一个最小 GPT 骨架。',
+        body: '这一章解决"模型怎么读懂文本"。你会从 Tokenizer、Embedding、位置编码一路搭到 Mini-GPT。产出是：能自己手写一个最小 GPT 骨架。',
       },
       {
         target: '[data-tour-part="training"]',
         title: '第二大章：Training Systems',
-        body: '这一章解决“模型怎么被训练出来”。内容包括架构改进、MoE、BERT、Loss、Scaling Laws、数据工程、LoRA、RLHF。产出是：能看懂训练系统的关键组件和取舍。',
+        body: '这一章解决"模型怎么被训练出来"。内容包括架构改进、MoE、BERT、Loss、Scaling Laws、数据工程、LoRA、RLHF。产出是：能看懂训练系统的关键组件和取舍。',
       },
       {
         target: '[data-tour-part="inference"]',
         title: '第三大章：Inference',
-        body: '这一章解决“模型怎么生成答案并跑得更快”。内容包括生成策略、推理加速、投机解码。产出是：能自己实现基础解码，并理解 KV Cache、加速和吞吐约束。',
+        body: '这一章解决"模型怎么生成答案并跑得更快"。内容包括生成策略、推理加速、投机解码。产出是：能自己实现基础解码，并理解 KV Cache、加速和吞吐约束。',
       },
       {
         target: '[data-tour-part="frontiers"]',
@@ -165,7 +165,7 @@ function App() {
       {
         target: '[data-tour-part="production"]',
         title: '第五大章：Evaluation & Deployment',
-        body: '这一章解决“模型怎么可靠交付”。内容包括模型评测、知识蒸馏、On-Policy Distillation。产出是：能设计基础评测流程，并理解压缩和部署判断。',
+        body: '这一章解决"模型怎么可靠交付"。内容包括模型评测、知识蒸馏、On-Policy Distillation。产出是：能设计基础评测流程，并理解压缩和部署判断。',
       },
       {
         target: '.parts',
@@ -181,7 +181,7 @@ function App() {
       },
       {
         target: '.toc',
-        title: '按“直觉→手算→代码→观察”读',
+        title: '按"直觉→手算→代码→观察"读',
         body: '右侧大纲对应每个学习环节。推荐顺序是先看直觉，再看具体数字怎么手算，然后运行代码，最后读输出里的关键观察。',
       },
       {
@@ -298,18 +298,23 @@ function App() {
   }, [])
 
   return (
-    <div className="app">
+    <div className="min-h-screen flex bg-slate-50/70 text-slate-800 font-sans select-none antialiased">
+      {/* Mobile menu button */}
       <button
-        className="sidebar-toggle"
-        onClick={() => setSidebarOpen(v => !v)}
+        onClick={() => setSidebarOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-white/80 border border-slate-200/50 text-slate-600 hover:text-slate-800 shadow-sm backdrop-blur-md transition-colors"
         aria-label="Toggle sidebar"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <line x1="3" y1="18" x2="21" y2="18" />
-        </svg>
+        <Menu className="w-5 h-5" />
       </button>
+
+      {/* Sidebar overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-20 bg-black/20 backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       <Sidebar
         catalog={catalog}
@@ -318,11 +323,12 @@ function App() {
         onLanguageChange={handleLanguageChange}
         onSelect={handleSelect}
         onHome={handleHome}
+        onStartTour={startTour}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="main">
+      <main className="flex-1 flex flex-col min-h-screen min-w-0">
         {currentId ? (
           <NotebookViewer
             notebook={notebook}
@@ -339,6 +345,7 @@ function App() {
           />
         )}
       </main>
+
       <GuidedTour
         active={tourActive}
         step={tourSteps[tourStepIndex]}
