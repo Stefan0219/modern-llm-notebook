@@ -1,8 +1,17 @@
+import { useEffect, useState } from 'react'
 import {
   BookOpen, ArrowRight, Check, Layers, Cpu, Star,
   Monitor, Languages, ChevronRight, CodeXml, Rocket, Sparkles, Menu,
 } from 'lucide-react'
-import { PATH_STEPS, RUNNABLE_NOTEBOOKS, SIDEBAR_SECTIONS, PATH_STEP_LESSON_IDS } from '../data/sidebar.js'
+import { GITHUB_OWNER, GITHUB_REPO } from '../config.js'
+import { PATH_STEPS, RUNNABLE_NOTEBOOKS } from '../data/sidebar.js'
+
+const GITHUB_STARS_CACHE_KEY = `github-stars:${GITHUB_OWNER}/${GITHUB_REPO}`
+
+function formatStarCount(count) {
+  if (typeof count !== 'number') return '--'
+  return count.toLocaleString('en-US')
+}
 
 const SECTION_STYLES = {
   foundation: { bg: 'from-[#dbeafe] to-[#e0f2fe]', tag: 'bg-blue-50 text-blue-600 border-blue-200/50', nameZh: '基础', nameEn: 'Foundation', accent: 'blue', iconBg: 'bg-blue-100 text-blue-600 border-blue-200/50', pathBorder: 'border-l-blue-400' },
@@ -206,6 +215,41 @@ const NOTEBOOK_SVGS = {
 }
 
 export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onStartTour }) {
+  const [starCount, setStarCount] = useState(null)
+  const catalogById = new Map(catalog.map(item => [item.id, item]))
+
+  useEffect(() => {
+    let cancelled = false
+
+    const cachedCount = window.localStorage.getItem(GITHUB_STARS_CACHE_KEY)
+    if (cachedCount !== null) {
+      const parsedCount = Number(cachedCount)
+      if (Number.isFinite(parsedCount)) {
+        setStarCount(parsedCount)
+      }
+    }
+
+    fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`GitHub API status: ${response.status}`)
+        }
+        return response.json()
+      })
+      .then((repo) => {
+        if (cancelled || typeof repo.stargazers_count !== 'number') return
+        setStarCount(repo.stargazers_count)
+        window.localStorage.setItem(GITHUB_STARS_CACHE_KEY, String(repo.stargazers_count))
+      })
+      .catch(() => {
+        // GitHub API 偶尔会被限流；页面保留缓存或占位即可。
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const t = lang === 'zh' ? {
     bannerBadge: '面向未来的 LLM 学习方式',
     bannerTitleLine1: '动手实践大模型，',
@@ -362,14 +406,14 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
         </section>
 
         {/* STATS BAR */}
-        <section className="stats grid grid-cols-2 lg:grid-cols-4 bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden divide-y md:divide-y-0 md:divide-x divide-slate-100/80">
+        <section className="stats grid grid-cols-[repeat(auto-fit,minmax(min(100%,190px),1fr))] bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden">
           <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/50 shrink-0">
               <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
             </div>
             <div className="space-y-0.5 min-w-0">
               <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">23+</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">{lang === 'zh' ? '可运行 Notebook' : 'Runnable Notebooks'}</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '可运行 Notebook' : 'Runnable Notebooks'}</div>
             </div>
           </div>
           <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
@@ -378,7 +422,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
             </div>
             <div className="space-y-0.5 min-w-0">
               <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">5</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">{lang === 'zh' ? '学习路径' : 'Learning Paths'}</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '学习路径' : 'Learning Paths'}</div>
             </div>
           </div>
           <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
@@ -387,7 +431,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
             </div>
             <div className="space-y-0.5 min-w-0">
               <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">20+</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">{lang === 'zh' ? '核心模块' : 'Core Modules'}</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '核心模块' : 'Core Modules'}</div>
             </div>
           </div>
           <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
@@ -395,14 +439,14 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
               <Star className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
             </div>
             <div className="space-y-0.5 min-w-0">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">GitHub Stars</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">{lang === 'zh' ? '开源社区支持' : 'Open Source Community'}</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">{formatStarCount(starCount)}</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '开源社区支持' : 'Open Source Community'}</div>
             </div>
           </div>
         </section>
 
         {/* FEATURES STRIP */}
-        <section data-tour="features" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 bg-white rounded-2xl border border-black/10 shadow-sm p-3 sm:p-4 gap-3 sm:gap-4 lg:divide-x divide-slate-100/80">
+        <section data-tour="features" className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] bg-white rounded-2xl border border-black/10 shadow-sm p-3 sm:p-4 gap-3 sm:gap-4">
           {[
             { icon: <Monitor className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature1, desc: t.feature1d },
             { icon: <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5]" />, title: t.feature2, desc: t.feature2d },
@@ -410,11 +454,11 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
             { icon: <Languages className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature4, desc: t.feature4d },
             { icon: <Rocket className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature5, desc: t.feature5d },
           ].map((f, i) => (
-            <div key={i} className="p-1.5 sm:p-2 flex items-start gap-2.5 sm:gap-3.5 lg:pl-6 first:lg:pl-0">
+            <div key={i} className="p-1.5 sm:p-2 flex items-start gap-2.5 sm:gap-3.5">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border shrink-0 bg-slate-50 text-slate-500 border-slate-200/50">{f.icon}</div>
               <div className="space-y-0.5 min-w-0">
-                <h3 className="text-[11px] sm:text-[13px] font-bold text-slate-800 truncate">{f.title}</h3>
-                <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium leading-normal line-clamp-2">{f.desc}</p>
+                <h3 className="text-[11px] sm:text-[13px] font-bold text-slate-800 leading-snug break-words">{f.title}</h3>
+                <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium leading-normal break-words">{f.desc}</p>
               </div>
             </div>
           ))}
@@ -471,6 +515,8 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
           <div className="flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
             {RUNNABLE_NOTEBOOKS.map((nb) => {
               const style = SECTION_STYLES[nb.section] || SECTION_STYLES.foundation
+              const notebookMeta = catalogById.get(nb.lessonId)
+              const notebookTitle = notebookMeta?.title || (lang === 'zh' ? nb.title : nb.titleEn)
               return (
                 <div
                   key={nb.id}
@@ -482,7 +528,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                   </div>
                   <div className="p-3 bg-white flex-1 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-[12px] font-semibold text-slate-800 group-hover:text-[#1d6bf3] transition-colors mb-1 line-clamp-1">{lang === 'zh' ? nb.title : nb.titleEn}</h4>
+                      <h4 className="text-[12px] font-semibold text-slate-800 group-hover:text-[#1d6bf3] transition-colors mb-1 line-clamp-1">{notebookTitle}</h4>
                       <p className="text-[11px] text-slate-400 line-clamp-1 leading-relaxed">{lang === 'zh' ? nb.desc : nb.descEn}</p>
                     </div>
                     <div className="flex items-center justify-between text-[10px] mt-2">

@@ -345,8 +345,8 @@ LESSONS = {
         ],
         "checklist": ["Decoder-only GPT predicts the next token.", "Causal masking prevents future-token leakage.", "The lm_head maps hidden states to vocabulary logits."],
     },
-    "06-architecture-refinements": {
-        "title": "Architecture Refinements: RMSNorm, SwiGLU, RoPE, Pre-Norm",
+    "06-gpt2-to-modern-models": {
+        "title": "From GPT-2 to Modern Models: RMSNorm, SwiGLU, RoPE, Pre-Norm",
         "previous": "Mini-GPT gave us a working decoder. Modern models refine the same skeleton for stability and efficiency.",
         "goal": "Implement common LLaMA-style refinements and see what problem each one solves.",
         "sections": [

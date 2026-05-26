@@ -11,7 +11,9 @@ const DEFAULT_LANG = 'zh'
 
 const LEGACY_NOTEBOOK_IDS = {
   '04-mini-gpt': '05-mini-gpt',
-  '05-architecture-refinements': '06-architecture-refinements',
+  '05-architecture-refinements': '06-gpt2-to-modern-models',
+  '06-architecture-refinements': '06-gpt2-to-modern-models',
+  '06-llama-architecture-upgrades': '06-gpt2-to-modern-models',
   '06-moe': '07-moe',
   '07-bert-encoder': '08-bert-encoder',
   '08-training-loss': '09-training-loss',
@@ -150,7 +152,7 @@ function App() {
       {
         target: '.parts',
         title: '5 大学习路径',
-        body: '从左到右依次是：基础（蓝）、训练（紫）、推理（绿）、前沿（黄）、评测与部署（红）。点击任意卡片，左侧目录会滑动到对应章节。课程按"直觉→手算→代码→观察"的顺序组织。',
+        body: '这里是整套课程的地图：基础、训练、推理、前沿、评测与部署。每张卡片概括一个阶段要解决的问题，点击后会定位到对应学习路径，方便你从全局选择下一步。',
       },
       {
         target: '[data-tour="notebooks"]',
@@ -199,7 +201,7 @@ function App() {
       {
         target: '.parts',
         title: '5 Learning Paths',
-        body: 'From left to right: Foundation (blue), Training (purple), Inference (green), Frontiers (amber), Eval & Deploy (rose). Click any card to scroll the sidebar to that section. Content follows: intuition → hand calculation → code → observation.',
+        body: 'This is the course map: Foundation, Training, Inference, Frontiers, and Eval & Deploy. Each card summarizes one stage, and clicking a card takes you to that learning path so you can choose the next step from the full curriculum.',
       },
       {
         target: '[data-tour="notebooks"]',
@@ -268,11 +270,11 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen flex bg-slate-50/70 text-slate-800 font-sans select-none antialiased">
+    <div className="min-h-screen flex bg-slate-50/70 text-slate-800 font-sans antialiased">
       {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-white/80 border border-slate-200/50 text-slate-600 hover:text-slate-800 shadow-sm backdrop-blur-md transition-colors"
+        className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-white/80 border border-slate-200/50 text-slate-600 hover:text-slate-800 shadow-sm backdrop-blur-md transition-colors select-none"
         aria-label="Toggle sidebar"
       >
         <Menu className="w-5 h-5" />

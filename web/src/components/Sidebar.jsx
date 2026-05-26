@@ -1,8 +1,52 @@
 import { useState, useEffect, useRef } from 'react'
-import { Search, Github, Compass, BookMarked, History, X, GraduationCap } from 'lucide-react'
-import { SIDEBAR_SECTIONS } from '../data/sidebar.js'
+import {
+  BookMarked,
+  Code2,
+  GitFork,
+  Github,
+  GraduationCap,
+  History,
+  X,
+} from 'lucide-react'
 
 const SECTION_KEYS = ['foundation', 'training', 'inference', 'frontiers', 'production']
+const SECTION_LABELS = {
+  foundation: { title: '基础', titleEn: 'FOUNDATION' },
+  training: { title: '训练', titleEn: 'TRAINING' },
+  inference: { title: '推理', titleEn: 'INFERENCE' },
+  frontiers: { title: '前沿', titleEn: 'FRONTIERS' },
+  production: { title: '评测与部署', titleEn: 'EVAL & DEPLOY' },
+}
+
+function getSectionKey(partDir) {
+  return String(partDir || '').replace(/^part\d+-/, '')
+}
+
+function getLessonNumber(id) {
+  return String(id || '').match(/^\d+/)?.[0] || ''
+}
+
+function buildSidebarSections(catalog) {
+  const sections = new Map()
+  for (const item of catalog) {
+    const section = getSectionKey(item.partDir)
+    if (!sections.has(section)) {
+      sections.set(section, {
+        ...(SECTION_LABELS[section] || { title: section, titleEn: section.toUpperCase() }),
+        lessons: [],
+      })
+    }
+    sections.get(section).lessons.push({
+      id: item.id,
+      num: getLessonNumber(item.id),
+      title: item.title,
+      section,
+    })
+  }
+  return SECTION_KEYS
+    .map(section => sections.get(section))
+    .filter(Boolean)
+}
 
 export default function Sidebar({ catalog, currentId, lang, onLanguageChange, onSelect, onHome, onStartTour, isOpen, onClose }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -27,7 +71,8 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
     return () => window.removeEventListener('sidebar-scroll-to', handler)
   }, [])
 
-  const filteredSections = SIDEBAR_SECTIONS.map(section => ({
+  const sidebarSections = buildSidebarSections(catalog)
+  const filteredSections = sidebarSections.map(section => ({
     ...section,
     lessons: section.lessons.filter(lesson =>
       lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -43,9 +88,15 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
       {/* Header */}
       <div className="p-6 border-b shrink-0 flex flex-col gap-4 z-10 select-none border-slate-100">
         <div className="flex items-center justify-between">
-          <button onClick={onHome} className="flex flex-col text-left">
-            <span className="text-base font-black tracking-wider text-slate-800 uppercase">Modern LLM</span>
-            <span className="text-base font-black tracking-wider text-slate-800 uppercase -mt-1">Notebook</span>
+          <button onClick={onHome} className="brand-button" aria-label="Modern LLM Notebook">
+            <span className="brand-logo" aria-hidden="true">
+              <GitFork className="brand-logo-fork" />
+              <Code2 className="brand-logo-code" />
+            </span>
+            <span className="brand-copy">
+              <span className="brand-line brand-line-main">Modern LLM</span>
+              <span className="brand-line brand-line-sub">Notebook</span>
+            </span>
           </button>
           <button onClick={onClose} className="md:hidden text-slate-400 hover:text-slate-600 p-1 rounded-lg">
             <X className="w-5 h-5" />

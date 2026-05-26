@@ -18,59 +18,6 @@ const PARTS = [
   ['part5-production', 'Evaluation & Deployment'],
 ]
 
-const TITLE_MAP = {
-  zh: {
-    '01-tokenizer-basics': 'Tokenizer 基础',
-    '02-bpe-tokenizer': 'BPE Tokenizer',
-    '03-embedding-position': 'Embedding 与位置编码',
-    '04-transformer-block': 'Attention 与 Transformer Block',
-    '05-mini-gpt': '实现自己的第一个 GPT',
-    '06-architecture-refinements': '架构改进',
-    '07-moe': 'MoE 混合专家',
-    '08-bert-encoder': 'BERT 编码器',
-    '09-training-loss': '训练与 Loss',
-    '10-scaling-laws': 'Scaling Laws',
-    '11-data-engineering': '数据工程',
-    '12-lora': 'LoRA',
-    '13-midtraining-cpt': 'Mid-Training & CPT',
-    '14-rlhf-alignment': 'RLHF 对齐',
-    '15-generation': '生成策略',
-    '16-inference-acceleration': '推理加速',
-    '17-speculative-decoding': '投机解码',
-    '18-long-context': '长上下文',
-    '19-cot-thinking': 'CoT 思维链',
-    '20-vlm': '视觉语言模型',
-    '21-evaluation': '模型评测',
-    '22-distillation': '知识蒸馏',
-    '23-opd': 'On-Policy Distillation',
-  },
-  en: {
-    '01-tokenizer-basics': 'Tokenizer Basics',
-    '02-bpe-tokenizer': 'BPE Tokenizer',
-    '03-embedding-position': 'Embeddings & Position',
-    '04-transformer-block': 'Attention & Transformer Block',
-    '05-mini-gpt': 'Build Your First GPT',
-    '06-architecture-refinements': 'Architecture Refinements',
-    '07-moe': 'Mixture of Experts',
-    '08-bert-encoder': 'BERT Encoder',
-    '09-training-loss': 'Training & Loss',
-    '10-scaling-laws': 'Scaling Laws',
-    '11-data-engineering': 'Data Engineering',
-    '12-lora': 'LoRA',
-    '13-midtraining-cpt': 'Mid-Training & CPT',
-    '14-rlhf-alignment': 'RLHF Alignment',
-    '15-generation': 'Generation',
-    '16-inference-acceleration': 'Inference Acceleration',
-    '17-speculative-decoding': 'Speculative Decoding',
-    '18-long-context': 'Long Context',
-    '19-cot-thinking': 'CoT & Thinking',
-    '20-vlm': 'Vision-Language Models',
-    '21-evaluation': 'Evaluation',
-    '22-distillation': 'Distillation',
-    '23-opd': 'On-Policy Distillation',
-  },
-}
-
 const PYTHON_KEYWORDS = new Set([
   'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class',
   'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from',
@@ -111,6 +58,32 @@ function normalizeLang(lang) {
   return lang === 'en' ? 'en' : 'zh'
 }
 
+function stripMarkdownInline(value) {
+  return String(value)
+    .replace(/^#+\s*/, '')
+    .replace(/\s+#+$/, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .trim()
+}
+
+function getNotebookTitle(raw, fallback) {
+  try {
+    const nb = JSON.parse(raw)
+    for (const cell of nb.cells || []) {
+      if (cell.cell_type !== 'markdown') continue
+      const source = normalizeSource(cell.source)
+      const heading = source.match(/^#\s+(.+)$/m)
+      if (heading) return stripMarkdownInline(heading[1])
+    }
+  } catch {
+    // Invalid notebooks are ignored here; the viewer will fail visibly when opened.
+  }
+  return fallback
+}
+
 function buildNotebookEntries(modules, rootDir) {
   return Object.entries(modules)
   .map(([path, raw]) => {
@@ -122,6 +95,7 @@ function buildNotebookEntries(modules, rootDir) {
       partDir,
       raw,
       order: PARTS.findIndex(([dir]) => dir === partDir),
+      title: getNotebookTitle(raw, id),
     }
   })
   .filter(Boolean)
@@ -177,6 +151,10 @@ function inlineMarkdown(text) {
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>')
+  html = html.replace(
+    /!\[([^\]]*)\]\(([^)]+)\)/g,
+    '<img src="$2" alt="$1" loading="lazy" />'
+  )
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
   mathSegments.forEach((segment, index) => {
     html = html.replace(`@@MATH_${index}@@`, segment)
@@ -222,6 +200,21 @@ function renderMarkdown(source) {
 
     if (!trimmed) {
       flushParagraph(blocks, paragraph)
+      continue
+    }
+
+    if (trimmed.startsWith('$$')) {
+      flushParagraph(blocks, paragraph)
+      const mathLines = [line]
+      if (!trimmed.endsWith('$$') || trimmed === '$$') {
+        i += 1
+        while (i < lines.length) {
+          mathLines.push(lines[i])
+          if (lines[i].trim().endsWith('$$')) break
+          i += 1
+        }
+      }
+      blocks.push(`<div class="math-display">${escapeHtml(mathLines.join('\n'))}</div>`)
       continue
     }
 
@@ -633,10 +626,9 @@ function parseNotebook(entry, lang = 'zh') {
   const safeLang = normalizeLang(lang)
   const nb = JSON.parse(entry.raw)
   const part = PARTS.find(([dir]) => dir === entry.partDir)?.[1] || entry.partDir
-  const title = TITLE_MAP[safeLang][entry.id] || entry.id
   return {
     id: entry.id,
-    title,
+    title: entry.title,
     part,
     partDir: entry.partDir,
     html: renderNotebook(nb, safeLang),
@@ -649,7 +641,7 @@ export function getCatalog(lang = 'zh') {
     const part = PARTS.find(([dir]) => dir === entry.partDir)?.[1] || entry.partDir
     return {
       id: entry.id,
-      title: TITLE_MAP[safeLang][entry.id] || entry.id,
+      title: entry.title,
       part,
       partDir: entry.partDir,
       lang: safeLang,

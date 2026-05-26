@@ -92,10 +92,19 @@ function NotebookViewer({ notebook, meta, loading }) {
       return
     }
 
-    if (window.MathJax?.typesetPromise) {
+    const typesetMath = () => {
+      if (!window.MathJax?.typesetPromise) return
       window.MathJax.typesetPromise([content]).catch((error) => {
         console.warn('MathJax typeset failed', error)
       })
+    }
+
+    if (window.MathJax?.startup?.promise) {
+      window.MathJax.startup.promise.then(typesetMath).catch((error) => {
+        console.warn('MathJax startup failed', error)
+      })
+    } else {
+      typesetMath()
     }
 
     updateActiveHeading()

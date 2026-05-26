@@ -117,11 +117,11 @@ Use this project if you want to:
 |:---|:---|:---|
 | Foundations | Tokenization, BPE, embeddings, position encoding | `CharTokenizer`, `WordTokenizer`, `BPETokenizer`, `TokenEmbedding` |
 | Transformer core | Self-Attention, Multi-Head Attention, Transformer block | `MultiHeadAttention`, `TransformerBlock`, `MiniGPT` |
-| Architecture refinements | RMSNorm, SwiGLU, RoPE, Pre-Norm, MoE | `RMSNorm`, `SwiGLU`, `RoPE`, `MoELayer` |
-| Training | Loss, optimization, scaling laws, data engineering | Training loop, gradient accumulation, MinHash deduplication |
+| GPT-2 to modern models | RMSNorm, SwiGLU, RoPE, GQA, QK-Norm, MLA, MoE | `RMSNorm`, `SwiGLU`, `RoPE`, `GroupedQueryAttention`, `MultiHeadLatentAttention`, `MoELayer` |
+| Training | Loss, optimization, scaling laws, data engineering, MTP, FIM | Training loop, gradient accumulation, MinHash deduplication, Multi-Token Prediction, Fill-in-the-Middle |
 | Adaptation and alignment | LoRA, reward modeling, PPO, DPO | `LoraLinear`, reward model loss, PPO clip, DPO loss |
 | Inference | Sampling, beam search, KV Cache, speculative decoding | Top-k, Top-p, beam search, `AttentionWithKVCache` |
-| Frontiers | Long context, reasoning traces, vision-language models | RoPE extrapolation, Self-Consistency, Cross-Attention |
+| Frontiers | Long context, reasoning traces, VLM, Sliding Window Attention | RoPE extrapolation, Self-Consistency, Cross-Attention, Sliding Window mask |
 | Production concepts | Evaluation, distillation, on-policy distillation | Win-rate matrices, soft labels, KL estimators |
 
 ## What This Project Is Not
@@ -165,6 +165,8 @@ Most notebooks run on CPU. Larger training experiments are easier with a GPU.
 ### Web viewer
 
 The repository also includes a React / Vite reader for a course-like browsing experience.
+The reader imports the `.ipynb` files directly and renders them in the browser, without a generated
+web content copy.
 
 ```bash
 npm install
@@ -176,12 +178,6 @@ Build and preview the static site:
 ```bash
 npm run build
 npm run preview
-```
-
-Convert notebooks only:
-
-```bash
-npm run convert
 ```
 
 ### Executing notebooks in restricted environments
@@ -228,7 +224,7 @@ Modern LLM Notebook
 │   └── Mini-GPT
 │
 ├── Part 2: Training
-│   ├── Architecture refinements
+│   ├── From GPT-2 to modern models
 │   ├── Mixture of Experts
 │   ├── BERT encoder
 │   ├── Training and loss
@@ -273,12 +269,12 @@ topic without depending on hidden runtime state from earlier notebooks.
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 06 | [Architecture Refinements](notebooks-en/part2-training/06-architecture-refinements.ipynb) | What changed from the original Transformer to LLaMA-style blocks? | RMSNorm, SwiGLU, RoPE |
-| 07 | [Mixture of Experts](notebooks-en/part2-training/07-moe.ipynb) | How does sparse expert routing work? | Router gate, top-k experts |
+| 06 | [From GPT-2 to Modern Models](notebooks-en/part2-training/06-gpt2-to-modern-models.ipynb) | What changed architecturally after GPT-2? | RMSNorm, SwiGLU, RoPE, GQA, QK-Norm, MLA |
+| 07 | [Mixture of Experts](notebooks-en/part2-training/07-moe.ipynb) | How does sparse expert routing work? | Router gate, top-k experts, aux-free load balancing |
 | 08 | [BERT Encoder](notebooks-en/part2-training/08-bert-encoder.ipynb) | Why can encoder-only models read bidirectionally? | MiniBERT, MLM head |
-| 09 | [Training & Loss](notebooks-en/part2-training/09-training-loss.ipynb) | How does a language model learn from prediction errors? | Training loop, loss, gradients |
+| 09 | [Training & Loss](notebooks-en/part2-training/09-training-loss.ipynb) | How does a language model learn from prediction errors? | Training loop, loss, gradients, Multi-Token Prediction |
 | 10 | [Scaling Laws](notebooks-en/part2-training/10-scaling-laws.ipynb) | How do model size, data, and compute trade off? | FLOPs estimates, Chinchilla intuition |
-| 11 | [Data Engineering](notebooks-en/part2-training/11-data-engineering.ipynb) | Why does data quality dominate model behavior? | Cleaning, filtering, MinHash |
+| 11 | [Data Engineering](notebooks-en/part2-training/11-data-engineering.ipynb) | Why does data quality dominate model behavior? | Cleaning, filtering, MinHash, FIM |
 | 12 | [LoRA](notebooks-en/part2-training/12-lora.ipynb) | Why does low-rank adaptation work? | `LoraLinear`, merge for inference |
 | 13 | [Mid-Training & CPT](notebooks-en/part2-training/13-midtraining-cpt.ipynb) | How does continued pretraining adapt a model? | Data mixing, loss observation |
 | 14 | [RLHF Alignment](notebooks-en/part2-training/14-rlhf-alignment.ipynb) | How do preference signals become objectives? | Reward model, PPO, DPO |
@@ -295,7 +291,7 @@ topic without depending on hidden runtime state from earlier notebooks.
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 18 | [Long Context](notebooks-en/part4-frontiers/18-long-context.ipynb) | How do models extend beyond their training context length? | RoPE extrapolation, YaRN intuition |
+| 18 | [Long Context](notebooks-en/part4-frontiers/18-long-context.ipynb) | How do models extend beyond their training context length? | RoPE extrapolation, YaRN, Sliding Window Attention |
 | 19 | [CoT & Thinking](notebooks-en/part4-frontiers/19-cot-thinking.ipynb) | Why can reasoning traces improve answers? | Self-Consistency, reward design |
 | 20 | [Vision-Language Models](notebooks-en/part4-frontiers/20-vlm.ipynb) | How does visual information enter a language model? | Patch embedding, cross-attention |
 
@@ -329,9 +325,12 @@ The course connects implementation details to influential papers and production 
 | Attention Is All You Need | Multi-Head Attention, position encoding |
 | BERT | Encoder-only models, masked language modeling |
 | LLaMA | RMSNorm, SwiGLU, RoPE, Pre-Norm |
+| DeepSeek-V2 / DeepSeek-V3 | MLA, Multi-Token Prediction, aux-free MoE load balancing |
+| Mixtral / Qwen3 | Sliding Window Attention, MoE with shared experts |
 | Scaling Laws / Chinchilla | Parameter, data, and compute trade-offs |
 | LoRA | Low-rank adaptation |
 | RLHF / PPO / DPO | Preference alignment |
+| Code Llama / DeepSeek-Coder | Fill-in-the-Middle (FIM) |
 | FlashAttention / vLLM | Inference acceleration and memory management |
 | Speculative Decoding | Draft-then-verify generation |
 | RoPE / YaRN | Long-context extrapolation |
@@ -398,6 +397,20 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
     >
   </picture>
 </a>
+
+## Citation
+
+If Modern LLM Notebook helps your research or work, please cite:
+
+```bibtex
+@misc{modern-llm-notebook,
+  title   = {Modern LLM Notebook: Build Modern LLMs from Scratch},
+  author  = {WalkingLabs},
+  year    = {2025},
+  url     = {https://github.com/walkinglabs/modern-llm-notebook},
+  note    = {GitHub repository, accessed 2026}
+}
+```
 
 ## License
 

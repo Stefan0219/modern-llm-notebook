@@ -56,6 +56,153 @@
   background-size: 24px 24px;
 }
 
+.brand-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.brand-logo {
+  display: inline-grid;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(29, 107, 243, 0.11), rgba(20, 184, 166, 0.12)),
+    #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 20px rgba(15, 23, 42, 0.06);
+  color: #172033;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.brand-logo::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px dashed rgba(29, 107, 243, 0.18);
+  border-radius: 5px;
+  opacity: 0.72;
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.brand-logo::after {
+  content: "";
+  position: absolute;
+  top: -45%;
+  left: -70%;
+  width: 48%;
+  height: 190%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.76), transparent);
+  transform: rotate(22deg);
+  transition: left 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-logo-fork {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  transform: translate(-4px, -3px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.brand-logo-code {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  color: #1d6bf3;
+  opacity: 0.88;
+  transform: translate(5px, 5px);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.brand-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 0.96;
+}
+
+.brand-line {
+  color: #172033;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.brand-line-sub {
+  margin-top: 1px;
+}
+
+.brand-button:hover .brand-logo,
+.brand-button:focus-visible .brand-logo {
+  border-color: rgba(29, 107, 243, 0.3);
+  color: #1d6bf3;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 10px 24px rgba(29, 107, 243, 0.13);
+  transform: translateY(-1px);
+}
+
+.brand-button:hover .brand-logo::before,
+.brand-button:focus-visible .brand-logo::before {
+  border-color: rgba(20, 184, 166, 0.34);
+  opacity: 1;
+}
+
+.brand-button:hover .brand-logo::after,
+.brand-button:focus-visible .brand-logo::after {
+  left: 118%;
+}
+
+.brand-button:hover .brand-logo-fork,
+.brand-button:focus-visible .brand-logo-fork {
+  opacity: 0.82;
+  transform: translate(-5px, -4px) rotate(-7deg);
+}
+
+.brand-button:hover .brand-logo-code,
+.brand-button:focus-visible .brand-logo-code {
+  color: #14b8a6;
+  transform: translate(6px, 5px) rotate(5deg);
+}
+
+.brand-button:hover .brand-line-main,
+.brand-button:focus-visible .brand-line-main {
+  color: #1d6bf3;
+  text-shadow: 0 8px 22px rgba(29, 107, 243, 0.16);
+  transform: translateX(2px);
+}
+
+.brand-button:hover .brand-line-sub,
+.brand-button:focus-visible .brand-line-sub {
+  color: #0f766e;
+  text-shadow: 0 8px 22px rgba(20, 184, 166, 0.14);
+  transform: translateX(4px);
+}
+
+.brand-button:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid rgba(29, 107, 243, 0.35);
+  outline-offset: 4px;
+}
+
+.viewer,
+.welcome-copy,
+.notebook-content,
+.notebook-content * {
+  user-select: text;
+}
+
 /* ===== Notebook Viewer Styles (preserved from original) ===== */
 
 #notebook-container,
@@ -81,6 +228,7 @@
 }
 
 .rendered_html h1 {
+  position: relative;
   margin: 0 0 0.8em;
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(0,0,0,0.075);
@@ -88,22 +236,27 @@
   font-weight: 820;
   line-height: 1.08;
   scroll-margin-top: 28px;
+  transition: color 0.18s ease, transform 0.18s ease, text-shadow 0.18s ease;
 }
 
 .rendered_html h2 {
+  position: relative;
   margin: 2.35em 0 0.7em;
   font-size: 2.18em;
   font-weight: 820;
   line-height: 1.12;
   scroll-margin-top: 32px;
+  transition: color 0.18s ease, transform 0.18s ease, text-shadow 0.18s ease;
 }
 
 .rendered_html h3 {
+  position: relative;
   margin: 2.05em 0 0.68em;
   font-size: 1.86em;
   font-weight: 810;
   line-height: 1.14;
   scroll-margin-top: 32px;
+  transition: color 0.18s ease, transform 0.18s ease, text-shadow 0.18s ease;
 }
 
 .rendered_html h4,
@@ -116,9 +269,73 @@
   scroll-margin-top: 28px;
 }
 
+.rendered_html h1::after,
+.rendered_html h2::after,
+.rendered_html h3::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 34px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1d6bf3, rgba(29, 107, 243, 0.12));
+  opacity: 0;
+  transform: scaleX(0.45);
+  transform-origin: left center;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.rendered_html h1:hover,
+.rendered_html h2:hover,
+.rendered_html h3:hover {
+  color: #1d6bf3 !important;
+  text-shadow: 0 8px 24px rgba(29, 107, 243, 0.12);
+  transform: translateX(4px);
+}
+
+.rendered_html h1:hover::after,
+.rendered_html h2:hover::after,
+.rendered_html h3:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 .rendered_html p { margin: 0 0 1.05em; }
 .rendered_html ul, .rendered_html ol { margin: 0 0 1.05em; padding-left: 1.55em; }
 .rendered_html li { margin-bottom: 0.35em; }
+.rendered_html .task-list-item {
+  list-style: none;
+  margin-left: -1.55em;
+}
+.rendered_html .task-list-item-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.05em;
+  height: 1.05em;
+  margin: 0 0.55em 0 0;
+  border: 1.6px solid #c4c9d4;
+  border-radius: 4px;
+  background: #fff;
+  vertical-align: text-bottom;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.rendered_html .task-list-item-checkbox:checked {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+.rendered_html .task-list-item-checkbox:checked::after {
+  content: "";
+  display: block;
+  width: 0.28em;
+  height: 0.55em;
+  margin: 0.08em auto 0;
+  border: solid #fff;
+  border-width: 0 0.14em 0.14em 0;
+  transform: rotate(45deg);
+}
 .rendered_html strong { font-weight: 720; }
 
 .rendered_html a {
@@ -452,6 +669,7 @@
 }
 
 .viewer-title {
+  position: relative;
   max-width: 760px;
   margin-bottom: 20px;
   color: #1d1d1f;
@@ -459,6 +677,33 @@
   font-weight: 760;
   letter-spacing: 0;
   line-height: 1.12;
+  transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
+}
+
+.viewer-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 44px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1d6bf3, rgba(29, 107, 243, 0.1));
+  opacity: 0;
+  transform: scaleX(0.4);
+  transform-origin: left center;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.viewer-title:hover {
+  color: #1d6bf3;
+  text-shadow: 0 12px 30px rgba(29, 107, 243, 0.14);
+  transform: translateX(5px);
+}
+
+.viewer-title:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .viewer-launches {
@@ -570,8 +815,33 @@
 @media (prefers-reduced-motion: reduce) {
   .viewer-header,
   .toc,
-  .notebook-content {
+  .notebook-content,
+  .brand-logo,
+  .brand-logo::before,
+  .brand-logo::after,
+  .brand-logo-fork,
+  .brand-logo-code,
+  .brand-line,
+  .viewer-title,
+  .rendered_html h1,
+  .rendered_html h2,
+  .rendered_html h3 {
     transition: none;
+    transform: none;
+  }
+
+  .brand-button:hover .brand-logo,
+  .brand-button:hover .brand-logo-fork,
+  .brand-button:hover .brand-logo-code,
+  .brand-button:hover .brand-line,
+  .brand-button:focus-visible .brand-logo,
+  .brand-button:focus-visible .brand-logo-fork,
+  .brand-button:focus-visible .brand-logo-code,
+  .brand-button:focus-visible .brand-line,
+  .viewer-title:hover,
+  .rendered_html h1:hover,
+  .rendered_html h2:hover,
+  .rendered_html h3:hover {
     transform: none;
   }
 }
@@ -698,6 +968,65 @@
 }
 .tour-mascot-eye-left { left: 17px; }
 .tour-mascot-eye-right { right: 17px; }
+.tour-mascot-mouth {
+  position: absolute;
+  left: 21px;
+  top: 35px;
+  width: 10px;
+  height: 5px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-top: 0;
+  border-radius: 0 0 999px 999px;
+  transition: border-radius 0.18s, height 0.18s, top 0.18s, transform 0.18s;
+}
+.tour-mascot-spark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.18s, transform 0.18s;
+}
+.tour-mascot-spark-one { top: 10px; right: 9px; }
+.tour-mascot-spark-two { right: 14px; bottom: 12px; width: 3px; height: 3px; }
+.tour-mascot.look-left .tour-mascot-eye { transform: translateX(-4px); }
+.tour-mascot.look-right .tour-mascot-eye { transform: translateX(4px); }
+.tour-mascot.look-up .tour-mascot-eye { top: 18px; transform: scaleY(0.9); }
+.tour-mascot.look-down .tour-mascot-eye { top: 25px; transform: scaleY(0.86); }
+.tour-mascot-smile .tour-mascot-mouth {
+  top: 34px;
+  height: 7px;
+  transform: scaleX(1.18);
+}
+.tour-mascot-cry .tour-mascot-eye {
+  height: 9px;
+  border-radius: 999px 999px 70% 70%;
+  transform: translateY(2px) scaleY(0.82);
+}
+.tour-mascot-cry .tour-mascot-mouth {
+  top: 36px;
+  height: 6px;
+  border-top: 2px solid rgba(255, 255, 255, 0.92);
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+}
+.tour-mascot-think .tour-mascot-eye-left { transform: translate(-2px, -2px) scaleY(0.9); }
+.tour-mascot-think .tour-mascot-eye-right { transform: translate(3px, 1px) scaleY(0.78); }
+.tour-mascot-think .tour-mascot-mouth {
+  width: 8px;
+  height: 3px;
+  border-top: 2px solid rgba(255, 255, 255, 0.92);
+  border-bottom: 0;
+  border-radius: 999px;
+  transform: translateX(2px) rotate(-8deg);
+}
+.tour-mascot-smile .tour-mascot-spark,
+.tour-mascot-think .tour-mascot-spark {
+  opacity: 0.9;
+  transform: scale(1);
+}
 .tour-step-count { margin-bottom: 8px; color: #1d6bf3; font-size: 12px; font-weight: 760; letter-spacing: 0.08em; }
 .tour-card h2 { margin-bottom: 8px; font-size: 20px; font-weight: 760; line-height: 1.25; }
 .tour-card p { font-size: 14px; line-height: 1.66; }
