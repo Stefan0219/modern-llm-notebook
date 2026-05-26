@@ -6,8 +6,13 @@ import NotebookViewer from './components/NotebookViewer.jsx'
 import NotesPanel from './components/NotesPanel.jsx'
 import Welcome from './components/Welcome.jsx'
 import GuidedTour from './components/GuidedTour.jsx'
-import { getCatalog, getNotebook } from './data/notebooks.js'
+import SettingsPanel from './components/SettingsPanel.jsx'
+import ChangelogModal from './components/ChangelogModal.jsx'
+import { SettingsProvider } from './context/SettingsContext.jsx'
+import useSettings from './hooks/useSettings.js'
+import useTheme from './hooks/useTheme.js'
 import useNotesAndBookmarks from './hooks/useNotesAndBookmarks.js'
+import { getCatalog, getNotebook } from './data/notebooks.js'
 
 const NOTES_SENTINEL = '__notes__'
 
@@ -36,6 +41,9 @@ const LEGACY_NOTEBOOK_IDS = {
   '20-distillation': '22-distillation',
   '21-opd': '23-opd',
 }
+
+// 从构建时注入的 git log 数据中读取
+const CHANGELOG_COMMITS = typeof __CHANGELOG_COMMITS__ !== 'undefined' ? __CHANGELOG_COMMITS__ : []
 
 function normalizeNotebookId(id) {
   return LEGACY_NOTEBOOK_IDS[id] || id
@@ -79,7 +87,7 @@ function getInitialNotebookId() {
   return hash ? normalizeNotebookId(hash) : null
 }
 
-function App() {
+function AppContent() {
   const [lang, setLang] = useState(() => getInitialLang())
   const [catalog, setCatalog] = useState(() => getCatalog(lang))
   const [currentId, setCurrentId] = useState(() => getInitialNotebookId())
@@ -87,8 +95,18 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [tourActive, setTourActive] = useState(false)
   const [tourStepIndex, setTourStepIndex] = useState(0)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [changelogOpen, setChangelogOpen] = useState(false)
 
+  const { settings, updateSettings } = useSettings()
+  const { resolvedTheme, toggleTheme } = useTheme(settings.theme)
   const nbm = useNotesAndBookmarks()
+
+  // 同步字号到 CSS 变量
+  useEffect(() => {
+    const sizeMap = { small: '14.5px', default: '16.5px', large: '18.5px' }
+    document.documentElement.style.setProperty('--font-size-notebook', sizeMap[settings.fontSize] || '16.5px')
+  }, [settings.fontSize])
 
   useEffect(() => {
     setCatalog(getCatalog(lang))
@@ -288,11 +306,11 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen flex bg-slate-50/70 text-slate-800 font-sans antialiased">
+    <div className="min-h-screen flex bg-[var(--bg-app)] text-[var(--text-body)] font-sans antialiased">
       {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-white/80 border border-slate-200/50 text-slate-600 hover:text-slate-800 shadow-sm backdrop-blur-md transition-colors select-none"
+        className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-[var(--bg-sidebar)]/80 border border-[var(--border-light)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-sm backdrop-blur-md transition-colors select-none"
         aria-label="Toggle sidebar"
       >
         <Menu className="w-5 h-5" />
@@ -315,6 +333,8 @@ function App() {
         onHome={handleHome}
         onStartTour={startTour}
         onOpenNotes={handleOpenNotes}
+        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenChangelog={() => setChangelogOpen(true)}
         bookmarks={nbm.bookmarks}
         notes={nbm.notes}
         isOpen={sidebarOpen}
@@ -365,8 +385,30 @@ function App() {
         onPrev={handleTourPrev}
         onClose={stopTour}
       />
+
+      <SettingsPanel
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        lang={lang}
+      />
+
+      <ChangelogModal
+        isOpen={changelogOpen}
+        onClose={() => setChangelogOpen(false)}
+        lang={lang}
+        commits={CHANGELOG_COMMITS}
+      />
     </div>
   )
 }
 
-export default App
+export default function App() {
+  const { settings, updateSettings } = useSettings()
+  const { resolvedTheme, toggleTheme } = useTheme(settings.theme)
+
+  return (
+    <SettingsProvider settings={settings} updateSettings={updateSettings} resolvedTheme={resolvedTheme} toggleTheme={toggleTheme}>
+      <AppContent />
+    </SettingsProvider>
+  )
+}
