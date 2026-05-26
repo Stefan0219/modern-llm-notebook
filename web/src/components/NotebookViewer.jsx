@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Star, Trash2 } from 'lucide-react'
 import { getNotebookLaunchLinks } from '../config.js'
 
 function extractToc(html) {
@@ -16,7 +17,7 @@ function extractToc(html) {
   return toc
 }
 
-function NotebookViewer({ notebook, meta, loading }) {
+function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark, notes, saveNote, deleteNote }) {
   const contentRef = useRef(null)
   const notebookContentRef = useRef(null)
   const revealFrameRef = useRef(null)
@@ -26,6 +27,7 @@ function NotebookViewer({ notebook, meta, loading }) {
   const [activeHeading, setActiveHeading] = useState(null)
   const [visibleNotebookId, setVisibleNotebookId] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
+  const [noteEditor, setNoteEditor] = useState(null)
   const lang = meta?.lang === 'en' ? 'en' : 'zh'
 
   const shouldReduceMotion = () => {
@@ -126,18 +128,49 @@ function NotebookViewer({ notebook, meta, loading }) {
     }
   }, [notebook?.id, notebook?.html, toc.length])
 
+  // Inject note icons on h2/h3 headings
   useEffect(() => {
-    if (!imagePreview) return undefined
+    const content = notebookContentRef.current
+    if (!notebook?.id || !content) return
+
+    const headings = content.querySelectorAll('h2, h3')
+    headings.forEach((h) => {
+      // Avoid duplicate buttons
+      if (h.querySelector('.section-note-btn')) return
+
+      const btn = document.createElement('button')
+      btn.className = 'section-note-btn'
+      btn.setAttribute('aria-label', lang === 'en' ? 'Add note' : '添加笔记')
+      btn.setAttribute('title', lang === 'en' ? 'Add note' : '添加笔记')
+      btn.dataset.sectionId = h.id || ''
+      const noteKey = `${notebook.id}::${h.id || ''}`
+      btn.dataset.noteKey = noteKey
+      btn.dataset.sectionTitle = h.textContent.replace(/[#\n\r]/g, '').trim()
+
+      // Show existing note indicator
+      if (notes[noteKey]) {
+        btn.classList.add('has-note')
+        btn.setAttribute('title', lang === 'en' ? 'Edit note' : '编辑笔记')
+      }
+
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>'
+      h.appendChild(btn)
+    })
+  }, [notebook?.id, notebook?.html, notes, lang])
+
+  useEffect(() => {
+    if (!imagePreview && !noteEditor) return undefined
 
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        setImagePreview(null)
+        if (imagePreview) setImagePreview(null)
+        if (noteEditor) setNoteEditor(null)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [imagePreview])
+  }, [imagePreview, noteEditor])
 
   // Reset scroll before paint, then fade the new notebook in.
   useLayoutEffect(() => {
@@ -227,6 +260,26 @@ function NotebookViewer({ notebook, meta, loading }) {
   }
 
   const handleNotebookClick = (event) => {
+    // Note button click
+    const noteBtn = event.target.closest('.section-note-btn')
+    if (noteBtn && notebookContentRef.current?.contains(noteBtn)) {
+      event.preventDefault()
+      event.stopPropagation()
+      const sectionId = noteBtn.dataset.sectionId || ''
+      const sectionTitle = noteBtn.dataset.sectionTitle || ''
+      const noteKey = noteBtn.dataset.noteKey || ''
+      const rect = noteBtn.getBoundingClientRect()
+      setNoteEditor({
+        sectionId,
+        sectionTitle,
+        noteKey,
+        text: notes[noteKey]?.text || '',
+        top: rect.bottom + 6,
+        left: Math.min(rect.left, window.innerWidth - 340),
+      })
+      return
+    }
+
     const image = event.target.closest('.output_area img, .rendered_html img')
     if (image && notebookContentRef.current?.contains(image)) {
       event.preventDefault()
@@ -347,6 +400,19 @@ function NotebookViewer({ notebook, meta, loading }) {
       <div className={`viewer-header${isVisible ? ' visible' : ''}`}>
         <div className="viewer-part">{meta?.part}</div>
         <h1 className="viewer-title">{meta?.title}</h1>
+        {notebook?.id && (
+          <button
+            className={`bookmark-star ${isBookmarked?.(notebook.id) ? 'active' : ''}`}
+            onClick={() => {
+              toggleBookmark?.(notebook.id, meta?.title || '')
+            }}
+            title={isBookmarked?.(notebook.id)
+              ? (lang === 'en' ? 'Remove bookmark' : '取消收藏')
+              : (lang === 'en' ? 'Bookmark' : '收藏')}
+          >
+            <Star className="w-5 h-5" />
+          </button>
+        )}
         <div className="viewer-launches">
           {launchLinks.map((link) => {
             const content = (
@@ -428,6 +494,66 @@ function NotebookViewer({ notebook, meta, loading }) {
                 alt={imagePreview.alt}
                 onClick={(event) => event.stopPropagation()}
               />
+            </div>
+          </div>
+        )}
+
+        {noteEditor && (
+          <div
+            className="note-editor-backdrop"
+            onClick={() => setNoteEditor(null)}
+          >
+            <div
+              className="note-editor-popup"
+              style={{ top: noteEditor.top, left: noteEditor.left }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="note-editor-header">
+                <span className="note-editor-section">{noteEditor.sectionTitle}</span>
+                <button
+                  className="note-editor-close"
+                  onClick={() => setNoteEditor(null)}
+                >&times;</button>
+              </div>
+              <textarea
+                className="note-editor-textarea"
+                value={noteEditor.text}
+                onChange={(e) => setNoteEditor({ ...noteEditor, text: e.target.value })}
+                placeholder={lang === 'en' ? 'Write your note...' : '写下你的笔记...'}
+                rows={5}
+                autoFocus
+              />
+              <div className="note-editor-actions">
+                {notes[noteEditor.noteKey] && (
+                  <button
+                    className="note-editor-btn note-editor-delete"
+                    onClick={() => {
+                      deleteNote?.(notebook.id, noteEditor.sectionId)
+                      setNoteEditor(null)
+                    }}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>{lang === 'en' ? 'Delete' : '删除'}</span>
+                  </button>
+                )}
+                <div className="note-editor-spacer" />
+                <button
+                  className="note-editor-btn note-editor-cancel"
+                  onClick={() => setNoteEditor(null)}
+                >
+                  {lang === 'en' ? 'Cancel' : '取消'}
+                </button>
+                <button
+                  className="note-editor-btn note-editor-save"
+                  onClick={() => {
+                    saveNote?.(notebook.id, noteEditor.sectionId, noteEditor.sectionTitle, noteEditor.text)
+                    setNoteEditor(null)
+                  }}
+                  disabled={!noteEditor.text.trim() && !notes[noteEditor.noteKey]}
+                >
+                  {lang === 'en' ? 'Save' : '保存'}
+                </button>
+              </div>
             </div>
           </div>
         )}

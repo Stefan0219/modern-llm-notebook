@@ -48,8 +48,9 @@ function buildSidebarSections(catalog) {
     .filter(Boolean)
 }
 
-export default function Sidebar({ catalog, currentId, lang, onLanguageChange, onSelect, onHome, onStartTour, isOpen, onClose }) {
+export default function Sidebar({ catalog, currentId, lang, onLanguageChange, onSelect, onHome, onStartTour, onOpenNotes, bookmarks = {}, notes = {}, isOpen, onClose }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [filterMode, setFilterMode] = useState('all') // 'all' | 'bookmarked' | 'noted'
   const listRef = useRef(null)
 
   useEffect(() => {
@@ -74,11 +75,19 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
   const sidebarSections = buildSidebarSections(catalog)
   const filteredSections = sidebarSections.map(section => ({
     ...section,
-    lessons: section.lessons.filter(lesson =>
-      lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lesson.num.includes(searchQuery)
-    ),
+    lessons: section.lessons.filter(lesson => {
+      if (filterMode === 'bookmarked') return !!bookmarks[lesson.id]
+      if (filterMode === 'noted') return Object.keys(notes).some(k => k.startsWith(lesson.id + '::'))
+      if (!searchQuery) return true
+      return lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lesson.num.includes(searchQuery)
+    }),
   })).filter(section => section.lessons.length > 0)
+
+  const inFilterMode = filterMode !== 'all'
+
+  const hasBookmarks = Object.keys(bookmarks).length > 0
+  const hasNotes = Object.keys(notes).length > 0
 
   return (
     <aside className={`w-64 h-screen max-h-screen border-r flex flex-col justify-between shrink-0 md:sticky md:top-0 z-30 transition-transform duration-300 ${
@@ -128,11 +137,31 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
         </div>
       </div>
 
+      {/* Filter tabs */}
+      <div className="px-4 pt-4 pb-0 flex items-center gap-1.5 select-none">
+        <button
+          onClick={() => setFilterMode('all')}
+          className={`sidebar-filter-tab ${filterMode === 'all' ? 'active' : ''}`}
+        >{lang === 'zh' ? '全部' : 'All'}</button>
+        <button
+          onClick={() => setFilterMode('bookmarked')}
+          className={`sidebar-filter-tab ${filterMode === 'bookmarked' ? 'active' : ''}`}
+          disabled={!hasBookmarks}
+        >{lang === 'zh' ? '已收藏' : 'Saved'}</button>
+        <button
+          onClick={() => setFilterMode('noted')}
+          className={`sidebar-filter-tab ${filterMode === 'noted' ? 'active' : ''}`}
+          disabled={!hasNotes}
+        >{lang === 'zh' ? '有笔记' : 'Noted'}</button>
+      </div>
+
       {/* Lessons list */}
       <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-6 select-none">
         {filteredSections.length === 0 ? (
           <div className="text-xs text-slate-400 text-center py-8">
-            {lang === 'zh' ? '未找到相关章节' : 'No chapters found'}
+            {inFilterMode
+              ? (lang === 'zh' ? '没有匹配的章节' : 'No matching chapters')
+              : (lang === 'zh' ? '未找到相关章节' : 'No chapters found')}
           </div>
         ) : (
           filteredSections.map((section, idx) => (
@@ -149,6 +178,8 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
               <div className="space-y-3">
                 {section.lessons.map((lesson) => {
                   const isSelected = currentId === lesson.id
+                  const isBm = !!bookmarks[lesson.id]
+                  const hasNote = Object.keys(notes).some(k => k.startsWith(lesson.id + '::'))
                   return (
                     <button
                       key={lesson.id}
@@ -157,7 +188,7 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
                         isSelected ? 'bg-slate-100/70 font-semibold' : 'hover:bg-slate-50/80'
                       }`}
                     >
-                      <div className="flex items-center gap-3 w-full">
+                      <div className="flex items-center gap-3 w-full min-w-0">
                         <div className={`w-8 h-5 rounded flex items-center justify-center font-mono text-[10px] font-medium shrink-0 ${
                           isSelected ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-400'
                         }`}>
@@ -168,6 +199,10 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
                         }`}>
                           {lesson.title}
                         </span>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 ml-1">
+                        {isBm && <span className="sidebar-item-star" title={lang === 'zh' ? '已收藏' : 'Bookmarked'}>&#9733;</span>}
+                        {hasNote && <span className="sidebar-item-note-dot" title={lang === 'zh' ? '有笔记' : 'Has notes'}>&#183;</span>}
                       </div>
                     </button>
                   )
@@ -189,7 +224,7 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
             <span>{lang === 'zh' ? '新手指导' : 'Guided Tour'}</span>
           </button>
           <button
-            onClick={() => alert(lang === 'zh' ? '笔记与收藏功能即将上线' : 'Notes feature coming soon')}
+            onClick={() => onOpenNotes?.()}
             className="w-full text-left flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 transition-colors"
           >
             <BookMarked className="w-3.5 h-3.5 text-slate-400" />

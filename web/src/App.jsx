@@ -3,9 +3,13 @@ import { flushSync } from 'react-dom'
 import { Menu } from 'lucide-react'
 import Sidebar from './components/Sidebar.jsx'
 import NotebookViewer from './components/NotebookViewer.jsx'
+import NotesPanel from './components/NotesPanel.jsx'
 import Welcome from './components/Welcome.jsx'
 import GuidedTour from './components/GuidedTour.jsx'
 import { getCatalog, getNotebook } from './data/notebooks.js'
+import useNotesAndBookmarks from './hooks/useNotesAndBookmarks.js'
+
+const NOTES_SENTINEL = '__notes__'
 
 const DEFAULT_LANG = 'zh'
 
@@ -84,6 +88,8 @@ function App() {
   const [tourActive, setTourActive] = useState(false)
   const [tourStepIndex, setTourStepIndex] = useState(0)
 
+  const nbm = useNotesAndBookmarks()
+
   useEffect(() => {
     setCatalog(getCatalog(lang))
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN'
@@ -94,7 +100,11 @@ function App() {
   useEffect(() => {
     const syncFromHash = () => {
       const nextId = getInitialNotebookId()
-      setCurrentId(nextId)
+      if (nextId === NOTES_SENTINEL) return
+      setCurrentId((prev) => {
+        if (prev === NOTES_SENTINEL) return prev
+        return nextId
+      })
       if (nextId && window.location.hash !== `#${nextId}`) {
         replaceUrlWithHash(nextId, lang)
       }
@@ -123,6 +133,14 @@ function App() {
 
   const handleHome = useCallback(() => {
     flushSync(() => setCurrentId(null))
+    replaceUrlWithHash(null, lang)
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false)
+    }
+  }, [lang])
+
+  const handleOpenNotes = useCallback(() => {
+    flushSync(() => setCurrentId(NOTES_SENTINEL))
     replaceUrlWithHash(null, lang)
     if (window.innerWidth < 768) {
       setSidebarOpen(false)
@@ -296,16 +314,35 @@ function App() {
         onSelect={handleSelect}
         onHome={handleHome}
         onStartTour={startTour}
+        onOpenNotes={handleOpenNotes}
+        bookmarks={nbm.bookmarks}
+        notes={nbm.notes}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
       <main className="flex-1 flex flex-col min-h-screen min-w-0">
-        {currentId ? (
+        {currentId === NOTES_SENTINEL ? (
+          <NotesPanel
+            catalog={catalog}
+            bookmarks={nbm.bookmarks}
+            notes={nbm.notes}
+            getSectionNotes={nbm.getSectionNotes}
+            exportData={nbm.exportData}
+            importFile={nbm.importFile}
+            onSelect={handleSelect}
+            lang={lang}
+          />
+        ) : currentId ? (
           <NotebookViewer
             notebook={notebook}
             meta={currentMeta}
             loading={loading}
+            isBookmarked={nbm.isBookmarked}
+            toggleBookmark={nbm.toggleBookmark}
+            notes={nbm.notes}
+            saveNote={nbm.saveNote}
+            deleteNote={nbm.deleteNote}
           />
         ) : (
           <Welcome
