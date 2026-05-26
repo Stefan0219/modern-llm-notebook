@@ -306,7 +306,7 @@ function AppContent() {
   }, [])
 
   return (
-    <div className="min-h-screen flex bg-[var(--bg-app)] text-[var(--text-body)] font-sans antialiased">
+    <div className="h-screen flex overflow-hidden bg-[var(--bg-app)] text-[var(--text-body)] font-sans antialiased">
       {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(true)}
@@ -341,7 +341,7 @@ function AppContent() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 flex flex-col min-h-screen min-w-0">
+      <main className="flex-1 flex flex-col h-screen min-w-0 overflow-y-auto">
         {currentId === NOTES_SENTINEL ? (
           <NotesPanel
             catalog={catalog}
