@@ -128,36 +128,42 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
     }
   }, [notebook?.id, notebook?.html, toc.length])
 
-  // Inject note icons on h2/h3 headings
-  useEffect(() => {
+  // Inject note icons on h2/h3 headings — useLayoutEffect so DOM is ready
+  useLayoutEffect(() => {
     const content = notebookContentRef.current
     if (!notebook?.id || !content) return
 
-    const headings = content.querySelectorAll('h2, h3')
-    headings.forEach((h) => {
-      let btn = h.querySelector('.section-note-btn')
-      if (!btn) {
-        btn = document.createElement('button')
-        btn.className = 'section-note-btn'
-        btn.dataset.sectionId = h.id || ''
-        btn.dataset.sectionTitle = h.textContent.replace(/[#\n\r]/g, '').trim()
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>'
-        h.appendChild(btn)
-      }
+    // Defer injection to next frame to guarantee dangerouslySetInnerHTML has settled
+    const frame = requestAnimationFrame(() => {
+      const headings = content.querySelectorAll('h2, h3')
+      if (headings.length === 0) return
 
-      // Always update: note key, tooltip, and class based on current state
-      const noteKey = `${notebook.id}::${h.id || ''}`
-      btn.dataset.noteKey = noteKey
-      const hasNote = notes[noteKey]
-      btn.setAttribute('aria-label', lang === 'en' ? (hasNote ? 'Edit note' : 'Add note') : (hasNote ? '编辑笔记' : '添加笔记'))
-      btn.setAttribute('title', lang === 'en' ? (hasNote ? 'Edit note' : 'Add note') : (hasNote ? '编辑笔记' : '添加笔记'))
-      if (hasNote) {
-        btn.classList.add('has-note')
-      } else {
-        btn.classList.remove('has-note')
-      }
+      headings.forEach((h) => {
+        let btn = h.querySelector('.section-note-btn')
+        if (!btn) {
+          btn = document.createElement('button')
+          btn.className = 'section-note-btn'
+          btn.dataset.sectionId = h.id || ''
+          btn.dataset.sectionTitle = h.textContent.replace(/[#\n\r]/g, '').trim()
+          btn.textContent = '✎'
+          h.appendChild(btn)
+        }
+
+        const noteKey = `${notebook.id}::${h.id || ''}`
+        btn.dataset.noteKey = noteKey
+        const hasNote = notes[noteKey]
+        btn.setAttribute('aria-label', lang === 'en' ? (hasNote ? 'Edit note' : 'Add note') : (hasNote ? '编辑笔记' : '添加笔记'))
+        btn.setAttribute('title', lang === 'en' ? (hasNote ? 'Edit note' : 'Add note') : (hasNote ? '编辑笔记' : '添加笔记'))
+        if (hasNote) {
+          btn.classList.add('has-note')
+        } else {
+          btn.classList.remove('has-note')
+        }
+      })
     })
-  }, [notebook?.id, notebook?.html, notes, lang])
+
+    return () => cancelAnimationFrame(frame)
+  }, [notebook?.id, notes, lang])
 
   useEffect(() => {
     if (!imagePreview && !noteEditor) return undefined
