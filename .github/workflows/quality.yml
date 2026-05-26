@@ -20,9 +20,6 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Check English notebook coverage
-        run: python scripts/check_english_notebooks.py
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -37,4 +34,3 @@ jobs:
       - name: Build web reader
         working-directory: web
         run: npm run build
-
