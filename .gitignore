@@ -40,5 +40,11 @@ web/dist/
 web/public/data/
 web/public/notebooks/
 
+# Jupyter auxiliary files (notebook 重命名残留)
+*_files/
+
+# Reference materials
+.reference/
+
 # Auto-generated web builds
 docs/
