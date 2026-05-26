@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
 
 @theme {
   --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans CJK SC", sans-serif;
@@ -303,6 +304,11 @@
 
 .rendered_html p { margin: 0 0 1.05em; }
 .rendered_html ul, .rendered_html ol { margin: 0 0 1.05em; padding-left: 1.55em; }
+.rendered_html ul { list-style-type: disc; }
+.rendered_html ul ul { list-style-type: circle; }
+.rendered_html ul ul ul { list-style-type: square; }
+.rendered_html ol { list-style-type: decimal; }
+.rendered_html ol ol { list-style-type: lower-alpha; }
 .rendered_html li { margin-bottom: 0.35em; }
 .rendered_html .task-list-item {
   list-style: none;
@@ -598,6 +604,32 @@
 }
 
 .MathJax { font-size: 1em !important; }
+
+/* KaTeX math rendering */
+.rendered_html .katex-display {
+  margin: 1.2em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.rendered_html .katex-display > .katex {
+  text-align: center;
+  white-space: normal;
+}
+
+.rendered_html .katex {
+  font-size: 1.05em;
+}
+
+.math-display {
+  margin: 1.2em 0;
+  overflow-x: auto;
+}
+
+.rendered_html .katex-display > .katex > .katex-html > .tag {
+  position: absolute;
+  right: 0;
+}
 
 /* Pygments syntax highlighting - VS Code Dark+ theme */
 .highlight .hll { background-color: #264f78; }

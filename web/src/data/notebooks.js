@@ -1,3 +1,5 @@
+import katex from 'katex'
+
 const zhNotebookModules = import.meta.glob('../../../notebooks/**/*.ipynb', {
   query: '?raw',
   import: 'default',
@@ -156,9 +158,27 @@ function inlineMarkdown(text) {
     '<img src="$2" alt="$1" loading="lazy" />'
   )
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+
+  // Render math segments with KaTeX
   mathSegments.forEach((segment, index) => {
-    html = html.replace(`@@MATH_${index}@@`, segment)
+    const isDisplay = segment.startsWith('$$') || segment.startsWith('\\[')
+    const formula = segment
+      .replace(/^\$\$|\$\$$/g, '')
+      .replace(/^\\\[|\\\]$/g, '')
+      .replace(/^\\\(|\\\)$/g, '')
+      .replace(/^\$|\$$/g, '')
+    try {
+      const rendered = katex.renderToString(formula, {
+        displayMode: isDisplay,
+        throwOnError: false,
+        strict: false,
+      })
+      html = html.replace(`@@MATH_${index}@@`, rendered)
+    } catch {
+      html = html.replace(`@@MATH_${index}@@`, escapeHtml(segment))
+    }
   })
+
   return html
 }
 
@@ -214,7 +234,17 @@ function renderMarkdown(source) {
           i += 1
         }
       }
-      blocks.push(`<div class="math-display">${escapeHtml(mathLines.join('\n'))}</div>`)
+      const formula = mathLines.join('\n').replace(/^\$\$|\$\$$/g, '')
+      try {
+        const rendered = katex.renderToString(formula.trim(), {
+          displayMode: true,
+          throwOnError: false,
+          strict: false,
+        })
+        blocks.push(`<div class="math-display">${rendered}</div>`)
+      } catch {
+        blocks.push(`<div class="math-display">${escapeHtml(mathLines.join('\n'))}</div>`)
+      }
       continue
     }
 
