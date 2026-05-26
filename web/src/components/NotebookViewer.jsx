@@ -564,16 +564,21 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
             <div className="toc-sticky">
               <div className="toc-title">{lang === 'en' ? 'Outline' : '大纲'}</div>
               <nav className="toc-nav">
-                {toc.map((item) => (
-                  <button
-                    key={item.id}
-                    data-toc-id={item.id}
-                    className={`toc-item ${activeHeading === item.id ? 'active' : ''} toc-level-${item.level}`}
-                    onClick={() => handleTocClick(item.id)}
-                  >
-                    {item.text}
-                  </button>
-                ))}
+                {toc.map((item) => {
+                  const tocNoteKey = `${notebook.id}::${item.id}`
+                  const hasTocNote = !!notes[tocNoteKey]
+                  return (
+                    <button
+                      key={item.id}
+                      data-toc-id={item.id}
+                      className={`toc-item ${activeHeading === item.id ? 'active' : ''} toc-level-${item.level}`}
+                      onClick={() => handleTocClick(item.id)}
+                    >
+                      <span className="toc-item-text">{item.text}</span>
+                      {hasTocNote && <span className="toc-item-note-dot" title={lang === 'en' ? 'Has note' : '有笔记'} />}
+                    </button>
+                  )
+                })}
               </nav>
             </div>
           </aside>

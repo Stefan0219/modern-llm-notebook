@@ -22,11 +22,11 @@ const SECTION_STYLES = {
 }
 
 const PATH_STEP_STYLES = [
-  { numBg: 'bg-slate-50 text-slate-600' },
-  { numBg: 'bg-slate-50 text-slate-600' },
-  { numBg: 'bg-slate-50 text-slate-600' },
-  { numBg: 'bg-slate-50 text-slate-600' },
-  { numBg: 'bg-slate-50 text-slate-600' },
+  { numBg: 'bg-[var(--bg-input)] text-[var(--text-secondary)]' },
+  { numBg: 'bg-[var(--bg-input)] text-[var(--text-secondary)]' },
+  { numBg: 'bg-[var(--bg-input)] text-[var(--text-secondary)]' },
+  { numBg: 'bg-[var(--bg-input)] text-[var(--text-secondary)]' },
+  { numBg: 'bg-[var(--bg-input)] text-[var(--text-secondary)]' },
 ]
 
 const NOTEBOOK_BG = {
@@ -320,7 +320,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                 </span>
               </h1>
 
-              <p className="text-xs sm:text-sm md:text-base leading-relaxed text-slate-500 max-w-xl">
+              <p className="text-xs sm:text-sm md:text-base leading-relaxed text-[var(--text-muted)] max-w-xl">
                 {t.bannerDesc}
               </p>
 
@@ -334,15 +334,15 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                 </button>
                 <button
                   onClick={scrollToPath}
-                  className="h-10 sm:h-12 px-5 sm:px-6 rounded-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 font-bold text-xs sm:text-sm active:scale-[0.98] transition-all"
+                  className="h-10 sm:h-12 px-5 sm:px-6 rounded-full bg-white hover:bg-[var(--bg-input)] text-slate-700 border border-[var(--border-light)]/90 font-bold text-xs sm:text-sm active:scale-[0.98] transition-all"
                 >
                   {t.browsePath}
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 border-t border-slate-200/50 pt-4 sm:pt-5 max-w-lg select-none">
+              <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 border-t border-[var(--border-light)]/50 pt-4 sm:pt-5 max-w-lg select-none">
                 {[t.check1, t.check2, t.check3, t.check4].map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-[10px] sm:text-xs font-bold text-slate-500">
+                  <div key={idx} className="flex items-center gap-2 text-[10px] sm:text-xs font-bold text-[var(--text-muted)]">
                     <div className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
                       <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[2.5]" />
                     </div>
@@ -355,7 +355,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
             {/* Right column: floating glass windows — hidden on small screens to prevent overflow */}
             <div className="hidden lg:flex lg:col-span-5 relative min-h-[300px] items-center justify-center select-none">
               <div className="absolute w-[280px] h-[190px] rounded-2xl glass-effect shadow-xl p-4 border border-white/60 left-[5%] top-[10%] animate-float-1 z-10 overflow-hidden">
-                <div className="flex items-center justify-between mb-3 border-b border-slate-200/40 pb-1.5">
+                <div className="flex items-center justify-between mb-3 border-b border-[var(--border-light)]/40 pb-1.5">
                   <div className="flex gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-400"></span>
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
@@ -363,7 +363,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                   </div>
                   <span className="text-[9px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">inference.py</span>
                 </div>
-                <pre className="font-mono text-[10px] text-slate-600 space-y-0.5">
+                <pre className="font-mono text-[10px] text-[var(--text-secondary)] space-y-0.5">
                   <div><span className="text-purple-600 font-bold">import</span> torch</div>
                   <div className="text-slate-300"># autoregressive search</div>
                   <div><span className="text-blue-600 font-bold">def</span> <span className="text-indigo-600 font-bold">generate</span>(inputs, max_len=50):</div>
@@ -376,7 +376,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
               </div>
 
               <div className="absolute w-[260px] h-[170px] rounded-2xl glass-effect shadow-lg p-3.5 border border-white/60 right-0 bottom-[5%] animate-float-2 z-0">
-                <div className="flex justify-between items-center text-[9px] font-semibold text-slate-500 mb-2">
+                <div className="flex justify-between items-center text-[9px] font-semibold text-[var(--text-muted)] mb-2">
                   <span className="font-bold flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-purple-500" />
                     Attention Map
@@ -406,47 +406,47 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
         </section>
 
         {/* STATS BAR */}
-        <section className="stats grid grid-cols-[repeat(auto-fit,minmax(min(100%,190px),1fr))] bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden">
-          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/50 shrink-0">
+        <section className="stats grid grid-cols-[repeat(auto-fit,minmax(min(100%,190px),1fr))] bg-[var(--bg-sidebar)] rounded-2xl border border-black/10 shadow-sm overflow-hidden">
+          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-[var(--bg-input)]/45 transition-colors">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[var(--bg-input)] text-[var(--text-muted)] flex items-center justify-center border border-[var(--border-light)]/50 shrink-0">
               <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
             </div>
             <div className="space-y-0.5 min-w-0">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">23+</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '可运行 Notebook' : 'Runnable Notebooks'}</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text-primary)] tracking-tight leading-none">23+</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-[var(--text-label)] leading-snug break-words">{lang === 'zh' ? '可运行 Notebook' : 'Runnable Notebooks'}</div>
             </div>
           </div>
-          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/50 shrink-0">
+          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-[var(--bg-input)]/45 transition-colors">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[var(--bg-input)] text-[var(--text-muted)] flex items-center justify-center border border-[var(--border-light)]/50 shrink-0">
               <Layers className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
             </div>
             <div className="space-y-0.5 min-w-0">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">5</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '学习路径' : 'Learning Paths'}</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text-primary)] tracking-tight leading-none">5</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-[var(--text-label)] leading-snug break-words">{lang === 'zh' ? '学习路径' : 'Learning Paths'}</div>
             </div>
           </div>
-          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/50 shrink-0">
+          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-[var(--bg-input)]/45 transition-colors">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[var(--bg-input)] text-[var(--text-muted)] flex items-center justify-center border border-[var(--border-light)]/50 shrink-0">
               <Cpu className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
             </div>
             <div className="space-y-0.5 min-w-0">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">20+</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '核心模块' : 'Core Modules'}</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text-primary)] tracking-tight leading-none">20+</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-[var(--text-label)] leading-snug break-words">{lang === 'zh' ? '核心模块' : 'Core Modules'}</div>
             </div>
           </div>
-          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-slate-50/45 transition-colors">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-200/50 shrink-0">
+          <div className="p-4 sm:p-5 md:p-6 flex items-center gap-3 sm:gap-4 hover:bg-[var(--bg-input)]/45 transition-colors">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[var(--bg-input)] text-[var(--text-muted)] flex items-center justify-center border border-[var(--border-light)]/50 shrink-0">
               <Star className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
             </div>
             <div className="space-y-0.5 min-w-0">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 tracking-tight leading-none">{formatStarCount(starCount)}</div>
-              <div className="text-[10px] sm:text-[11px] font-medium text-slate-400 leading-snug break-words">{lang === 'zh' ? '开源社区支持' : 'Open Source Community'}</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text-primary)] tracking-tight leading-none">{formatStarCount(starCount)}</div>
+              <div className="text-[10px] sm:text-[11px] font-medium text-[var(--text-label)] leading-snug break-words">{lang === 'zh' ? '开源社区支持' : 'Open Source Community'}</div>
             </div>
           </div>
         </section>
 
         {/* FEATURES STRIP */}
-        <section data-tour="features" className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] bg-white rounded-2xl border border-black/10 shadow-sm p-3 sm:p-4 gap-3 sm:gap-4">
+        <section data-tour="features" className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] bg-[var(--bg-sidebar)] rounded-2xl border border-black/10 shadow-sm p-3 sm:p-4 gap-3 sm:gap-4">
           {[
             { icon: <Monitor className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature1, desc: t.feature1d },
             { icon: <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5]" />, title: t.feature2, desc: t.feature2d },
@@ -455,21 +455,21 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
             { icon: <Rocket className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature5, desc: t.feature5d },
           ].map((f, i) => (
             <div key={i} className="p-1.5 sm:p-2 flex items-start gap-2.5 sm:gap-3.5">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border shrink-0 bg-slate-50 text-slate-500 border-slate-200/50">{f.icon}</div>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border shrink-0 bg-[var(--bg-input)] text-[var(--text-muted)] border-[var(--border-light)]/50">{f.icon}</div>
               <div className="space-y-0.5 min-w-0">
-                <h3 className="text-[11px] sm:text-[13px] font-bold text-slate-800 leading-snug break-words">{f.title}</h3>
-                <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium leading-normal break-words">{f.desc}</p>
+                <h3 className="text-[11px] sm:text-[13px] font-bold text-[var(--text-primary)] leading-snug break-words">{f.title}</h3>
+                <p className="text-[10px] sm:text-[11px] text-[var(--text-label)] font-medium leading-normal break-words">{f.desc}</p>
               </div>
             </div>
           ))}
         </section>
 
         {/* LEARNING PATH */}
-        <section id="learning-path-section" className="parts bg-white rounded-2xl border border-black/10 shadow-sm p-5 md:p-6 space-y-4">
+        <section id="learning-path-section" className="parts bg-[var(--bg-sidebar)] rounded-2xl border border-black/10 shadow-sm p-5 md:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h2 className="text-[18px] md:text-[20px] font-bold text-slate-800">{t.learningPathTitle}</h2>
-              <p className="text-xs text-slate-500 font-medium">{t.learningPathSub}</p>
+              <h2 className="text-[18px] md:text-[20px] font-bold text-[var(--text-primary)]">{t.learningPathTitle}</h2>
+              <p className="text-xs text-[var(--text-muted)] font-medium">{t.learningPathSub}</p>
             </div>
           </div>
 
@@ -482,19 +482,19 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                   onClick={() => {
                     window.dispatchEvent(new CustomEvent('sidebar-scroll-to', { detail: { section: step.section } }))
                   }}
-                  className="w-full bg-white rounded-[10px] p-3 sm:p-4 border border-black/10 flex flex-col justify-between shadow-sm relative transition-all duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 cursor-pointer group overflow-hidden"
+                  className="w-full bg-white rounded-[10px] p-3 sm:p-4 border border-black/10 flex flex-col justify-between shadow-sm relative transition-shadow transition-transform duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 cursor-pointer group overflow-hidden"
                 >
                   <span className={`text-[11px] font-mono font-bold tracking-wider px-1.5 py-0.5 rounded ${ps.numBg} w-fit`}>{step.num}</span>
                   <div className="space-y-1 mt-2 sm:mt-3">
                     <h3 className="text-[12px] sm:text-[13px] font-semibold text-slate-700 group-hover:text-[#1d6bf3] transition-colors">{lang === 'zh' ? step.title : step.titleEn}</h3>
-                    <p className="text-[10px] sm:text-[11px] text-slate-500 leading-normal line-clamp-2">{lang === 'zh' ? step.desc : step.descEn}</p>
+                    <p className="text-[10px] sm:text-[11px] text-[var(--text-muted)] leading-normal line-clamp-2">{lang === 'zh' ? step.desc : step.descEn}</p>
                   </div>
                 </div>
 
                 {idx < PATH_STEPS.length - 1 && (
                   <div className="hidden lg:flex absolute right-[-14px] top-1/2 -translate-y-1/2 z-10 pointer-events-none items-center justify-center text-slate-200 w-6">
-                    <div className="w-full border-t-2 border-dashed border-slate-200/80"></div>
-                    <div className="w-2.5 h-2.5 rounded-full border-2 border-slate-200 bg-white absolute"></div>
+                    <div className="w-full border-t-2 border-dashed border-[var(--border-light)]/80"></div>
+                    <div className="w-2.5 h-2.5 rounded-full border-2 border-[var(--border-light)] bg-white absolute"></div>
                   </div>
                 )}
               </div>
@@ -504,11 +504,11 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
         </section>
 
         {/* RUNNABLE NOTEBOOKS */}
-        <section data-tour="notebooks" className="bg-white rounded-2xl border border-black/10 shadow-sm p-5 md:p-6 space-y-4">
+        <section data-tour="notebooks" className="bg-[var(--bg-sidebar)] rounded-2xl border border-black/10 shadow-sm p-5 md:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h2 className="text-[18px] md:text-[20px] font-bold text-slate-800">{t.runnableNotebooksTitle}</h2>
-              <p className="text-xs text-slate-500 font-medium">{t.runnableNotebooksSub}</p>
+              <h2 className="text-[18px] md:text-[20px] font-bold text-[var(--text-primary)]">{t.runnableNotebooksTitle}</h2>
+              <p className="text-xs text-[var(--text-muted)] font-medium">{t.runnableNotebooksSub}</p>
             </div>
           </div>
 
@@ -521,21 +521,21 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                 <div
                   key={nb.id}
                   onClick={() => onSelect(nb.lessonId)}
-                  className="shrink-0 w-[180px] sm:w-[200px] border border-black/10 rounded-[10px] overflow-hidden cursor-pointer transition-all duration-200 bg-white relative hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 group flex flex-col snap-start"
+                  className="shrink-0 w-[180px] sm:w-[200px] border border-black/10 rounded-[10px] overflow-hidden cursor-pointer transition-shadow transition-transform duration-200 bg-white relative hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 group flex flex-col snap-start"
                 >
                   <div className={`h-[90px] flex items-center justify-center relative overflow-hidden bg-gradient-to-br ${NOTEBOOK_BG[nb.id] || style.bg}`}>
                     {NOTEBOOK_SVGS[nb.id] || NOTEBOOK_SVGS['nb-1']}
                   </div>
                   <div className="p-3 bg-white flex-1 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-[12px] font-semibold text-slate-800 group-hover:text-[#1d6bf3] transition-colors mb-1 line-clamp-1">{notebookTitle}</h4>
-                      <p className="text-[11px] text-slate-400 line-clamp-1 leading-relaxed">{lang === 'zh' ? nb.desc : nb.descEn}</p>
+                      <h4 className="text-[12px] font-semibold text-[var(--text-primary)] group-hover:text-[#1d6bf3] transition-colors mb-1 line-clamp-1">{notebookTitle}</h4>
+                      <p className="text-[11px] text-[var(--text-label)] line-clamp-1 leading-relaxed">{lang === 'zh' ? nb.desc : nb.descEn}</p>
                     </div>
                     <div className="flex items-center justify-between text-[10px] mt-2">
                       <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold border ${style.tag}`}>
                         {lang === 'zh' ? style.nameZh : style.nameEn}
                       </span>
-                      <span className="text-slate-400 font-medium">{nb.duration}{lang === 'zh' ? '分钟' : 'm'}</span>
+                      <span className="text-[var(--text-label)] font-medium">{nb.duration}{lang === 'zh' ? '分钟' : 'm'}</span>
                     </div>
                   </div>
                 </div>
@@ -546,7 +546,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
 
         {/* FOOTER */}
         <div className="w-full flex items-center justify-center pt-2 pb-6 select-none">
-          <span className="text-xs text-slate-400 tracking-wide">{t.footerQuote}</span>
+          <span className="text-xs text-[var(--text-label)] tracking-wide">{t.footerQuote}</span>
         </div>
     </div>
   )
