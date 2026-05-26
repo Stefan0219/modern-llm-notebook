@@ -13,24 +13,24 @@ const SECTION_STYLES = {
 }
 
 const PATH_STEP_STYLES = [
-  { border: 'border-l-[3px] border-l-blue-400', numBg: 'bg-blue-50 text-blue-600', hoverShadow: 'hover:shadow-blue-100/60' },
-  { border: 'border-l-[3px] border-l-purple-400', numBg: 'bg-purple-50 text-purple-600', hoverShadow: 'hover:shadow-purple-100/60' },
-  { border: 'border-l-[3px] border-l-emerald-400', numBg: 'bg-emerald-50 text-emerald-600', hoverShadow: 'hover:shadow-emerald-100/60' },
-  { border: 'border-l-[3px] border-l-amber-400', numBg: 'bg-amber-50 text-amber-600', hoverShadow: 'hover:shadow-amber-100/60' },
-  { border: 'border-l-[3px] border-l-rose-400', numBg: 'bg-rose-50 text-rose-600', hoverShadow: 'hover:shadow-rose-100/60' },
+  { numBg: 'bg-slate-50 text-slate-600' },
+  { numBg: 'bg-slate-50 text-slate-600' },
+  { numBg: 'bg-slate-50 text-slate-600' },
+  { numBg: 'bg-slate-50 text-slate-600' },
+  { numBg: 'bg-slate-50 text-slate-600' },
 ]
 
 const NOTEBOOK_BG = {
-  'nb-1': 'bg-[#dbeafe]',     // Tokenizer — blue
-  'nb-2': 'bg-[#c7d2fe]',     // Attention — indigo-blue
-  'nb-3': 'bg-[#ddd6fe]',     // MoE — lavender
-  'nb-4': 'bg-[#e9d5ff]',     // Training — violet
-  'nb-5': 'bg-[#93c5fd]',     // Mini-GPT — sky blue
-  'nb-6': 'bg-[#f0abfc]',     // LoRA — fuchsia
-  'nb-7': 'bg-[#6ee7b7]',     // Generation — emerald
-  'nb-8': 'bg-[#fcd34d]',     // CoT — amber
-  'nb-9': 'bg-[#a78bfa]',     // RLHF — purple
-  'nb-10': 'bg-[#fda4af]',    // Distillation — rose
+  'nb-1': 'from-[#eff6ff] to-[#dbeafe]',     // Tokenizer — soft blue gradient
+  'nb-2': 'from-[#eef2ff] to-[#c7d2fe]',     // Attention — indigo-blue
+  'nb-3': 'from-[#f5f3ff] to-[#ddd6fe]',     // MoE — lavender
+  'nb-4': 'from-[#faf5ff] to-[#e9d5ff]',     // Training — violet
+  'nb-5': 'from-[#dbeafe] to-[#93c5fd]',     // Mini-GPT — vivid blue
+  'nb-6': 'from-[#fdf4ff] to-[#f0abfc]',     // LoRA — fuchsia
+  'nb-7': 'from-[#ecfdf5] to-[#6ee7b7]',     // Generation — vivid emerald
+  'nb-8': 'from-[#fffbeb] to-[#fcd34d]',     // CoT — golden amber
+  'nb-9': 'from-[#ede9fe] to-[#a78bfa]',     // RLHF — deep purple
+  'nb-10': 'from-[#fff1f2] to-[#fda4af]',    // Distillation — rose
 }
 
 const NOTEBOOK_SVGS = {
@@ -404,14 +404,14 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
         {/* FEATURES STRIP */}
         <section data-tour="features" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 bg-white rounded-2xl border border-black/10 shadow-sm p-3 sm:p-4 gap-3 sm:gap-4 lg:divide-x divide-slate-100/80">
           {[
-            { icon: <Monitor className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, bg: 'bg-[#ebf3ff] text-blue-600 border-blue-100/30', title: t.feature1, desc: t.feature1d },
-            { icon: <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5]" />, bg: 'bg-[#ecfdf5] text-emerald-600 border-emerald-100/30', title: t.feature2, desc: t.feature2d },
-            { icon: <Layers className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, bg: 'bg-[#eef2ff] text-indigo-600 border-indigo-100/30', title: t.feature3, desc: t.feature3d },
-            { icon: <Languages className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, bg: 'bg-[#faf5ff] text-purple-600 border-purple-100/30', title: t.feature4, desc: t.feature4d },
-            { icon: <Rocket className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, bg: 'bg-amber-50 text-amber-600 border-amber-100/30', title: t.feature5, desc: t.feature5d },
+            { icon: <Monitor className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature1, desc: t.feature1d },
+            { icon: <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5]" />, title: t.feature2, desc: t.feature2d },
+            { icon: <Layers className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature3, desc: t.feature3d },
+            { icon: <Languages className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature4, desc: t.feature4d },
+            { icon: <Rocket className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />, title: t.feature5, desc: t.feature5d },
           ].map((f, i) => (
             <div key={i} className="p-1.5 sm:p-2 flex items-start gap-2.5 sm:gap-3.5 lg:pl-6 first:lg:pl-0">
-              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border shrink-0 ${f.bg}`}>{f.icon}</div>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border shrink-0 bg-slate-50 text-slate-500 border-slate-200/50">{f.icon}</div>
               <div className="space-y-0.5 min-w-0">
                 <h3 className="text-[11px] sm:text-[13px] font-bold text-slate-800 truncate">{f.title}</h3>
                 <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium leading-normal line-clamp-2">{f.desc}</p>
@@ -438,7 +438,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                   onClick={() => {
                     window.dispatchEvent(new CustomEvent('sidebar-scroll-to', { detail: { section: step.section } }))
                   }}
-                  className={`w-full bg-white rounded-[10px] p-3 sm:p-4 border border-black/10 ${ps.border} flex flex-col justify-between shadow-sm relative transition-all duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 cursor-pointer group overflow-hidden`}
+                  className="w-full bg-white rounded-[10px] p-3 sm:p-4 border border-black/10 flex flex-col justify-between shadow-sm relative transition-all duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 cursor-pointer group overflow-hidden"
                 >
                   <span className={`text-[11px] font-mono font-bold tracking-wider px-1.5 py-0.5 rounded ${ps.numBg} w-fit`}>{step.num}</span>
                   <div className="space-y-1 mt-2 sm:mt-3">
@@ -477,7 +477,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                   onClick={() => onSelect(nb.lessonId)}
                   className="shrink-0 w-[180px] sm:w-[200px] border border-black/10 rounded-[10px] overflow-hidden cursor-pointer transition-all duration-200 bg-white relative hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 group flex flex-col snap-start"
                 >
-                  <div className={`h-[90px] flex items-center justify-center relative overflow-hidden ${NOTEBOOK_BG[nb.id] || 'bg-gradient-to-br ' + style.bg}`}>
+                  <div className={`h-[90px] flex items-center justify-center relative overflow-hidden bg-gradient-to-br ${NOTEBOOK_BG[nb.id] || style.bg}`}>
                     {NOTEBOOK_SVGS[nb.id] || NOTEBOOK_SVGS['nb-1']}
                   </div>
                   <div className="p-3 bg-white flex-1 flex flex-col justify-between">
