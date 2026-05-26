@@ -8,9 +8,15 @@
 }
 
 @layer base {
-  body {
+  html, body {
     @apply text-slate-800 antialiased bg-[#f5f7fa];
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overscroll-behavior: none;
+  }
+
+  [class*="overflow-y-auto"],
+  [class*="overflow-auto"] {
+    overscroll-behavior: none;
   }
 }
 
@@ -658,6 +664,7 @@
 .viewer {
   height: 100vh;
   overflow-y: auto;
+  overscroll-behavior: none;
   scrollbar-color: rgba(0, 0, 0, 0.16) transparent;
   scrollbar-width: thin;
 }
