@@ -23,8 +23,8 @@ function saveJSON(key, value) {
   }
 }
 
-function noteKey(notebookId, sectionId) {
-  return `${notebookId}::${sectionId}`
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 }
 
 export default function useNotesAndBookmarks() {
@@ -48,39 +48,65 @@ export default function useNotesAndBookmarks() {
     return !!bookmarks[id]
   }, [bookmarks])
 
-  const saveNote = useCallback((notebookId, sectionId, sectionTitle, text) => {
+  const saveNote = useCallback((notebookId, sectionId, sectionTitle, quote, text, noteId) => {
     setNotes((prev) => {
       const next = { ...prev }
-      const key = noteKey(notebookId, sectionId)
-      if (text.trim()) {
-        next[key] = { sectionTitle, text: text.trim(), updatedAt: Date.now() }
+      const list = [...(next[notebookId] || [])]
+      if (noteId) {
+        const idx = list.findIndex((n) => n.id === noteId)
+        if (idx >= 0) {
+          list[idx] = { ...list[idx], sectionTitle, quote, text, updatedAt: Date.now() }
+        } else {
+          list.push({
+            id: noteId,
+            sectionId,
+            sectionTitle,
+            quote,
+            text,
+            updatedAt: Date.now(),
+          })
+        }
       } else {
-        delete next[key]
+        // Create new
+        list.push({
+          id: makeId(),
+          sectionId,
+          sectionTitle,
+          quote,
+          text,
+          updatedAt: Date.now(),
+        })
       }
+      next[notebookId] = list
       saveJSON(NOTES_KEY, next)
       return next
     })
   }, [])
 
-  const deleteNote = useCallback((notebookId, sectionId) => {
+  const deleteNote = useCallback((notebookId, noteId) => {
     setNotes((prev) => {
       const next = { ...prev }
-      delete next[noteKey(notebookId, sectionId)]
+      const list = (next[notebookId] || []).filter((n) => n.id !== noteId)
+      if (list.length === 0) {
+        delete next[notebookId]
+      } else {
+        next[notebookId] = list
+      }
       saveJSON(NOTES_KEY, next)
       return next
     })
   }, [])
 
   const getSectionNotes = useCallback((notebookId) => {
-    const prefix = `${notebookId}::`
-    const result = []
-    for (const [key, note] of Object.entries(notes)) {
-      if (key.startsWith(prefix)) {
-        result.push({ sectionId: key.slice(prefix.length), ...note })
-      }
+    return (notes[notebookId] || []).slice().sort((a, b) => b.updatedAt - a.updatedAt)
+  }, [notes])
+
+  const notebooksWithNotes = useMemo(() => {
+    const set = new Set()
+    for (const [id, list] of Object.entries(notes)) {
+      if (list.length > 0) set.add(id)
     }
-    result.sort((a, b) => b.updatedAt - a.updatedAt)
-    return result
+    return set
   }, [notes])
 
   const exportData = useCallback(() => {
@@ -101,7 +127,11 @@ export default function useNotesAndBookmarks() {
       setNotes(newNotes)
       saveJSON(BOOKMARKS_KEY, newBookmarks)
       saveJSON(NOTES_KEY, newNotes)
-      return { ok: true, bookmarkCount: Object.keys(newBookmarks).length, noteCount: Object.keys(newNotes).length }
+      let noteCount = 0
+      for (const list of Object.values(newNotes)) {
+        if (Array.isArray(list)) noteCount += list.length
+      }
+      return { ok: true, bookmarkCount: Object.keys(newBookmarks).length, noteCount }
     } catch {
       return { ok: false, error: 'Invalid import file' }
     }
@@ -121,12 +151,26 @@ export default function useNotesAndBookmarks() {
     })
   }, [importData])
 
+  const clearAll = useCallback(() => {
+    setBookmarks({})
+    setNotes({})
+    saveJSON(BOOKMARKS_KEY, {})
+    saveJSON(NOTES_KEY, {})
+  }, [])
+
   const bookmarkCount = useMemo(() => Object.keys(bookmarks).length, [bookmarks])
-  const noteCount = useMemo(() => Object.keys(notes).length, [notes])
+  const noteCount = useMemo(() => {
+    let count = 0
+    for (const list of Object.values(notes)) {
+      if (Array.isArray(list)) count += list.length
+    }
+    return count
+  }, [notes])
 
   return {
     bookmarks,
     notes,
+    notebooksWithNotes,
     toggleBookmark,
     isBookmarked,
     saveNote,
@@ -135,6 +179,7 @@ export default function useNotesAndBookmarks() {
     exportData,
     importData,
     importFile,
+    clearAll,
     bookmarkCount,
     noteCount,
   }

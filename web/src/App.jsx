@@ -390,19 +390,25 @@ function AppContent() {
       replaceUrlWithHash(tourNotebookId, lang)
     }
     if (step?.action === 'open-notes') {
-      setSettingsOpen(false)
-      setWalkingLabsOpen(false)
-      setCurrentId(NOTES_SENTINEL)
+      flushSync(() => {
+        setSettingsOpen(false)
+        setWalkingLabsOpen(false)
+        setCurrentId(NOTES_SENTINEL)
+      })
     }
     if (step?.action === 'open-settings') {
-      setCurrentId(null)
-      setWalkingLabsOpen(false)
-      setSettingsOpen(true)
+      flushSync(() => {
+        setCurrentId(null)
+        setWalkingLabsOpen(false)
+        setSettingsOpen(true)
+      })
     }
     if (step?.action === 'open-walkinglabs') {
-      setCurrentId(null)
-      setSettingsOpen(false)
-      setWalkingLabsOpen(true)
+      flushSync(() => {
+        setCurrentId(null)
+        setSettingsOpen(false)
+        setWalkingLabsOpen(true)
+      })
     }
 
     if (tourStepIndex >= tourSteps.length - 1) {
@@ -473,6 +479,7 @@ function AppContent() {
             getSectionNotes={nbm.getSectionNotes}
             exportData={nbm.exportData}
             importFile={nbm.importFile}
+            onClearAll={nbm.clearAll}
             onSelect={handleSelect}
             lang={lang}
           />
