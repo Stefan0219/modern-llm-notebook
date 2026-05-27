@@ -208,6 +208,10 @@ function flushParagraph(blocks, paragraph) {
   paragraph.length = 0
 }
 
+function cleanListItemText(text) {
+  return String(text).replace(/^\[(?: |x|X)\]\s+/, '')
+}
+
 function renderMarkdown(source) {
   const lines = source.split(/\r?\n/)
   const blocks = []
@@ -306,12 +310,12 @@ function renderMarkdown(source) {
       flushParagraph(blocks, paragraph)
       const ordered = /\d+\./.test(list[1])
       const tag = ordered ? 'ol' : 'ul'
-      const items = [list[2]]
+      const items = [cleanListItemText(list[2])]
       while (i + 1 < lines.length) {
         const next = lines[i + 1].trim().match(/^([-*+]|\d+\.)\s+(.+)$/)
         if (!next) break
         i += 1
-        items.push(next[2])
+        items.push(cleanListItemText(next[2]))
       }
       blocks.push(`<${tag}>${items.map(item => `<li>${inlineMarkdown(item)}</li>`).join('')}</${tag}>`)
       continue
