@@ -219,14 +219,14 @@ function AppContent() {
       {
         target: '[data-tour="walkinglabs"]',
         title: '扫码加入社群',
-        body: '点击左上角的「...」按钮，可以打开 WalkingLabs 社群页面，里面有微信群二维码和学习交流信息。',
+        body: '点击左上角的「...」按钮，可以打开 WalkingLabs 页面。WalkingLabs 是一个专注于 Agent 技术的开源实验室。',
         nextLabel: '打开看看',
         action: 'open-walkinglabs',
       },
       {
         target: '.modal-card',
         title: '社群与交流',
-        body: '这里展示了 WalkingLabs 社群的二维码和介绍。扫码加入微信群，可以和其他读者一起讨论问题、分享学习心得，还有不定期直播答疑。',
+        body: 'WalkingLabs 专注于 Agent 相关基础建设与教程。扫码加入微信群，和其他开发者一起探讨 Agent 技术、分享实践经验。',
       },
       {
         target: '[data-tour="notebooks"]',
@@ -241,9 +241,9 @@ function AppContent() {
         body: '顶部按钮可以把当前 Notebook 打开到 ModelScope、百度星河社区或 Colab，在线运行代码，无需本地配置。',
       },
       {
-        target: '.viewer-title-row',
+        target: '.bookmark-star',
         title: '收藏与笔记',
-        body: '点击标题旁的星标可收藏当前 Notebook。所有收藏和笔记在左侧边栏「笔记与收藏」中统一管理，支持导出和导入备份。',
+        body: '点击运行按钮左侧的星标可收藏当前 Notebook。所有收藏和笔记在左侧边栏「笔记与收藏」中统一管理，支持导出和导入备份。',
       },
       {
         target: '.viewer-body',
@@ -314,14 +314,14 @@ function AppContent() {
       {
         target: '[data-tour="walkinglabs"]',
         title: 'Join the Community',
-        body: 'Click the "..." button in the top-left corner to open the WalkingLabs community page with QR codes and group info.',
+        body: 'Click the "..." button in the top-left corner to open the WalkingLabs page. WalkingLabs is an open-source lab focused on Agent technology.',
         nextLabel: 'Take a look',
         action: 'open-walkinglabs',
       },
       {
         target: '.modal-card',
         title: 'Community & Discussion',
-        body: 'This shows the WalkingLabs community QR code and introduction. Scan to join the WeChat group for discussions, study tips, and live Q&A sessions.',
+        body: 'WalkingLabs builds Agent infrastructure and tutorials. Scan the QR code to join the WeChat group and discuss Agent tech with fellow developers.',
       },
       {
         target: '[data-tour="notebooks"]',
@@ -336,9 +336,9 @@ function AppContent() {
         body: 'The top buttons open the current notebook in ModelScope, Baidu Xinghe, or Google Colab. Run code online without any local setup.',
       },
       {
-        target: '.viewer-title-row',
+        target: '.bookmark-star',
         title: 'Bookmarks & Notes',
-        body: 'Click the star next to the title to bookmark. All bookmarks and notes are managed in the sidebar under "Notes & Saved", with export and import support.',
+        body: 'Click the star to the left of the run buttons to bookmark. All bookmarks and notes are managed in the sidebar under "Notes & Saved", with export and import support.',
       },
       {
         target: '.viewer-body',
