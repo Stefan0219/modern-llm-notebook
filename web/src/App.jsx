@@ -195,17 +195,38 @@ function AppContent() {
       {
         target: '[data-tour="notes-saved"]',
         title: '笔记与收藏',
-        body: '阅读时可以随时收藏 Notebook、选中文字添加笔记或高亮标记。所有内容在这里统一管理，支持导出备份和导入恢复，换浏览器也不会丢失。',
+        body: '点击这里可以打开笔记与收藏面板。阅读时你可以收藏 Notebook、选中文字添加笔记或高亮标记，所有内容统一管理，支持导出备份。',
+        nextLabel: '打开看看',
+        action: 'open-notes',
+      },
+      {
+        target: '.notes-panel',
+        title: '笔记与收藏面板',
+        body: '这里展示了你所有的收藏和笔记。上方可以按收藏或笔记筛选，每条笔记都会标注出处章节。底部有导出和导入按钮，换浏览器也不怕丢数据。',
       },
       {
         target: '[data-tour="settings"]',
         title: '个性化设置',
-        body: '点击齿轮图标打开设置面板，可以切换浅色/深色/跟随系统主题，调整正文字号大小。设置会自动保存到本地，下次打开时保持不变。',
+        body: '点击齿轮图标打开设置面板，可以切换浅色/深色/跟随系统主题，还能调整正文字号大小。设置会自动保存。',
+        nextLabel: '打开看看',
+        action: 'open-settings',
+      },
+      {
+        target: '.modal-card',
+        title: '设置面板',
+        body: '这里可以切换主题：浅色、深色或跟随系统自动切换。下方还能调整正文字号（小/中/大），选择后立即生效，阅读更舒适。',
       },
       {
         target: '[data-tour="walkinglabs"]',
         title: '扫码加入社群',
-        body: '点击左上角的「...」按钮，会展开 WalkingLabs 社群二维码。扫码可以加入学习交流群，和其他读者一起讨论问题、分享学习心得。',
+        body: '点击左上角的「...」按钮，可以打开 WalkingLabs 社群页面，里面有微信群二维码和学习交流信息。',
+        nextLabel: '打开看看',
+        action: 'open-walkinglabs',
+      },
+      {
+        target: '.modal-card',
+        title: '社群与交流',
+        body: '这里展示了 WalkingLabs 社群的二维码和介绍。扫码加入微信群，可以和其他读者一起讨论问题、分享学习心得，还有不定期直播答疑。',
       },
       {
         target: '[data-tour="notebooks"]',
@@ -269,17 +290,38 @@ function AppContent() {
       {
         target: '[data-tour="notes-saved"]',
         title: 'Notes & Bookmarks',
-        body: 'Bookmark any notebook, highlight text, or add notes while reading. Everything is managed here — export and import backups so you never lose your work across browsers.',
+        body: 'Click here to open the notes panel. Bookmark notebooks, highlight text, or add notes while reading. Everything is managed here with export and import support.',
+        nextLabel: 'Take a look',
+        action: 'open-notes',
+      },
+      {
+        target: '.notes-panel',
+        title: 'Notes Panel',
+        body: 'All your bookmarks and notes are listed here. Filter by bookmarks or notes using the tabs above. Each note shows its source section. Export and import at the bottom.',
       },
       {
         target: '[data-tour="settings"]',
         title: 'Personalization',
         body: 'Click the gear icon to open settings. Switch between light, dark, and system themes, or adjust the reading font size. Preferences are saved automatically.',
+        nextLabel: 'Take a look',
+        action: 'open-settings',
+      },
+      {
+        target: '.modal-card',
+        title: 'Settings Panel',
+        body: 'Switch themes here: light, dark, or follow your system. Below that, adjust the reading font size (S/M/L). Changes take effect immediately.',
       },
       {
         target: '[data-tour="walkinglabs"]',
         title: 'Join the Community',
-        body: 'Click the "..." button in the top-left corner to reveal the WalkingLabs community QR code. Scan to join the discussion group and connect with other learners.',
+        body: 'Click the "..." button in the top-left corner to open the WalkingLabs community page with QR codes and group info.',
+        nextLabel: 'Take a look',
+        action: 'open-walkinglabs',
+      },
+      {
+        target: '.modal-card',
+        title: 'Community & Discussion',
+        body: 'This shows the WalkingLabs community QR code and introduction. Scan to join the WeChat group for discussions, study tips, and live Q&A sessions.',
       },
       {
         target: '[data-tour="notebooks"]',
@@ -334,6 +376,8 @@ function AppContent() {
 
   const stopTour = useCallback(() => {
     setTourActive(false)
+    setSettingsOpen(false)
+    setWalkingLabsOpen(false)
   }, [])
 
   const handleTourNext = useCallback(() => {
@@ -345,15 +389,39 @@ function AppContent() {
       })
       replaceUrlWithHash(tourNotebookId, lang)
     }
+    if (step?.action === 'open-notes') {
+      setSettingsOpen(false)
+      setWalkingLabsOpen(false)
+      setCurrentId(NOTES_SENTINEL)
+    }
+    if (step?.action === 'open-settings') {
+      setCurrentId(null)
+      setWalkingLabsOpen(false)
+      setSettingsOpen(true)
+    }
+    if (step?.action === 'open-walkinglabs') {
+      setCurrentId(null)
+      setSettingsOpen(false)
+      setWalkingLabsOpen(true)
+    }
 
     if (tourStepIndex >= tourSteps.length - 1) {
+      setSettingsOpen(false)
+      setWalkingLabsOpen(false)
       setTourActive(false)
       return
+    }
+    const nextStep = tourSteps[tourStepIndex + 1]
+    if (!nextStep?.target?.startsWith('.notes-panel') && !nextStep?.target?.startsWith('.modal-card')) {
+      setSettingsOpen(false)
+      setWalkingLabsOpen(false)
     }
     setTourStepIndex(i => i + 1)
   }, [lang, tourNotebookId, tourStepIndex, tourSteps])
 
   const handleTourPrev = useCallback(() => {
+    setSettingsOpen(false)
+    setWalkingLabsOpen(false)
     setTourStepIndex(i => Math.max(0, i - 1))
   }, [])
 

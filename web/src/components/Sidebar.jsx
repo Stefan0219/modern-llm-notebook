@@ -263,7 +263,7 @@ export default function Sidebar({
             className="w-full text-left flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors"
           >
             <GraduationCap className="w-3.5 h-3.5" />
-            <span>{lang === 'zh' ? '新手指导' : 'Guided Tour'}</span>
+            <span>{lang === 'zh' ? '新手引导' : 'Guided Tour'}</span>
           </button>
           <button
             onClick={() => onOpenNotes?.()}
