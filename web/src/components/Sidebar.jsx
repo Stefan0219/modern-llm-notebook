@@ -12,7 +12,7 @@ import {
   StickyNote,
   Sun,
   Moon,
-  X,
+  PanelLeftClose,
 } from 'lucide-react'
 import { useSettingsContext } from '../context/SettingsContext.jsx'
 
@@ -114,8 +114,10 @@ export default function Sidebar({
   const hasNotes = notebooksWithNotes.size > 0
 
   return (
-    <aside className={`w-64 h-screen max-h-screen border-r flex flex-col justify-between shrink-0 md:sticky md:top-0 z-30 transition-transform duration-300 ${
-      isOpen ? 'translate-x-0 fixed inset-y-0 left-0' : '-translate-x-full md:translate-x-0 absolute'
+    <aside className={`w-64 h-screen max-h-screen border-r flex flex-col justify-between shrink-0 z-30 transition-transform duration-300 ${
+      isOpen
+        ? 'translate-x-0 fixed inset-y-0 left-0 md:sticky md:top-0'
+        : '-translate-x-full fixed inset-y-0 left-0 md:absolute'
     } bg-[var(--bg-sidebar)] border-[var(--border-light)]`}>
 
       {/* Header */}
@@ -145,10 +147,11 @@ export default function Sidebar({
             </button>
             <button
               onClick={onClose}
-              className="md:hidden text-[var(--text-muted)] hover:text-[var(--text-secondary)] p-1 rounded-lg"
-              aria-label={lang === 'zh' ? '关闭侧栏' : 'Close sidebar'}
+              className="sidebar-header-icon"
+              title={lang === 'zh' ? '收起侧栏' : 'Collapse sidebar'}
+              aria-label={lang === 'zh' ? '收起侧栏' : 'Collapse sidebar'}
             >
-              <X className="w-5 h-5" />
+              <PanelLeftClose className="w-5 h-5" />
             </button>
           </div>
         </div>

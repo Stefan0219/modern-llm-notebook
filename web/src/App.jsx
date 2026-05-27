@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { flushSync } from 'react-dom'
-import { Menu } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Sidebar from './components/Sidebar.jsx'
 import NotebookViewer from './components/NotebookViewer.jsx'
 import NotesPanel from './components/NotesPanel.jsx'
@@ -88,12 +88,16 @@ function getInitialNotebookId() {
   return hash ? normalizeNotebookId(hash) : null
 }
 
+function getInitialSidebarOpen() {
+  return window.innerWidth >= 768
+}
+
 function AppContent() {
   const [lang, setLang] = useState(() => getInitialLang())
   const [catalog, setCatalog] = useState(() => getCatalog(lang))
   const [currentId, setCurrentId] = useState(() => getInitialNotebookId())
   const [loading] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(() => getInitialSidebarOpen())
   const [tourActive, setTourActive] = useState(false)
   const [tourStepIndex, setTourStepIndex] = useState(0)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -109,6 +113,17 @@ function AppContent() {
     const sizeMap = { small: '14.5px', default: '16.5px', large: '18.5px' }
     document.documentElement.style.setProperty('--font-size-notebook', sizeMap[settings.fontSize] || '16.5px')
   }, [settings.fontSize])
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 767px)')
+    const syncSidebarForMobile = () => {
+      if (mobileQuery.matches) setSidebarOpen(false)
+    }
+
+    syncSidebarForMobile()
+    mobileQuery.addEventListener?.('change', syncSidebarForMobile)
+    return () => mobileQuery.removeEventListener?.('change', syncSidebarForMobile)
+  }, [])
 
   useEffect(() => {
     setCatalog(getCatalog(lang))
@@ -433,13 +448,17 @@ function AppContent() {
 
   return (
     <div className="h-screen flex overflow-hidden bg-[var(--bg-app)] text-[var(--text-body)] font-sans antialiased">
-      {/* Mobile menu button */}
       <button
-        onClick={() => setSidebarOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-[var(--bg-sidebar)]/80 border border-[var(--border-light)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] shadow-sm backdrop-blur-md transition-colors select-none"
-        aria-label="Toggle sidebar"
+        onClick={() => setSidebarOpen((open) => !open)}
+        className="sidebar-toggle-btn"
+        aria-label={sidebarOpen
+          ? (lang === 'zh' ? '收起左侧栏' : 'Collapse sidebar')
+          : (lang === 'zh' ? '展开左侧栏' : 'Expand sidebar')}
+        title={sidebarOpen
+          ? (lang === 'zh' ? '收起左侧栏' : 'Collapse sidebar')
+          : (lang === 'zh' ? '展开左侧栏' : 'Expand sidebar')}
       >
-        <Menu className="w-5 h-5" />
+        {sidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
       </button>
 
       {/* Sidebar overlay for mobile */}

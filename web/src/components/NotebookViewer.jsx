@@ -1,5 +1,15 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Copy, Download, Highlighter, Pencil, Share2, Star, Trash2 } from 'lucide-react'
+import {
+  Copy,
+  Download,
+  Highlighter,
+  PanelRightClose,
+  PanelRightOpen,
+  Pencil,
+  Share2,
+  Star,
+  Trash2,
+} from 'lucide-react'
 import { getNotebookLaunchLinks } from '../config.js'
 
 function extractToc(html) {
@@ -36,7 +46,6 @@ const DISALLOWED_HIGHLIGHT_ANCESTOR_SELECTOR = [
   'h5',
   'h6',
   'a',
-  'code',
   'img',
   'svg',
   'canvas',
@@ -50,7 +59,6 @@ const DISALLOWED_HIGHLIGHT_CONTENT_SELECTOR = [
   'div',
   'pre',
   'a',
-  'code',
   'table',
   'h1',
   'h2',
@@ -69,6 +77,10 @@ const DISALLOWED_HIGHLIGHT_CONTENT_SELECTOR = [
 ].join(', ')
 
 const EMPTY_NOTE_LIST = Object.freeze([])
+
+function getInitialTocOpen() {
+  return window.innerWidth >= 1024
+}
 
 function elementFromNode(node) {
   if (!node) return null
@@ -95,8 +107,53 @@ function getTextHighlightBlock(root, range) {
   return startBlock
 }
 
+function isAllowedHighlightElement(element) {
+  return !!element &&
+    !element.closest(DISALLOWED_HIGHLIGHT_ANCESTOR_SELECTOR) &&
+    !element.closest('mark.user-highlight')
+}
+
+function getHighlightBlockRanges(root, range) {
+  if (!root || !range || !range.toString().trim()) return []
+  if (!root.contains(range.startContainer) || !root.contains(range.endContainer)) return []
+
+  const startElement = elementFromNode(range.startContainer)
+  const endElement = elementFromNode(range.endContainer)
+  if (!isAllowedHighlightElement(startElement) || !isAllowedHighlightElement(endElement)) {
+    return []
+  }
+
+  const blocks = getHighlightBlocks(root).filter((block) => range.intersectsNode(block))
+  const ranges = []
+
+  for (const block of blocks) {
+    const blockRange = document.createRange()
+    blockRange.selectNodeContents(block)
+
+    if (block.contains(range.startContainer)) {
+      blockRange.setStart(range.startContainer, range.startOffset)
+    }
+    if (block.contains(range.endContainer)) {
+      blockRange.setEnd(range.endContainer, range.endOffset)
+    }
+
+    if (!blockRange.toString().trim()) continue
+    if (!getTextHighlightBlock(root, blockRange)) return []
+    ranges.push({ block, range: blockRange })
+  }
+
+  return ranges
+}
+
 function canHighlightTextRange(root, range) {
-  return !!getTextHighlightBlock(root, range)
+  return getHighlightBlockRanges(root, range).length > 0
+}
+
+function getBlockRangesText(blockRanges) {
+  return blockRanges
+    .map(({ range }) => range.toString().trim())
+    .filter(Boolean)
+    .join('\n')
 }
 
 function makeHighlightNoteId() {
@@ -133,6 +190,24 @@ function makeHighlightAnchor(root, block, startOffset, endOffset) {
   }
 }
 
+function makeMultiHighlightAnchor(root, blockRanges) {
+  const ranges = blockRanges
+    .map(({ block, range }) => {
+      const blockIndex = getHighlightBlocks(root).indexOf(block)
+      const startOffset = getAbsoluteOffset(block, range.startContainer, range.startOffset)
+      const endOffset = getAbsoluteOffset(block, range.endContainer, range.endOffset)
+      if (blockIndex < 0 || endOffset <= startOffset) return null
+      return { blockIndex, startOffset, endOffset }
+    })
+    .filter(Boolean)
+
+  if (ranges.length === 0) return null
+  if (ranges.length === 1) {
+    return { kind: 'text-offset-v1', ...ranges[0] }
+  }
+  return { kind: 'text-ranges-v1', ranges }
+}
+
 function getRangeAnchor(root, block, range) {
   if (!root || !block || !range) return null
   const startOffset = getAbsoluteOffset(block, range.startContainer, range.startOffset)
@@ -142,19 +217,23 @@ function getRangeAnchor(root, block, range) {
 
 function applyTextHighlight(root, sourceRange, data) {
   const range = sourceRange?.cloneRange()
-  const block = getTextHighlightBlock(root, range)
-  if (!block) return null
+  const blockRanges = getHighlightBlockRanges(root, range)
+  if (blockRanges.length === 0) return null
 
-  const selectedText = range.toString().trim()
-  const anchor = getRangeAnchor(root, block, range)
-  const mark = document.createElement('mark')
-  setHighlightMarkData(mark, { ...data, quote: selectedText.slice(0, 160) })
+  const selectedText = getBlockRangesText(blockRanges)
+  const anchor = makeMultiHighlightAnchor(root, blockRanges)
+  const marks = []
 
   try {
-    mark.appendChild(range.extractContents())
-    range.insertNode(mark)
-    block.normalize()
-    return { mark, selectedText, anchor }
+    for (const item of [...blockRanges].reverse()) {
+      const mark = document.createElement('mark')
+      setHighlightMarkData(mark, { ...data, quote: selectedText.slice(0, 160) })
+      mark.appendChild(item.range.extractContents())
+      item.range.insertNode(mark)
+      item.block.normalize()
+      marks.unshift(mark)
+    }
+    return { mark: marks[0], marks, selectedText, anchor }
   } catch {
     return null
   }
@@ -217,6 +296,28 @@ function findAnchoredTextRange(root, note) {
   return range
 }
 
+function findAnchoredTextRanges(root, note) {
+  const anchor = note?.anchor
+  if (!anchor || anchor.kind !== 'text-ranges-v1' || !Array.isArray(anchor.ranges)) return null
+
+  const blocks = getHighlightBlocks(root)
+  const ranges = []
+
+  for (const item of anchor.ranges) {
+    const { blockIndex, startOffset, endOffset } = item || {}
+    if (![blockIndex, startOffset, endOffset].every(Number.isFinite)) return null
+
+    const block = blocks[blockIndex]
+    if (!block) return null
+
+    const range = rangeFromOffsets(block, startOffset, endOffset)
+    if (!range || !getTextHighlightBlock(root, range)) return null
+    ranges.push(range)
+  }
+
+  return ranges.length > 0 ? ranges : null
+}
+
 function findPlainTextRange(root, quote) {
   const target = String(quote || '').trim()
   if (!target) return null
@@ -234,8 +335,15 @@ function findPlainTextRange(root, quote) {
   return null
 }
 
-function findSavedHighlightRange(root, note) {
-  return findAnchoredTextRange(root, note) || findPlainTextRange(root, note.quote)
+function findSavedHighlightRanges(root, note) {
+  const anchoredRanges = findAnchoredTextRanges(root, note)
+  if (anchoredRanges) return anchoredRanges
+
+  const anchoredRange = findAnchoredTextRange(root, note)
+  if (anchoredRange) return [anchoredRange]
+
+  const plainRange = findPlainTextRange(root, note.quote)
+  return plainRange ? [plainRange] : null
 }
 
 function renderHighlightMark(range, note) {
@@ -251,6 +359,26 @@ function renderHighlightMark(range, note) {
   return mark
 }
 
+function renderHighlightMarks(ranges, note) {
+  const marks = []
+  for (const range of [...ranges].reverse()) {
+    marks.unshift(renderHighlightMark(range, note))
+  }
+  return marks
+}
+
+function getHighlightQuote(root, noteId) {
+  return [...root.querySelectorAll(`mark.user-highlight[data-note-id="${noteId}"]`)]
+    .map((mark) => mark.textContent)
+    .join('\n')
+    .trim()
+}
+
+function getHighlightMarks(root, noteId) {
+  if (!root || !noteId) return []
+  return [...root.querySelectorAll(`mark.user-highlight[data-note-id="${noteId}"]`)]
+}
+
 function syncSavedHighlights(root, noteList) {
   const highlightNotes = new Map()
   for (const note of noteList) {
@@ -260,7 +388,7 @@ function syncSavedHighlights(root, noteList) {
 
   root.querySelectorAll('mark.user-highlight').forEach((mark) => {
     const note = highlightNotes.get(mark.dataset.noteId || '')
-    if (note && mark.textContent.trim() === String(note.quote || '').trim()) {
+    if (note && getHighlightQuote(root, note.id) === String(note.quote || '').trim()) {
       setHighlightMarkData(mark, {
         noteId: note.id,
         sectionId: note.sectionId,
@@ -276,8 +404,8 @@ function syncSavedHighlights(root, noteList) {
     const existing = root.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`)
     if (existing) continue
 
-    const range = findSavedHighlightRange(root, note)
-    if (range) renderHighlightMark(range, note)
+    const ranges = findSavedHighlightRanges(root, note)
+    if (ranges) renderHighlightMarks(ranges, note)
   }
 }
 
@@ -410,6 +538,7 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
   const scrollSpyFrameRef = useRef(null)
   const [toc, setToc] = useState([])
   const [activeHeading, setActiveHeading] = useState(null)
+  const [tocOpen, setTocOpen] = useState(() => getInitialTocOpen())
   const [visibleNotebookId, setVisibleNotebookId] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [noteEditor, setNoteEditor] = useState(null)
@@ -432,6 +561,9 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
   }, [currentNotebookNotes])
 
   const showHighlightEditor = (mark) => {
+    const root = notebookContentRef.current
+    const noteId = mark.dataset.noteId || ''
+    const marks = getHighlightMarks(root, noteId)
     const position = getHighlightEditorPosition(mark)
     if (!position) return
     activeHighlightRef.current = mark
@@ -440,7 +572,8 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
       noteId: mark.dataset.noteId || '',
       sectionId: mark.dataset.sectionId || '',
       sectionTitle: mark.dataset.sectionTitle || '',
-      quote: mark.textContent.trim(),
+      quote: noteId ? getHighlightQuote(root, noteId) : mark.textContent.trim(),
+      canResize: marks.length <= 1,
     })
   }
 
@@ -452,9 +585,16 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
       return
     }
 
+    const noteId = mark.dataset.noteId || ''
+    const marks = getHighlightMarks(notebookContentRef.current, noteId)
     const position = getHighlightEditorPosition(mark)
     if (!position) return
-    setHighlightEditor((prev) => prev ? { ...prev, ...position, quote: mark.textContent.trim() } : prev)
+    setHighlightEditor((prev) => prev ? {
+      ...prev,
+      ...position,
+      quote: noteId ? getHighlightQuote(notebookContentRef.current, noteId) : mark.textContent.trim(),
+      canResize: marks.length <= 1,
+    } : prev)
   }
 
   const deleteActiveHighlight = () => {
@@ -462,7 +602,7 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
     if (!mark) return
     const noteId = mark.dataset.noteId
     if (noteId) deleteNote?.(notebook.id, noteId)
-    unwrapHighlight(mark)
+    getHighlightMarks(notebookContentRef.current, noteId).forEach(unwrapHighlight)
     activeHighlightRef.current = null
     setHighlightEditor(null)
   }
@@ -474,6 +614,7 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
     const mark = activeHighlightRef.current
     const block = mark?.closest(TEXT_HIGHLIGHT_BLOCK_SELECTOR)
     if (!mark || !block) return
+    if (getHighlightMarks(notebookContentRef.current, mark.dataset.noteId || '').length > 1) return
 
     highlightDragRef.current = {
       side,
@@ -806,6 +947,17 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
     setToc(items)
   }, [notebook?.html])
 
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 1023px)')
+    const syncTocForMobile = () => {
+      if (mobileQuery.matches) setTocOpen(false)
+    }
+
+    syncTocForMobile()
+    mobileQuery.addEventListener?.('change', syncTocForMobile)
+    return () => mobileQuery.removeEventListener?.('change', syncTocForMobile)
+  }, [])
+
   useLayoutEffect(() => {
     const content = notebookContentRef.current
     if (!notebook?.html || !content) {
@@ -868,6 +1020,11 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
       note.anchor?.blockIndex ?? null,
       note.anchor?.startOffset ?? null,
       note.anchor?.endOffset ?? null,
+      ...(note.anchor?.ranges || []).flatMap((item) => [
+        item.blockIndex ?? null,
+        item.startOffset ?? null,
+        item.endOffset ?? null,
+      ]),
     ]))
     const previousSync = previousHighlightSyncRef.current
     if (
@@ -988,15 +1145,18 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
       if (!drag) return
 
       const mark = activeHighlightRef.current
-      const quote = mark?.textContent.trim() || ''
-      if (mark && drag.noteId && quote) {
+      const noteId = drag.noteId
+      const quote = noteId
+        ? getHighlightQuote(notebookContentRef.current, noteId)
+        : mark?.textContent.trim() || ''
+      if (mark && noteId && quote) {
         saveNote?.(
           notebook.id,
           drag.sectionId,
           drag.sectionTitle,
           quote,
           '',
-          drag.noteId,
+          noteId,
           drag.anchor
         )
       }
@@ -1305,7 +1465,24 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
         </div>
       </div>
 
-      <div className="viewer-body">
+      {toc.length > 0 && (
+        <button
+          type="button"
+          className={`toc-toggle${tocOpen ? ' active' : ''}`}
+          onClick={() => setTocOpen((open) => !open)}
+          title={tocOpen
+            ? (lang === 'en' ? 'Hide outline' : '收起大纲')
+            : (lang === 'en' ? 'Show outline' : '展开大纲')}
+          aria-label={tocOpen
+            ? (lang === 'en' ? 'Hide outline' : '收起大纲')
+            : (lang === 'en' ? 'Show outline' : '展开大纲')}
+        >
+          {tocOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+          <span>{lang === 'en' ? 'Outline' : '大纲'}</span>
+        </button>
+      )}
+
+      <div className={`viewer-body${tocOpen ? '' : ' toc-collapsed'}`}>
         <div
           key={notebook.id}
           className={`notebook-content${isVisible ? ' visible' : ''}`}
@@ -1489,28 +1666,32 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
             >
               ×
             </button>
-            <span
-              role="presentation"
-              className="highlight-drag-handle highlight-drag-handle-start"
-              title={lang === 'en' ? 'Drag to adjust start' : '拖动调整起点'}
-              style={{
-                top: highlightEditor.startTop,
-                left: highlightEditor.startLeft,
-                height: highlightEditor.startHeight,
-              }}
-              onPointerDown={(e) => startHighlightDrag(e, 'start')}
-            />
-            <span
-              role="presentation"
-              className="highlight-drag-handle highlight-drag-handle-end"
-              title={lang === 'en' ? 'Drag to adjust end' : '拖动调整终点'}
-              style={{
-                top: highlightEditor.endTop,
-                left: highlightEditor.endLeft,
-                height: highlightEditor.endHeight,
-              }}
-              onPointerDown={(e) => startHighlightDrag(e, 'end')}
-            />
+            {highlightEditor.canResize && (
+              <>
+                <span
+                  role="presentation"
+                  className="highlight-drag-handle highlight-drag-handle-start"
+                  title={lang === 'en' ? 'Drag to adjust start' : '拖动调整起点'}
+                  style={{
+                    top: highlightEditor.startTop,
+                    left: highlightEditor.startLeft,
+                    height: highlightEditor.startHeight,
+                  }}
+                  onPointerDown={(e) => startHighlightDrag(e, 'start')}
+                />
+                <span
+                  role="presentation"
+                  className="highlight-drag-handle highlight-drag-handle-end"
+                  title={lang === 'en' ? 'Drag to adjust end' : '拖动调整终点'}
+                  style={{
+                    top: highlightEditor.endTop,
+                    left: highlightEditor.endLeft,
+                    height: highlightEditor.endHeight,
+                  }}
+                  onPointerDown={(e) => startHighlightDrag(e, 'end')}
+                />
+              </>
+            )}
           </>
         )}
 
@@ -1569,8 +1750,8 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
               title={selectionToolbar.canHighlight
                 ? (lang === 'en' ? 'Highlight' : '高亮')
                 : (lang === 'en'
-                  ? 'Only text in one paragraph can be highlighted'
-                  : '只能高亮同一段正文文字')}
+                  ? 'Only body text can be highlighted'
+                  : '只能高亮正文文字')}
               disabled={!selectionToolbar.canHighlight}
               onMouseDown={(e) => {
                 e.preventDefault()
@@ -1609,7 +1790,7 @@ function NotebookViewer({ notebook, meta, loading, isBookmarked, toggleBookmark,
           </div>
         )}
 
-        {toc.length > 0 && (
+        {toc.length > 0 && tocOpen && (
           <aside className={`toc${isVisible ? ' visible' : ''}`}>
             <div className="toc-sticky">
               <div className="toc-title">{lang === 'en' ? 'Outline' : '大纲'}</div>
