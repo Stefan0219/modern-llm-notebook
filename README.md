@@ -32,6 +32,7 @@
 
 <p align="center">
   <a href="#overview">Overview</a> ·
+  <a href="#screenshots">Screenshots</a> ·
   <a href="#what-you-will-build">What You Will Build</a> ·
   <a href="#why-this-project">Why</a> ·
   <a href="#what-is-included">What Is Included</a> ·
@@ -68,6 +69,24 @@ intuition -> hand calculation -> implementation -> experiment
 That contract matters. A reader should not only know that BPE merges frequent pairs, or that KV
 Cache speeds up generation. They should be able to trace the numbers, write the minimal code, and
 explain why the behavior appears.
+
+## Screenshots
+
+<p align="center">
+  <img src="assets/readme/home-en.png" alt="Modern LLM Notebook English home page" width="920">
+</p>
+
+<p align="center">
+  <em>Browse the bilingual course map, learning paths, and runnable notebook catalog.</em>
+</p>
+
+<p align="center">
+  <img src="assets/readme/notebook-reader-en.png" alt="Modern LLM Notebook English notebook reader" width="920">
+</p>
+
+<p align="center">
+  <em>Read notebooks in the web viewer, jump by outline, and open the same lesson in Colab or other notebook platforms.</em>
+</p>
 
 ## What You Will Build
 
