@@ -6,7 +6,10 @@ import {
   Github,
   GraduationCap,
   History,
+  Ellipsis,
   Settings,
+  Star,
+  StickyNote,
   Sun,
   Moon,
   X,
@@ -52,7 +55,24 @@ function buildSidebarSections(catalog) {
     .filter(Boolean)
 }
 
-export default function Sidebar({ catalog, currentId, lang, onLanguageChange, onSelect, onHome, onStartTour, onOpenNotes, onOpenSettings, onOpenChangelog, bookmarks = {}, notes = {}, isOpen, onClose }) {
+export default function Sidebar({
+  catalog,
+  currentId,
+  lang,
+  onLanguageChange,
+  onSelect,
+  onHome,
+  onStartTour,
+  onOpenNotes,
+  onOpenSettings,
+  onOpenChangelog,
+  onOpenWalkingLabs,
+  bookmarks = {},
+  notes = {},
+  notebooksWithNotes = new Set(),
+  isOpen,
+  onClose,
+}) {
   const { resolvedTheme, toggleTheme } = useSettingsContext()
   const [searchQuery, setSearchQuery] = useState('')
   const [filterMode, setFilterMode] = useState('all')
@@ -82,7 +102,7 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
     ...section,
     lessons: section.lessons.filter(lesson => {
       if (filterMode === 'bookmarked') return !!bookmarks[lesson.id]
-      if (filterMode === 'noted') return Object.keys(notes).some(k => k.startsWith(lesson.id + '::'))
+      if (filterMode === 'noted') return notebooksWithNotes.has(lesson.id)
       if (!searchQuery) return true
       return lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         lesson.num.includes(searchQuery)
@@ -91,7 +111,7 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
 
   const inFilterMode = filterMode !== 'all'
   const hasBookmarks = Object.keys(bookmarks).length > 0
-  const hasNotes = Object.keys(notes).length > 0
+  const hasNotes = notebooksWithNotes.size > 0
 
   return (
     <aside className={`w-64 h-screen max-h-screen border-r flex flex-col justify-between shrink-0 md:sticky md:top-0 z-30 transition-transform duration-300 ${
@@ -111,9 +131,26 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
               <span className="brand-line brand-line-sub">Notebook</span>
             </span>
           </button>
-          <button onClick={onClose} className="md:hidden text-[var(--text-muted)] hover:text-[var(--text-secondary)] p-1 rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onOpenWalkingLabs?.()}
+              data-tour="walkinglabs"
+              className="sidebar-header-icon"
+              title={lang === 'zh' ? '更多' : 'More'}
+              aria-label={
+                lang === 'zh' ? '打开 WalkingLabs 介绍' : 'Open WalkingLabs intro'
+              }
+            >
+              <Ellipsis className="w-5 h-5" />
+            </button>
+            <button
+              onClick={onClose}
+              className="md:hidden text-[var(--text-muted)] hover:text-[var(--text-secondary)] p-1 rounded-lg"
+              aria-label={lang === 'zh' ? '关闭侧栏' : 'Close sidebar'}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Language toggle */}
@@ -146,17 +183,19 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
         <button
           onClick={() => setFilterMode('all')}
           className={`sidebar-filter-tab ${filterMode === 'all' ? 'active' : ''}`}
-        >{lang === 'zh' ? '全部' : 'All'}</button>
+        >{lang === 'zh' ? '课程' : 'Courses'}</button>
         <button
           onClick={() => setFilterMode('bookmarked')}
-          className={`sidebar-filter-tab ${filterMode === 'bookmarked' ? 'active' : ''}`}
+          className={`sidebar-filter-tab sidebar-filter-tab-icon ${filterMode === 'bookmarked' ? 'active' : ''}`}
           disabled={!hasBookmarks}
-        >{lang === 'zh' ? '已收藏' : 'Saved'}</button>
+          title={lang === 'zh' ? '已收藏' : 'Saved'}
+        ><BookMarked className="w-3.5 h-3.5" /></button>
         <button
           onClick={() => setFilterMode('noted')}
-          className={`sidebar-filter-tab ${filterMode === 'noted' ? 'active' : ''}`}
+          className={`sidebar-filter-tab sidebar-filter-tab-icon ${filterMode === 'noted' ? 'active' : ''}`}
           disabled={!hasNotes}
-        >{lang === 'zh' ? '有笔记' : 'Noted'}</button>
+          title={lang === 'zh' ? '有笔记' : 'Noted'}
+        ><StickyNote className="w-3.5 h-3.5" /></button>
       </div>
 
       {/* Lessons list */}
@@ -183,7 +222,7 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
                 {section.lessons.map((lesson) => {
                   const isSelected = currentId === lesson.id
                   const isBm = !!bookmarks[lesson.id]
-                  const hasNote = Object.keys(notes).some(k => k.startsWith(lesson.id + '::'))
+                  const hasNote = notebooksWithNotes.has(lesson.id)
                   return (
                     <button
                       key={lesson.id}
@@ -206,7 +245,6 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
                       </div>
                       <div className="flex items-center gap-1 shrink-0 ml-1">
                         {isBm && <span className="sidebar-item-star" title={lang === 'zh' ? '已收藏' : 'Bookmarked'}>&#9733;</span>}
-                        {hasNote && <span className="sidebar-item-note-dot" title={lang === 'zh' ? '有笔记' : 'Has notes'}>&#183;</span>}
                       </div>
                     </button>
                   )
@@ -229,6 +267,7 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
           </button>
           <button
             onClick={() => onOpenNotes?.()}
+            data-tour="notes-saved"
             className="w-full text-left flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors"
           >
             <BookMarked className="w-3.5 h-3.5" />
@@ -256,6 +295,7 @@ export default function Sidebar({ catalog, currentId, lang, onLanguageChange, on
             </button>
             <button
               onClick={() => onOpenSettings?.()}
+              data-tour="settings"
               className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors"
               title={lang === 'zh' ? '设置' : 'Settings'}
             >

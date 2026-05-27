@@ -8,6 +8,7 @@ import Welcome from './components/Welcome.jsx'
 import GuidedTour from './components/GuidedTour.jsx'
 import SettingsPanel from './components/SettingsPanel.jsx'
 import ChangelogModal from './components/ChangelogModal.jsx'
+import WalkingLabsModal from './components/WalkingLabsModal.jsx'
 import { SettingsProvider } from './context/SettingsContext.jsx'
 import useSettings from './hooks/useSettings.js'
 import useTheme from './hooks/useTheme.js'
@@ -97,6 +98,7 @@ function AppContent() {
   const [tourStepIndex, setTourStepIndex] = useState(0)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [changelogOpen, setChangelogOpen] = useState(false)
+  const [walkingLabsOpen, setWalkingLabsOpen] = useState(false)
 
   const { settings, updateSettings } = useSettings()
   const { resolvedTheme, toggleTheme } = useTheme(settings.theme)
@@ -120,7 +122,7 @@ function AppContent() {
       const nextId = getInitialNotebookId()
       if (nextId === NOTES_SENTINEL) return
       setCurrentId((prev) => {
-        if (prev === NOTES_SENTINEL) return prev
+        if (prev === nextId) return prev
         return nextId
       })
       if (nextId && window.location.hash !== `#${nextId}`) {
@@ -191,6 +193,21 @@ function AppContent() {
         body: '这里是整套课程的地图：基础、训练、推理、前沿、评测与部署。每张卡片概括一个阶段要解决的问题，点击后会定位到对应学习路径，方便你从全局选择下一步。',
       },
       {
+        target: '[data-tour="notes-saved"]',
+        title: '笔记与收藏',
+        body: '阅读时可以随时收藏 Notebook、选中文字添加笔记或高亮标记。所有内容在这里统一管理，支持导出备份和导入恢复，换浏览器也不会丢失。',
+      },
+      {
+        target: '[data-tour="settings"]',
+        title: '个性化设置',
+        body: '点击齿轮图标打开设置面板，可以切换浅色/深色/跟随系统主题，调整正文字号大小。设置会自动保存到本地，下次打开时保持不变。',
+      },
+      {
+        target: '[data-tour="walkinglabs"]',
+        title: '扫码加入社群',
+        body: '点击左上角的「...」按钮，会展开 WalkingLabs 社群二维码。扫码可以加入学习交流群，和其他读者一起讨论问题、分享学习心得。',
+      },
+      {
         target: '[data-tour="notebooks"]',
         title: '精选可运行 Notebook',
         body: '这里展示了 10 篇推荐 Notebook，每篇都有独特的可视化封面。点击即可进入阅读，支持一键打开到 ModelScope、百度星河社区或 Colab 运行。',
@@ -203,9 +220,19 @@ function AppContent() {
         body: '顶部按钮可以把当前 Notebook 打开到 ModelScope、百度星河社区或 Colab，在线运行代码，无需本地配置。',
       },
       {
+        target: '.viewer-title-row',
+        title: '收藏与笔记',
+        body: '点击标题旁的星标可收藏当前 Notebook。所有收藏和笔记在左侧边栏「笔记与收藏」中统一管理，支持导出和导入备份。',
+      },
+      {
+        target: '.viewer-body',
+        title: '选中文字即可操作',
+        body: '阅读时选中任意文字，会弹出工具栏：复制内容、添加笔记（引用原文 + 你的想法）、黄色高亮标记重点，还能生成精美的分享卡片。',
+      },
+      {
         target: '.toc',
         title: '右侧大纲导航',
-        body: '右侧大纲对应每个学习环节，点击可快速跳转。推荐阅读顺序：先看直觉理解，再看手算验证，然后运行代码，最后观察输出。',
+        body: '右侧大纲对应每个学习环节，点击可快速跳转。大纲上的蓝色圆点表示该章节有笔记。推荐阅读顺序：先看直觉理解，再看手算验证，然后运行代码，最后观察输出。',
       },
       {
         target: '.code_cell',
@@ -240,6 +267,21 @@ function AppContent() {
         body: 'This is the course map: Foundation, Training, Inference, Frontiers, and Eval & Deploy. Each card summarizes one stage, and clicking a card takes you to that learning path so you can choose the next step from the full curriculum.',
       },
       {
+        target: '[data-tour="notes-saved"]',
+        title: 'Notes & Bookmarks',
+        body: 'Bookmark any notebook, highlight text, or add notes while reading. Everything is managed here — export and import backups so you never lose your work across browsers.',
+      },
+      {
+        target: '[data-tour="settings"]',
+        title: 'Personalization',
+        body: 'Click the gear icon to open settings. Switch between light, dark, and system themes, or adjust the reading font size. Preferences are saved automatically.',
+      },
+      {
+        target: '[data-tour="walkinglabs"]',
+        title: 'Join the Community',
+        body: 'Click the "..." button in the top-left corner to reveal the WalkingLabs community QR code. Scan to join the discussion group and connect with other learners.',
+      },
+      {
         target: '[data-tour="notebooks"]',
         title: 'Runnable Notebooks',
         body: '10 recommended notebooks with unique visual covers. Click to start reading, or open in ModelScope, Baidu Xinghe, or Google Colab to run code online.',
@@ -252,9 +294,19 @@ function AppContent() {
         body: 'The top buttons open the current notebook in ModelScope, Baidu Xinghe, or Google Colab. Run code online without any local setup.',
       },
       {
+        target: '.viewer-title-row',
+        title: 'Bookmarks & Notes',
+        body: 'Click the star next to the title to bookmark. All bookmarks and notes are managed in the sidebar under "Notes & Saved", with export and import support.',
+      },
+      {
+        target: '.viewer-body',
+        title: 'Select Text to Annotate',
+        body: 'Select any text while reading to bring up a toolbar: copy content, add a note (with quote + your thoughts), highlight key points in yellow, or generate a shareable card image.',
+      },
+      {
         target: '.toc',
         title: 'Table of Contents',
-        body: 'The right sidebar outlines each section. Click to jump. Recommended order: read the intuition first, then hand calculation, then run code, then observe outputs.',
+        body: 'The right sidebar outlines each section. Blue dots mark sections with notes. Recommended order: read the intuition first, then hand calculation, then run code, then observe outputs.',
       },
       {
         target: '.code_cell',
@@ -335,8 +387,10 @@ function AppContent() {
         onOpenNotes={handleOpenNotes}
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenChangelog={() => setChangelogOpen(true)}
+        onOpenWalkingLabs={() => setWalkingLabsOpen(true)}
         bookmarks={nbm.bookmarks}
         notes={nbm.notes}
+        notebooksWithNotes={nbm.notebooksWithNotes}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
@@ -347,6 +401,7 @@ function AppContent() {
             catalog={catalog}
             bookmarks={nbm.bookmarks}
             notes={nbm.notes}
+            notebooksWithNotes={nbm.notebooksWithNotes}
             getSectionNotes={nbm.getSectionNotes}
             exportData={nbm.exportData}
             importFile={nbm.importFile}
@@ -397,6 +452,12 @@ function AppContent() {
         onClose={() => setChangelogOpen(false)}
         lang={lang}
         commits={CHANGELOG_COMMITS}
+      />
+
+      <WalkingLabsModal
+        isOpen={walkingLabsOpen}
+        onClose={() => setWalkingLabsOpen(false)}
+        lang={lang}
       />
     </div>
   )
