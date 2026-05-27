@@ -48,7 +48,15 @@ export default function useNotesAndBookmarks() {
     return !!bookmarks[id]
   }, [bookmarks])
 
-  const saveNote = useCallback((notebookId, sectionId, sectionTitle, quote, text, noteId) => {
+  const saveNote = useCallback((
+    notebookId,
+    sectionId,
+    sectionTitle,
+    quote,
+    text,
+    noteId,
+    anchor
+  ) => {
     setNotes((prev) => {
       const next = { ...prev }
       const list = [...(next[notebookId] || [])]
@@ -56,6 +64,7 @@ export default function useNotesAndBookmarks() {
         const idx = list.findIndex((n) => n.id === noteId)
         if (idx >= 0) {
           list[idx] = { ...list[idx], sectionTitle, quote, text, updatedAt: Date.now() }
+          if (anchor) list[idx].anchor = anchor
         } else {
           list.push({
             id: noteId,
@@ -63,6 +72,7 @@ export default function useNotesAndBookmarks() {
             sectionTitle,
             quote,
             text,
+            ...(anchor ? { anchor } : {}),
             updatedAt: Date.now(),
           })
         }
@@ -74,6 +84,7 @@ export default function useNotesAndBookmarks() {
           sectionTitle,
           quote,
           text,
+          ...(anchor ? { anchor } : {}),
           updatedAt: Date.now(),
         })
       }

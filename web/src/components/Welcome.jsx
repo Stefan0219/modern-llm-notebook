@@ -482,7 +482,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                   onClick={() => {
                     window.dispatchEvent(new CustomEvent('sidebar-scroll-to', { detail: { section: step.section } }))
                   }}
-                  className="w-full bg-white rounded-[10px] p-3 sm:p-4 border border-black/10 flex flex-col justify-between shadow-sm relative hover:border-[#1d6bf3]/30 hover:shadow-[0_0_0_2px_rgba(29,107,243,0.12)] transition-[border-color,box-shadow] duration-200 cursor-pointer group overflow-hidden"
+                  className="w-full bg-white rounded-[10px] p-3 sm:p-4 border border-black/10 flex flex-col justify-between shadow-sm relative hover:bg-slate-50 transition-colors duration-200 cursor-pointer group overflow-hidden"
                 >
                   <span className={`text-[11px] font-mono font-bold tracking-wider px-1.5 py-0.5 rounded ${ps.numBg} w-fit`}>{step.num}</span>
                   <div className="space-y-1 mt-2 sm:mt-3">
@@ -521,7 +521,7 @@ export default function Welcome({ catalog, lang, onLanguageChange, onSelect, onS
                 <div
                   key={nb.id}
                   onClick={() => onSelect(nb.lessonId)}
-                  className="shrink-0 w-[180px] sm:w-[200px] border border-black/10 rounded-[10px] overflow-hidden cursor-pointer bg-white relative hover:border-[#1d6bf3]/30 hover:shadow-[0_0_0_2px_rgba(29,107,243,0.12)] transition-[border-color,box-shadow] duration-200 group flex flex-col snap-start"
+                  className="shrink-0 w-[180px] sm:w-[200px] border border-black/10 rounded-[10px] overflow-hidden cursor-pointer bg-white relative hover:bg-slate-50 transition-colors duration-200 group flex flex-col snap-start"
                 >
                   <div className={`h-[90px] flex items-center justify-center relative overflow-hidden bg-gradient-to-br ${NOTEBOOK_BG[nb.id] || style.bg}`}>
                     {NOTEBOOK_SVGS[nb.id] || NOTEBOOK_SVGS['nb-1']}
