@@ -309,21 +309,32 @@ LESSONS = {
         ],
         "checklist": ["BPE begins from small units and repeatedly merges frequent adjacent pairs.", "Merge rules define how encoding works later.", "Subword tokenization avoids most OOV failures while keeping sequences shorter than character-level tokenization."],
     },
-    "03-embedding-position": {
-        "title": "Embeddings and Position: Turning IDs Into Vectors",
+    "03-embedding": {
+        "title": "Embedding: Turning IDs Into Vectors",
         "previous": "Parts 01-02 turned text into token IDs. Now the IDs need to become numbers a neural network can compute with.",
-        "goal": "Build Token Embedding and Position Encoding, then observe why both token identity and token order matter.",
+        "goal": "Build Token Embedding from scratch and understand how distributed representation captures word similarity.",
         "sections": [
             ("Why IDs are not enough", "A token ID is only a lookup number. The model needs a vector, because vectors can be added, multiplied, compared, and learned."),
+            ("Distributed representation", "Instead of a single ID, each word is described by many continuous features. Words with similar contexts get similar vectors."),
             ("Token Embedding", "An Embedding table is like a dictionary from token ID to vector. If token 5 means 'cat', row 5 of the table is the vector the model receives for that token."),
-            ("Position information", "Without position, 'dog bites man' and 'man bites dog' contain the same tokens. Position Encoding gives the model a way to know where each token sits."),
-            ("Experiment", "The code visualizes and compares token vectors and position vectors so you can see that the final input representation is token meaning plus location."),
+            ("Industry practices", "Weight tying, no weight decay on embeddings, and proper initialization help training stability."),
         ],
-        "checklist": ["Embedding maps token IDs to learnable vectors.", "Position Encoding tells the model token order.", "The model input is usually token embedding plus position information."],
+        "checklist": ["Embedding maps token IDs to learnable vectors.", "Distributed hypothesis: words in similar contexts have similar meanings.", "nn.Embedding is a learnable lookup table."],
     },
-    "04-transformer-block": {
+    "04-position-encoding": {
+        "title": "Position Encoding: Letting the Model Sense Word Order",
+        "previous": "Part 03 turned token IDs into vectors. But the same token gets the same vector no matter where it appears.",
+        "goal": "Implement sinusoidal position encoding and assemble the full input layer (Token Embedding + Position Encoding).",
+        "sections": [
+            ("Why position matters", "Without position, 'dog bites man' and 'man bites dog' contain the same tokens. The model needs to know where each token sits."),
+            ("Sinusoidal position encoding", "Sin and cos waves of different frequencies give each position a unique vector. The encoding is bounded, extrapolatable, and encodes relative distance."),
+            ("Assembly", "The final input is Token Embedding + Position Encoding (addition, not concatenation). Batch dimension lets the GPU process many sequences at once."),
+        ],
+        "checklist": ["Position Encoding tells the model token order.", "The model input is token embedding plus position information.", "Addition (not concatenation) combines token and position vectors."],
+    },
+    "05-transformer-block": {
         "title": "Attention and Transformer Block",
-        "previous": "Part 03 built token and position vectors. Now each token needs to read information from other tokens.",
+        "previous": "Parts 03-04 built token and position vectors. Now each token needs to read information from other tokens.",
         "goal": "Understand Self-Attention, Multi-Head Attention, residual connections, LayerNorm, and the Transformer Block.",
         "sections": [
             ("The problem Attention solves", "A token cannot be understood alone. In 'the bank by the river', the word 'bank' needs surrounding words to decide its meaning."),
@@ -333,9 +344,9 @@ LESSONS = {
         ],
         "checklist": ["Self-Attention lets each token read other tokens.", "Multi-Head Attention reads several relationship patterns at once.", "A Transformer Block combines attention, feed-forward layers, residual paths, and normalization."],
     },
-    "05-mini-gpt": {
+    "06-mini-gpt": {
         "title": "Build Your First Mini-GPT",
-        "previous": "Parts 01-04 built tokenization, embeddings, attention, and Transformer blocks.",
+        "previous": "Parts 01-05 built tokenization, embeddings, position encoding, attention, and Transformer blocks.",
         "goal": "Assemble a small decoder-only GPT and understand how logits predict the next token.",
         "sections": [
             ("What GPT does", "GPT is an autoregressive model: given previous tokens, it predicts the next token. Repeating that prediction produces text."),

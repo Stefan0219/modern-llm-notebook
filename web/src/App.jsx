@@ -20,7 +20,10 @@ const NOTES_SENTINEL = '__notes__'
 const DEFAULT_LANG = 'zh'
 
 const LEGACY_NOTEBOOK_IDS = {
-  '04-mini-gpt': '05-mini-gpt',
+  '03-embedding-position': '03-embedding',
+  '04-transformer-block': '05-transformer-block',
+  '05-mini-gpt': '06-mini-gpt',
+  '04-mini-gpt': '06-mini-gpt',
   '05-architecture-refinements': '06-gpt2-to-modern-models',
   '06-architecture-refinements': '06-gpt2-to-modern-models',
   '06-llama-architecture-upgrades': '06-gpt2-to-modern-models',

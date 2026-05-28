@@ -283,9 +283,10 @@ topic without depending on hidden runtime state from earlier notebooks.
 |:---:|:---|:---|:---|
 | 01 | [Tokenizer Basics](notebooks-en/part1-foundation/01-tokenizer-basics.ipynb) | Why do models need tokenizers? | Character and word tokenizers |
 | 02 | [BPE Tokenizer](notebooks-en/part1-foundation/02-bpe-tokenizer.ipynb) | How does BPE learn a vocabulary? | Merge rules, encode, decode |
-| 03 | [Embedding & Position](notebooks-en/part1-foundation/03-embedding-position.ipynb) | How do IDs become vectors? | Token embedding, position encoding |
-| 04 | [Attention & Transformer Block](notebooks-en/part1-foundation/04-transformer-block.ipynb) | How does attention move information? | MHA, residuals, normalization |
-| 05 | [Mini-GPT](notebooks-en/part1-foundation/05-mini-gpt.ipynb) | How does a GPT-style model fit together? | Decoder-only model, LM head |
+| 03 | [Embedding](notebooks-en/part1-foundation/03-embedding.ipynb) | How do IDs become vectors? | Token embedding, distributed representation |
+| 04 | [Position Encoding](notebooks-en/part1-foundation/04-position-encoding.ipynb) | How does the model know word order? | Sinusoidal encoding, input assembly |
+| 05 | [Attention & Transformer Block](notebooks-en/part1-foundation/05-transformer-block.ipynb) | How does attention move information? | MHA, residuals, normalization |
+| 06 | [Mini-GPT](notebooks-en/part1-foundation/06-mini-gpt.ipynb) | How does a GPT-style model fit together? | Decoder-only model, LM head |
 
 ### Part 2: Training
 

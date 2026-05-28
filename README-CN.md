@@ -251,9 +251,10 @@ Modern LLM Notebook
 |:---:|:---|:---|:---|
 | 01 | [Tokenizer Basics](notebooks/part1-foundation/01-tokenizer-basics.ipynb) | 模型为什么需要 Tokenizer？ | 字符级和词级 Tokenizer |
 | 02 | [BPE Tokenizer](notebooks/part1-foundation/02-bpe-tokenizer.ipynb) | BPE 如何从语料里学习词表？ | Merge rules、encode、decode |
-| 03 | [Embedding & Position](notebooks/part1-foundation/03-embedding-position.ipynb) | Token ID 如何变成向量？ | Token Embedding、Position Encoding |
-| 04 | [Attention & Transformer Block](notebooks/part1-foundation/04-transformer-block.ipynb) | Attention 如何搬运上下文信息？ | MHA、残差、归一化 |
-| 05 | [Mini-GPT](notebooks/part1-foundation/05-mini-gpt.ipynb) | GPT 风格模型如何组装起来？ | Decoder-only 模型、LM head |
+| 03 | [Embedding](notebooks/part1-foundation/03-embedding.ipynb) | Token ID 如何变成向量？ | Token Embedding、分布式表示 |
+| 04 | [Position Encoding](notebooks/part1-foundation/04-position-encoding.ipynb) | 模型如何感知词的顺序？ | 正弦位置编码、输入组装 |
+| 05 | [Attention & Transformer Block](notebooks/part1-foundation/05-transformer-block.ipynb) | Attention 如何搬运上下文信息？ | MHA、残差、归一化 |
+| 06 | [Mini-GPT](notebooks/part1-foundation/06-mini-gpt.ipynb) | GPT 风格模型如何组装起来？ | Decoder-only 模型、LM head |
 
 ### Part 2: Training
 
