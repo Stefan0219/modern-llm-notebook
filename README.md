@@ -1,16 +1,25 @@
 # Modern LLM Notebook
 
 <p align="center">
-  <strong>An educational reference implementation of modern LLM systems, taught through notebooks.</strong>
+  <strong>Build modern LLMs from scratch through 23 runnable Jupyter Notebooks.</strong>
 </p>
 
 <p align="center">
+  <a href="README.md"><strong>English</strong></a>
+  ·
   <a href="README-CN.md"><strong>中文文档</strong></a>
+  ·
+  <a href="https://walkinglabs.github.io/modern-llm-notebook/"><strong>Read Online</strong></a>
+  ·
+  <a href="https://colab.research.google.com/github/walkinglabs/modern-llm-notebook/blob/main/notebooks-en/part1-foundation/01-tokenizer-basics.ipynb"><strong>Start in Colab</strong></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/walkinglabs/modern-llm-notebook/stargazers">
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/walkinglabs/modern-llm-notebook?style=social">
+  </a>
+  <a href="https://github.com/walkinglabs/modern-llm-notebook/actions/workflows/quality.yml">
+    <img alt="Quality checks" src="https://github.com/walkinglabs/modern-llm-notebook/actions/workflows/quality.yml/badge.svg">
   </a>
   <a href="https://github.com/walkinglabs/modern-llm-notebook/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-blue">
@@ -18,13 +27,16 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.9%2B-3776AB">
   <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C">
   <img alt="Notebooks" src="https://img.shields.io/badge/Notebooks-23-orange">
+  <img alt="Languages" src="https://img.shields.io/badge/Languages-English%20%7C%20Chinese-2ea44f">
 </p>
 
 <p align="center">
   <a href="#overview">Overview</a> ·
+  <a href="#what-you-will-build">What You Will Build</a> ·
   <a href="#why-this-project">Why</a> ·
   <a href="#what-is-included">What Is Included</a> ·
   <a href="#quick-start">Quick Start</a> ·
+  <a href="#project-status">Status</a> ·
   <a href="#curriculum">Curriculum</a> ·
   <a href="#quality-bar">Quality Bar</a> ·
   <a href="#contributing">Contributing</a>
@@ -32,12 +44,38 @@
 
 ---
 
+<p align="center">
+  <strong>Case-based LLM learning: course map -> concrete notebook -> runnable experiment.</strong>
+</p>
+
+<p align="center">
+  <img src="assets/readme/home-en.png" alt="Modern LLM Notebook English home page" width="920">
+</p>
+
+<p align="center">
+  <em>Start from the full bilingual course map, then choose a focused path through foundations,
+  training, inference, frontiers, and production topics.</em>
+</p>
+
+<p align="center">
+  <img src="assets/readme/notebook-reader-en.png" alt="Modern LLM Notebook English notebook reader" width="920">
+</p>
+
+<p align="center">
+  <em>Each case keeps the learning loop visible: intuition, hand calculation, implementation,
+  experiment, outline navigation, and one-click Colab access.</em>
+</p>
+
 ## Overview
 
-Modern LLM Notebook is a structured, notebook-first curriculum for understanding how large language
-models work from the inside. It implements the core mechanisms behind modern LLMs in small,
-readable, inspectable steps: tokenization, embeddings, attention, Transformer blocks, training
-loops, alignment, inference acceleration, long context, multimodality, evaluation, and distillation.
+Modern LLM Notebook is a hands-on course for building modern LLM systems from the ground up in
+PyTorch. Instead of treating the model as a black box, you implement the core pieces yourself:
+tokenizers, embeddings, attention, Transformer blocks, training loops, MoE, LoRA, RLHF, decoding,
+KV Cache, long context, VLMs, evaluation, distillation, and on-policy distillation.
+
+The repository ships with a full English notebook mirror under `notebooks-en/`. The web viewer
+supports language switching from the home page and the notebook sidebar (or via `?lang=en` in the
+URL), so both the curriculum and the browsing experience stay bilingual end to end.
 
 The project is designed as an **educational reference implementation**. It is not a model zoo, not
 a production serving framework, and not a wrapper around hosted APIs. Its purpose is to make the
@@ -52,6 +90,26 @@ intuition -> hand calculation -> implementation -> experiment
 That contract matters. A reader should not only know that BPE merges frequent pairs, or that KV
 Cache speeds up generation. They should be able to trace the numbers, write the minimal code, and
 explain why the behavior appears.
+
+## What You Will Build
+
+By the end, you will have implemented a compact version of the systems that power modern LLMs:
+
+| Stage | You build | Why it matters |
+|:---|:---|:---|
+| Text to tokens | Character, word, and BPE tokenizers | See exactly how raw text becomes model input |
+| Tokens to vectors | Token embeddings and position encodings | Understand what the model can compute over |
+| Transformer core | Self-Attention, Multi-Head Attention, Transformer blocks, Mini-GPT | Reconstruct the core forward pass |
+| Training system | Cross-Entropy, batching, gradient flow, scaling-law intuition | Connect loss curves to real model behavior |
+| Adaptation | LoRA, continued pretraining, reward modeling, PPO/DPO style objectives | Learn how base models become useful assistants |
+| Inference system | Sampling, beam search, KV Cache, speculative decoding | Understand why serving is a systems problem |
+| Frontiers | Long context, CoT experiments, VLM patch embeddings and cross-attention | Turn newer papers into small runnable examples |
+| Production loop | Evaluation, win-rate matrices, distillation, OPD | Measure, compress, and improve model behavior |
+
+```text
+raw text -> tokens -> embeddings -> attention -> Transformer -> Mini-GPT
+         -> training -> alignment -> inference -> evaluation -> distillation
+```
 
 ## Why This Project
 
@@ -81,11 +139,11 @@ Use this project if you want to:
 |:---|:---|:---|
 | Foundations | Tokenization, BPE, embeddings, position encoding | `CharTokenizer`, `WordTokenizer`, `BPETokenizer`, `TokenEmbedding` |
 | Transformer core | Self-Attention, Multi-Head Attention, Transformer block | `MultiHeadAttention`, `TransformerBlock`, `MiniGPT` |
-| Architecture refinements | RMSNorm, SwiGLU, RoPE, Pre-Norm, MoE | `RMSNorm`, `SwiGLU`, `RoPE`, `MoELayer` |
-| Training | Loss, optimization, scaling laws, data engineering | Training loop, gradient accumulation, MinHash deduplication |
+| GPT-2 to modern models | RMSNorm, SwiGLU, RoPE, GQA, QK-Norm, MLA, MoE | `RMSNorm`, `SwiGLU`, `RoPE`, `GroupedQueryAttention`, `MultiHeadLatentAttention`, `MoELayer` |
+| Training | Loss, optimization, scaling laws, data engineering, MTP, FIM | Training loop, gradient accumulation, MinHash deduplication, Multi-Token Prediction, Fill-in-the-Middle |
 | Adaptation and alignment | LoRA, reward modeling, PPO, DPO | `LoraLinear`, reward model loss, PPO clip, DPO loss |
 | Inference | Sampling, beam search, KV Cache, speculative decoding | Top-k, Top-p, beam search, `AttentionWithKVCache` |
-| Frontiers | Long context, reasoning traces, vision-language models | RoPE extrapolation, Self-Consistency, Cross-Attention |
+| Frontiers | Long context, reasoning traces, VLM, Sliding Window Attention | RoPE extrapolation, Self-Consistency, Cross-Attention, Sliding Window mask |
 | Production concepts | Evaluation, distillation, on-policy distillation | Win-rate matrices, soft labels, KL estimators |
 
 ## What This Project Is Not
@@ -112,6 +170,11 @@ pip install -r requirements.txt
 jupyter notebook notebooks-en/part1-foundation/01-tokenizer-basics.ipynb
 ```
 
+Language note:
+
+- Chinese notebooks live in `notebooks/`
+- English notebooks live in `notebooks-en/` (complete 23/23 translation coverage)
+
 Recommended environment:
 
 - Python 3.9+
@@ -124,6 +187,8 @@ Most notebooks run on CPU. Larger training experiments are easier with a GPU.
 ### Web viewer
 
 The repository also includes a React / Vite reader for a course-like browsing experience.
+The reader imports the `.ipynb` files directly and renders them in the browser, without a generated
+web content copy.
 
 ```bash
 npm install
@@ -137,11 +202,34 @@ npm run build
 npm run preview
 ```
 
-Convert notebooks only:
+### Executing notebooks in restricted environments
+
+Some sandboxed environments disallow opening local sockets, which breaks the standard Jupyter
+kernel protocol (and tools like `nbclient` / `nbconvert --execute`). For those cases we ship a
+no-kernel executor that runs code cells via plain Python and writes outputs back into the English
+notebooks:
 
 ```bash
-npm run convert
+python scripts/execute_notebooks_en_no_kernel.py
 ```
+
+## Project Status
+
+| Area | Status |
+|:---|:---|
+| Chinese notebooks | Complete 23/23 |
+| English notebooks | Complete 23/23 with executed outputs |
+| Web reader | React / Vite app with language switching |
+| Static site | Published through GitHub Pages |
+| Quality checks | English coverage, syntax, output-language checks, and web build |
+| Next focus | CS336/CME295-inspired depth, smoother writing, reproducible pretraining, and stronger eval benchmarks |
+
+### Near-Term Roadmap
+
+1. Incorporate more material inspired by CS336 and CME295, especially around data, training, systems, and evaluation.
+2. Polish the flow of the existing notebooks so the explanations read more naturally from intuition to code.
+3. Add a reproducible 0-to-1 pretraining workflow inspired by SmolLM, from data preparation to a small trained model.
+4. Make the eval benchmark chapter more detailed, including benchmark design, metrics, judge prompts, result aggregation, and failure analysis.
 
 ## Curriculum
 
@@ -158,7 +246,7 @@ Modern LLM Notebook
 │   └── Mini-GPT
 │
 ├── Part 2: Training
-│   ├── Architecture refinements
+│   ├── From GPT-2 to modern models
 │   ├── Mixture of Experts
 │   ├── BERT encoder
 │   ├── Training and loss
@@ -195,20 +283,21 @@ topic without depending on hidden runtime state from earlier notebooks.
 |:---:|:---|:---|:---|
 | 01 | [Tokenizer Basics](notebooks-en/part1-foundation/01-tokenizer-basics.ipynb) | Why do models need tokenizers? | Character and word tokenizers |
 | 02 | [BPE Tokenizer](notebooks-en/part1-foundation/02-bpe-tokenizer.ipynb) | How does BPE learn a vocabulary? | Merge rules, encode, decode |
-| 03 | [Embedding & Position](notebooks-en/part1-foundation/03-embedding-position.ipynb) | How do IDs become vectors? | Token embedding, position encoding |
-| 04 | [Attention & Transformer Block](notebooks-en/part1-foundation/04-transformer-block.ipynb) | How does attention move information? | MHA, residuals, normalization |
-| 05 | [Mini-GPT](notebooks-en/part1-foundation/05-mini-gpt.ipynb) | How does a GPT-style model fit together? | Decoder-only model, LM head |
+| 03 | [Embedding](notebooks-en/part1-foundation/03-embedding.ipynb) | How do IDs become vectors? | Token embedding, distributed representation |
+| 04 | [Position Encoding](notebooks-en/part1-foundation/04-position-encoding.ipynb) | How does the model know word order? | Sinusoidal encoding, input assembly |
+| 05 | [Attention & Transformer Block](notebooks-en/part1-foundation/05-transformer-block.ipynb) | How does attention move information? | MHA, residuals, normalization |
+| 06 | [Mini-GPT](notebooks-en/part1-foundation/06-mini-gpt.ipynb) | How does a GPT-style model fit together? | Decoder-only model, LM head |
 
 ### Part 2: Training
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 06 | [Architecture Refinements](notebooks-en/part2-training/06-architecture-refinements.ipynb) | What changed from the original Transformer to LLaMA-style blocks? | RMSNorm, SwiGLU, RoPE |
-| 07 | [Mixture of Experts](notebooks-en/part2-training/07-moe.ipynb) | How does sparse expert routing work? | Router gate, top-k experts |
+| 06 | [From GPT-2 to Modern Models](notebooks-en/part2-training/06-gpt2-to-modern-models.ipynb) | What changed architecturally after GPT-2? | RMSNorm, SwiGLU, RoPE, GQA, QK-Norm, MLA |
+| 07 | [Mixture of Experts](notebooks-en/part2-training/07-moe.ipynb) | How does sparse expert routing work? | Router gate, top-k experts, aux-free load balancing |
 | 08 | [BERT Encoder](notebooks-en/part2-training/08-bert-encoder.ipynb) | Why can encoder-only models read bidirectionally? | MiniBERT, MLM head |
-| 09 | [Training & Loss](notebooks-en/part2-training/09-training-loss.ipynb) | How does a language model learn from prediction errors? | Training loop, loss, gradients |
+| 09 | [Training & Loss](notebooks-en/part2-training/09-training-loss.ipynb) | How does a language model learn from prediction errors? | Training loop, loss, gradients, Multi-Token Prediction |
 | 10 | [Scaling Laws](notebooks-en/part2-training/10-scaling-laws.ipynb) | How do model size, data, and compute trade off? | FLOPs estimates, Chinchilla intuition |
-| 11 | [Data Engineering](notebooks-en/part2-training/11-data-engineering.ipynb) | Why does data quality dominate model behavior? | Cleaning, filtering, MinHash |
+| 11 | [Data Engineering](notebooks-en/part2-training/11-data-engineering.ipynb) | Why does data quality dominate model behavior? | Cleaning, filtering, MinHash, FIM |
 | 12 | [LoRA](notebooks-en/part2-training/12-lora.ipynb) | Why does low-rank adaptation work? | `LoraLinear`, merge for inference |
 | 13 | [Mid-Training & CPT](notebooks-en/part2-training/13-midtraining-cpt.ipynb) | How does continued pretraining adapt a model? | Data mixing, loss observation |
 | 14 | [RLHF Alignment](notebooks-en/part2-training/14-rlhf-alignment.ipynb) | How do preference signals become objectives? | Reward model, PPO, DPO |
@@ -225,7 +314,7 @@ topic without depending on hidden runtime state from earlier notebooks.
 
 | # | Notebook | Primary question | Implementation focus |
 |:---:|:---|:---|:---|
-| 18 | [Long Context](notebooks-en/part4-frontiers/18-long-context.ipynb) | How do models extend beyond their training context length? | RoPE extrapolation, YaRN intuition |
+| 18 | [Long Context](notebooks-en/part4-frontiers/18-long-context.ipynb) | How do models extend beyond their training context length? | RoPE extrapolation, YaRN, Sliding Window Attention |
 | 19 | [CoT & Thinking](notebooks-en/part4-frontiers/19-cot-thinking.ipynb) | Why can reasoning traces improve answers? | Self-Consistency, reward design |
 | 20 | [Vision-Language Models](notebooks-en/part4-frontiers/20-vlm.ipynb) | How does visual information enter a language model? | Patch embedding, cross-attention |
 
@@ -259,9 +348,12 @@ The course connects implementation details to influential papers and production 
 | Attention Is All You Need | Multi-Head Attention, position encoding |
 | BERT | Encoder-only models, masked language modeling |
 | LLaMA | RMSNorm, SwiGLU, RoPE, Pre-Norm |
+| DeepSeek-V2 / DeepSeek-V3 | MLA, Multi-Token Prediction, aux-free MoE load balancing |
+| Mixtral / Qwen3 | Sliding Window Attention, MoE with shared experts |
 | Scaling Laws / Chinchilla | Parameter, data, and compute trade-offs |
 | LoRA | Low-rank adaptation |
 | RLHF / PPO / DPO | Preference alignment |
+| Code Llama / DeepSeek-Coder | Fill-in-the-Middle (FIM) |
 | FlashAttention / vLLM | Inference acceleration and memory management |
 | Speculative Decoding | Draft-then-verify generation |
 | RoPE / YaRN | Long-context extrapolation |
@@ -273,18 +365,20 @@ The course connects implementation details to influential papers and production 
 
 ```text
 modern-llm-notebook/
-├── notebooks/
+├── notebooks/           # Chinese source notebooks
 │   ├── part1-foundation/
 │   ├── part2-training/
 │   ├── part3-inference/
 │   ├── part4-frontiers/
 │   └── part5-production/
-├── notebooks-en/
+├── notebooks-en/        # English mirror notebooks
 │   ├── part1-foundation/
 │   ├── part2-training/
 │   ├── part3-inference/
 │   ├── part4-frontiers/
 │   └── part5-production/
+├── external/            # Upstream references (e.g. karpathy nanoGPT/minGPT)
+├── karpathy_models.py   # Thin import wrapper used by a few notebooks
 ├── web/                 # React / Vite web viewer
 ├── docs/                # Static site build output
 ├── scripts/             # Notebook conversion scripts
@@ -326,6 +420,20 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
     >
   </picture>
 </a>
+
+## Citation
+
+If Modern LLM Notebook helps your research or work, please cite:
+
+```bibtex
+@misc{modern-llm-notebook,
+  title   = {Modern LLM Notebook: Build Modern LLMs from Scratch},
+  author  = {WalkingLabs},
+  year    = {2025},
+  url     = {https://github.com/walkinglabs/modern-llm-notebook},
+  note    = {GitHub repository, accessed 2026}
+}
+```
 
 ## License
 

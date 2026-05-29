@@ -119,7 +119,6 @@ notebooks/
 
 在根目录下支持以下命令：
 - 安装网页端依赖：`npm install`
-- 转换 Notebook 并启动网页端开发服务器：`npm run dev`
-- 转换 Notebook 并构建静态网页：`npm run build`
+- 直接读取 Notebook 原文并启动网页端开发服务器：`npm run dev`
+- 直接读取 Notebook 原文并构建静态网页：`npm run build`
 - 预览构建的静态网页：`npm run preview`
-- 仅执行 Notebook 转换：`npm run convert`

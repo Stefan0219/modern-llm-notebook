@@ -1,16 +1,32 @@
 import { useState, useEffect, useCallback } from 'react'
 import { flushSync } from 'react-dom'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Sidebar from './components/Sidebar.jsx'
 import NotebookViewer from './components/NotebookViewer.jsx'
+import NotesPanel from './components/NotesPanel.jsx'
 import Welcome from './components/Welcome.jsx'
 import GuidedTour from './components/GuidedTour.jsx'
+import SettingsPanel from './components/SettingsPanel.jsx'
+import ChangelogModal from './components/ChangelogModal.jsx'
+import WalkingLabsModal from './components/WalkingLabsModal.jsx'
+import { SettingsProvider } from './context/SettingsContext.jsx'
+import useSettings from './hooks/useSettings.js'
+import useTheme from './hooks/useTheme.js'
+import useNotesAndBookmarks from './hooks/useNotesAndBookmarks.js'
 import { getCatalog, getNotebook } from './data/notebooks.js'
+
+const NOTES_SENTINEL = '__notes__'
 
 const DEFAULT_LANG = 'zh'
 
 const LEGACY_NOTEBOOK_IDS = {
-  '04-mini-gpt': '05-mini-gpt',
-  '05-architecture-refinements': '06-architecture-refinements',
+  '03-embedding-position': '03-embedding',
+  '04-transformer-block': '05-transformer-block',
+  '05-mini-gpt': '06-mini-gpt',
+  '04-mini-gpt': '06-mini-gpt',
+  '05-architecture-refinements': '06-gpt2-to-modern-models',
+  '06-architecture-refinements': '06-gpt2-to-modern-models',
+  '06-llama-architecture-upgrades': '06-gpt2-to-modern-models',
   '06-moe': '07-moe',
   '07-bert-encoder': '08-bert-encoder',
   '08-training-loss': '09-training-loss',
@@ -29,6 +45,9 @@ const LEGACY_NOTEBOOK_IDS = {
   '20-distillation': '22-distillation',
   '21-opd': '23-opd',
 }
+
+// 从构建时注入的 git log 数据中读取
+const CHANGELOG_COMMITS = typeof __CHANGELOG_COMMITS__ !== 'undefined' ? __CHANGELOG_COMMITS__ : []
 
 function normalizeNotebookId(id) {
   return LEGACY_NOTEBOOK_IDS[id] || id
@@ -72,16 +91,43 @@ function getInitialNotebookId() {
   return hash ? normalizeNotebookId(hash) : null
 }
 
-function App() {
+function getInitialSidebarOpen() {
+  return window.innerWidth >= 768
+}
+
+function AppContent() {
   const [lang, setLang] = useState(() => getInitialLang())
   const [catalog, setCatalog] = useState(() => getCatalog(lang))
   const [currentId, setCurrentId] = useState(() => getInitialNotebookId())
   const [loading] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(() => getInitialSidebarOpen())
   const [tourActive, setTourActive] = useState(false)
   const [tourStepIndex, setTourStepIndex] = useState(0)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [changelogOpen, setChangelogOpen] = useState(false)
+  const [walkingLabsOpen, setWalkingLabsOpen] = useState(false)
 
-  // Refresh catalog when Vite hot-updates notebook modules.
+  const { settings, updateSettings } = useSettings()
+  const { resolvedTheme, toggleTheme } = useTheme(settings.theme)
+  const nbm = useNotesAndBookmarks()
+
+  // 同步字号到 CSS 变量
+  useEffect(() => {
+    const sizeMap = { small: '14.5px', default: '16.5px', large: '18.5px' }
+    document.documentElement.style.setProperty('--font-size-notebook', sizeMap[settings.fontSize] || '16.5px')
+  }, [settings.fontSize])
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 767px)')
+    const syncSidebarForMobile = () => {
+      if (mobileQuery.matches) setSidebarOpen(false)
+    }
+
+    syncSidebarForMobile()
+    mobileQuery.addEventListener?.('change', syncSidebarForMobile)
+    return () => mobileQuery.removeEventListener?.('change', syncSidebarForMobile)
+  }, [])
+
   useEffect(() => {
     setCatalog(getCatalog(lang))
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN'
@@ -92,7 +138,11 @@ function App() {
   useEffect(() => {
     const syncFromHash = () => {
       const nextId = getInitialNotebookId()
-      setCurrentId(nextId)
+      if (nextId === NOTES_SENTINEL) return
+      setCurrentId((prev) => {
+        if (prev === nextId) return prev
+        return nextId
+      })
       if (nextId && window.location.hash !== `#${nextId}`) {
         replaceUrlWithHash(nextId, lang)
       }
@@ -127,6 +177,14 @@ function App() {
     }
   }, [lang])
 
+  const handleOpenNotes = useCallback(() => {
+    flushSync(() => setCurrentId(NOTES_SENTINEL))
+    replaceUrlWithHash(null, lang)
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false)
+    }
+  }, [lang])
+
   const currentMeta = catalog.find(n => n.id === currentId)
   const notebook = currentId ? getNotebook(currentId, lang) : null
   const tourNotebookId = catalog.find(n => n.id === '01-tokenizer-basics')?.id || catalog[0]?.id
@@ -134,129 +192,191 @@ function App() {
     zh: [
       {
         target: '.hero',
-        title: '先看课程目标',
-        body: '这套课程不是 API 教程，而是从零重建 LLM 核心系统。你会沿着模型真正运转的顺序，理解文本如何变成 token、参数如何训练、模型如何生成答案。',
+        title: '欢迎来到 Modern LLM Notebook',
+        body: '这不是 API 调用教程，而是从零重建 LLM 核心系统的交互式课程。你会沿着模型真正运转的顺序，理解文本如何变成 token、参数如何训练、模型如何生成答案。',
       },
       {
         target: '.stats',
-        title: '5 个大章，23 篇 Notebook',
-        body: '课程分成 5 个大章：基础表示、训练系统、推理系统、前沿方向、评测与部署。每篇都是可执行 Notebook，读完马上能改代码观察结果。',
+        title: '课程规模',
+        body: '23 篇可运行 Notebook，覆盖 5 大学习路径、20+ 核心模块。每篇都是可执行代码，读完马上能改代码观察结果。',
       },
       {
-        target: '[data-tour-part="foundation"]',
-        title: '第一大章：Foundation',
-        body: '这一章解决“模型怎么读懂文本”。你会从 Tokenizer、Embedding、位置编码一路搭到 Mini-GPT。产出是：能自己手写一个最小 GPT 骨架。',
-      },
-      {
-        target: '[data-tour-part="training"]',
-        title: '第二大章：Training Systems',
-        body: '这一章解决“模型怎么被训练出来”。内容包括架构改进、MoE、BERT、Loss、Scaling Laws、数据工程、LoRA、RLHF。产出是：能看懂训练系统的关键组件和取舍。',
-      },
-      {
-        target: '[data-tour-part="inference"]',
-        title: '第三大章：Inference',
-        body: '这一章解决“模型怎么生成答案并跑得更快”。内容包括生成策略、推理加速、投机解码。产出是：能自己实现基础解码，并理解 KV Cache、加速和吞吐约束。',
-      },
-      {
-        target: '[data-tour-part="frontiers"]',
-        title: '第四大章：Frontiers',
-        body: '这一章看当代 LLM 的前沿能力：长上下文、CoT 思维链、VLM。产出是：知道这些能力的机制来源，以及它们和普通文本模型有什么不同。',
-      },
-      {
-        target: '[data-tour-part="production"]',
-        title: '第五大章：Evaluation & Deployment',
-        body: '这一章解决“模型怎么可靠交付”。内容包括模型评测、知识蒸馏、On-Policy Distillation。产出是：能设计基础评测流程，并理解压缩和部署判断。',
+        target: '[data-tour="features"]',
+        title: '课程特色',
+        body: '浏览器内直接渲染 Notebook，无需配置环境。中英双语支持，代码级图解帮助你直观理解模型结构。',
       },
       {
         target: '.parts',
-        title: '学完能做什么',
-        body: '走完整套后，你应该能自己写出 Tokenizer、Embedding、Attention、Mini-GPT、训练循环、LoRA、解码策略和基础评测流程。',
+        title: '5 大学习路径',
+        body: '这里是整套课程的地图：基础、训练、推理、前沿、评测与部署。每张卡片概括一个阶段要解决的问题，点击后会定位到对应学习路径，方便你从全局选择下一步。',
+      },
+      {
+        target: '[data-tour="notes-saved"]',
+        title: '笔记与收藏',
+        body: '点击这里可以打开笔记与收藏面板。阅读时你可以收藏 Notebook、选中文字添加笔记或高亮标记，所有内容统一管理，支持导出备份。',
+        nextLabel: '打开看看',
+        action: 'open-notes',
+      },
+      {
+        target: '.notes-panel',
+        title: '笔记与收藏面板',
+        body: '这里展示了你所有的收藏和笔记。上方可以按收藏或笔记筛选，每条笔记都会标注出处章节。底部有导出和导入按钮，换浏览器也不怕丢数据。',
+      },
+      {
+        target: '[data-tour="settings"]',
+        title: '个性化设置',
+        body: '点击齿轮图标打开设置面板，可以切换浅色/深色/跟随系统主题，还能调整正文字号大小。设置会自动保存。',
+        nextLabel: '打开看看',
+        action: 'open-settings',
+      },
+      {
+        target: '.modal-card',
+        title: '设置面板',
+        body: '这里可以切换主题：浅色、深色或跟随系统自动切换。下方还能调整正文字号（小/中/大），选择后立即生效，阅读更舒适。',
+      },
+      {
+        target: '[data-tour="walkinglabs"]',
+        title: '扫码加入社群',
+        body: '点击左上角的「...」按钮，可以打开 WalkingLabs 页面。WalkingLabs 是一个专注于 Agent 技术的开源实验室。',
+        nextLabel: '打开看看',
+        action: 'open-walkinglabs',
+      },
+      {
+        target: '.modal-card',
+        title: '社群与交流',
+        body: 'WalkingLabs 专注于 Agent 相关基础建设与教程。扫码加入微信群，和其他开发者一起探讨 Agent 技术、分享实践经验。',
+      },
+      {
+        target: '[data-tour="notebooks"]',
+        title: '精选可运行 Notebook',
+        body: '这里展示了 10 篇推荐 Notebook，每篇都有独特的可视化封面。点击即可进入阅读，支持一键打开到 ModelScope、百度星河社区或 Colab 运行。',
         nextLabel: '进入 01',
         action: 'open-notebook',
       },
       {
         target: '.viewer-launches',
-        title: '01 怎么学',
-        body: '01 是入口：先理解为什么文本不能直接喂给模型，再手算字符级、词级 tokenizer，最后运行代码。顶部按钮可以把当前 Notebook 打开到 ModelScope、百度星河社区或 Colab。',
+        title: '一键运行',
+        body: '顶部按钮可以把当前 Notebook 打开到 ModelScope、百度星河社区或 Colab，在线运行代码，无需本地配置。',
+      },
+      {
+        target: '.bookmark-star',
+        title: '收藏与笔记',
+        body: '点击运行按钮左侧的星标可收藏当前 Notebook。所有收藏和笔记在左侧边栏「笔记与收藏」中统一管理，支持导出和导入备份。',
+      },
+      {
+        target: '.viewer-body',
+        title: '选中文字即可操作',
+        body: '阅读时选中任意文字，会弹出工具栏：复制内容、添加笔记（引用原文 + 你的想法）、黄色高亮标记重点，还能生成精美的分享卡片。',
       },
       {
         target: '.toc',
-        title: '按“直觉→手算→代码→观察”读',
-        body: '右侧大纲对应每个学习环节。推荐顺序是先看直觉，再看具体数字怎么手算，然后运行代码，最后读输出里的关键观察。',
+        title: '右侧大纲导航',
+        body: '右侧大纲对应每个学习环节，点击可快速跳转。大纲上的蓝色圆点表示该章节有笔记。推荐阅读顺序：先看直觉理解，再看手算验证，然后运行代码，最后观察输出。',
       },
       {
         target: '.code_cell',
         title: '代码和输出可展开',
-        body: '每个核心算法都会落到代码。长代码和长输出默认保留前 28 行，点击对应区域可展开或收起，方便你边读边验证。',
+        body: '每个核心算法都会落到代码。长代码和长输出默认折叠，点击可展开查看完整内容。右上角按钮可以复制代码。',
       },
       {
         target: '.viewer-header',
-        title: '快开始你的学习吧！',
-        body: '学完整套后，你应该能自己手写 Tokenizer、Embedding、Attention、Mini-GPT、训练循环、LoRA、解码策略和基础评测流程。',
+        title: '开始你的学习旅程',
+        body: '从 01 Tokenizer 开始，一步步搭建你的 LLM 知识体系。每篇 Notebook 都是自包含的，可以按任意顺序阅读。',
       },
     ],
     en: [
       {
         target: '.hero',
-        title: 'Start With The Goal',
-        body: 'This is not an API tutorial. It rebuilds the core LLM systems from scratch, following the path from text to tokens, training, and generation.',
+        title: 'Welcome to Modern LLM Notebook',
+        body: 'This is not an API tutorial. It rebuilds core LLM systems from scratch via interactive notebooks, following the path from text to tokens, training, and generation.',
       },
       {
         target: '.stats',
-        title: '5 Parts, 23 Notebooks',
-        body: 'The course covers foundations, training systems, inference, frontiers, and evaluation/deployment. Every notebook is runnable and editable.',
+        title: 'Course Overview',
+        body: '23 runnable notebooks across 5 learning paths and 20+ core modules. Every notebook is executable — read, modify, and observe results immediately.',
       },
       {
-        target: '[data-tour-part="foundation"]',
-        title: 'Part 1: Foundation',
-        body: 'This part answers how models read text: Tokenizer, Embedding, position encoding, Attention, and a small Mini-GPT skeleton.',
-      },
-      {
-        target: '[data-tour-part="training"]',
-        title: 'Part 2: Training Systems',
-        body: 'This part explains how models are trained: architecture refinements, MoE, BERT, loss, scaling laws, data, LoRA, and RLHF.',
-      },
-      {
-        target: '[data-tour-part="inference"]',
-        title: 'Part 3: Inference',
-        body: 'This part shows how models generate answers and run faster, from decoding rules to KV Cache and speculative decoding.',
-      },
-      {
-        target: '[data-tour-part="frontiers"]',
-        title: 'Part 4: Frontiers',
-        body: 'This part studies long context, CoT reasoning traces, and VLM data flow as small, understandable experiments.',
-      },
-      {
-        target: '[data-tour-part="production"]',
-        title: 'Part 5: Evaluation & Deployment',
-        body: 'This part covers evaluation, distillation, and On-Policy Distillation so model behavior can be measured and delivered.',
+        target: '[data-tour="features"]',
+        title: 'What Makes It Different',
+        body: 'Notebooks render directly in your browser with zero setup. Bilingual support and code-level diagrams help you understand model internals intuitively.',
       },
       {
         target: '.parts',
-        title: 'What You Can Build',
-        body: 'After the full path, you should be able to write a tokenizer, embeddings, attention, Mini-GPT, a training loop, LoRA, decoding, and basic evaluation.',
+        title: '5 Learning Paths',
+        body: 'This is the course map: Foundation, Training, Inference, Frontiers, and Eval & Deploy. Each card summarizes one stage, and clicking a card takes you to that learning path so you can choose the next step from the full curriculum.',
+      },
+      {
+        target: '[data-tour="notes-saved"]',
+        title: 'Notes & Bookmarks',
+        body: 'Click here to open the notes panel. Bookmark notebooks, highlight text, or add notes while reading. Everything is managed here with export and import support.',
+        nextLabel: 'Take a look',
+        action: 'open-notes',
+      },
+      {
+        target: '.notes-panel',
+        title: 'Notes Panel',
+        body: 'All your bookmarks and notes are listed here. Filter by bookmarks or notes using the tabs above. Each note shows its source section. Export and import at the bottom.',
+      },
+      {
+        target: '[data-tour="settings"]',
+        title: 'Personalization',
+        body: 'Click the gear icon to open settings. Switch between light, dark, and system themes, or adjust the reading font size. Preferences are saved automatically.',
+        nextLabel: 'Take a look',
+        action: 'open-settings',
+      },
+      {
+        target: '.modal-card',
+        title: 'Settings Panel',
+        body: 'Switch themes here: light, dark, or follow your system. Below that, adjust the reading font size (S/M/L). Changes take effect immediately.',
+      },
+      {
+        target: '[data-tour="walkinglabs"]',
+        title: 'Join the Community',
+        body: 'Click the "..." button in the top-left corner to open the WalkingLabs page. WalkingLabs is an open-source lab focused on Agent technology.',
+        nextLabel: 'Take a look',
+        action: 'open-walkinglabs',
+      },
+      {
+        target: '.modal-card',
+        title: 'Community & Discussion',
+        body: 'WalkingLabs builds Agent infrastructure and tutorials. Scan the QR code to join the WeChat group and discuss Agent tech with fellow developers.',
+      },
+      {
+        target: '[data-tour="notebooks"]',
+        title: 'Runnable Notebooks',
+        body: '10 recommended notebooks with unique visual covers. Click to start reading, or open in ModelScope, Baidu Xinghe, or Google Colab to run code online.',
         nextLabel: 'Open 01',
         action: 'open-notebook',
       },
       {
         target: '.viewer-launches',
-        title: 'How To Read 01',
-        body: '01 starts with why raw text cannot go directly into a model, then hand-calculates tokenizer choices before running code.',
+        title: 'One-Click Run',
+        body: 'The top buttons open the current notebook in ModelScope, Baidu Xinghe, or Google Colab. Run code online without any local setup.',
+      },
+      {
+        target: '.bookmark-star',
+        title: 'Bookmarks & Notes',
+        body: 'Click the star to the left of the run buttons to bookmark. All bookmarks and notes are managed in the sidebar under "Notes & Saved", with export and import support.',
+      },
+      {
+        target: '.viewer-body',
+        title: 'Select Text to Annotate',
+        body: 'Select any text while reading to bring up a toolbar: copy content, add a note (with quote + your thoughts), highlight key points in yellow, or generate a shareable card image.',
       },
       {
         target: '.toc',
-        title: 'Read In The Intended Order',
-        body: 'The outline follows intuition, hand calculation, code, and observation. Read the idea first, then inspect the numbers and outputs.',
+        title: 'Table of Contents',
+        body: 'The right sidebar outlines each section. Blue dots mark sections with notes. Recommended order: read the intuition first, then hand calculation, then run code, then observe outputs.',
       },
       {
         target: '.code_cell',
-        title: 'Code And Outputs Expand',
-        body: 'Core ideas end up in code. Long code and output blocks keep the first 28 lines visible and can be expanded.',
+        title: 'Expandable Code & Output',
+        body: 'Core algorithms land in code. Long code and output blocks are collapsed by default — click to expand. Use the copy button in the top-right corner.',
       },
       {
         target: '.viewer-header',
-        title: 'You Are Ready',
-        body: 'Start small, run cells often, and change one thing at a time so the model internals become concrete.',
+        title: 'Start Your Journey',
+        body: 'Begin with 01 Tokenizer and build your LLM knowledge step by step. Each notebook is self-contained — read in any order.',
       },
     ],
   }
@@ -274,6 +394,8 @@ function App() {
 
   const stopTour = useCallback(() => {
     setTourActive(false)
+    setSettingsOpen(false)
+    setWalkingLabsOpen(false)
   }, [])
 
   const handleTourNext = useCallback(() => {
@@ -285,31 +407,70 @@ function App() {
       })
       replaceUrlWithHash(tourNotebookId, lang)
     }
+    if (step?.action === 'open-notes') {
+      flushSync(() => {
+        setSettingsOpen(false)
+        setWalkingLabsOpen(false)
+        setCurrentId(NOTES_SENTINEL)
+      })
+    }
+    if (step?.action === 'open-settings') {
+      flushSync(() => {
+        setCurrentId(null)
+        setWalkingLabsOpen(false)
+        setSettingsOpen(true)
+      })
+    }
+    if (step?.action === 'open-walkinglabs') {
+      flushSync(() => {
+        setCurrentId(null)
+        setSettingsOpen(false)
+        setWalkingLabsOpen(true)
+      })
+    }
 
     if (tourStepIndex >= tourSteps.length - 1) {
+      setSettingsOpen(false)
+      setWalkingLabsOpen(false)
       setTourActive(false)
       return
+    }
+    const nextStep = tourSteps[tourStepIndex + 1]
+    if (!nextStep?.target?.startsWith('.notes-panel') && !nextStep?.target?.startsWith('.modal-card')) {
+      setSettingsOpen(false)
+      setWalkingLabsOpen(false)
     }
     setTourStepIndex(i => i + 1)
   }, [lang, tourNotebookId, tourStepIndex, tourSteps])
 
   const handleTourPrev = useCallback(() => {
+    setSettingsOpen(false)
+    setWalkingLabsOpen(false)
     setTourStepIndex(i => Math.max(0, i - 1))
   }, [])
 
   return (
-    <div className="app">
+    <div className="h-screen flex overflow-hidden bg-[var(--bg-app)] text-[var(--text-body)] font-sans antialiased">
       <button
-        className="sidebar-toggle"
-        onClick={() => setSidebarOpen(v => !v)}
-        aria-label="Toggle sidebar"
+        onClick={() => setSidebarOpen((open) => !open)}
+        className="sidebar-toggle-btn"
+        aria-label={sidebarOpen
+          ? (lang === 'zh' ? '收起左侧栏' : 'Collapse sidebar')
+          : (lang === 'zh' ? '展开左侧栏' : 'Expand sidebar')}
+        title={sidebarOpen
+          ? (lang === 'zh' ? '收起左侧栏' : 'Collapse sidebar')
+          : (lang === 'zh' ? '展开左侧栏' : 'Expand sidebar')}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <line x1="3" y1="18" x2="21" y2="18" />
-        </svg>
+        {sidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
       </button>
+
+      {/* Sidebar overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-20 bg-black/20 backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       <Sidebar
         catalog={catalog}
@@ -318,16 +479,42 @@ function App() {
         onLanguageChange={handleLanguageChange}
         onSelect={handleSelect}
         onHome={handleHome}
+        onStartTour={startTour}
+        onOpenNotes={handleOpenNotes}
+        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenChangelog={() => setChangelogOpen(true)}
+        onOpenWalkingLabs={() => setWalkingLabsOpen(true)}
+        bookmarks={nbm.bookmarks}
+        notes={nbm.notes}
+        notebooksWithNotes={nbm.notebooksWithNotes}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="main">
-        {currentId ? (
+      <main className="flex-1 flex flex-col h-screen min-w-0 overflow-y-auto">
+        {currentId === NOTES_SENTINEL ? (
+          <NotesPanel
+            catalog={catalog}
+            bookmarks={nbm.bookmarks}
+            notes={nbm.notes}
+            notebooksWithNotes={nbm.notebooksWithNotes}
+            getSectionNotes={nbm.getSectionNotes}
+            exportData={nbm.exportData}
+            importFile={nbm.importFile}
+            onClearAll={nbm.clearAll}
+            onSelect={handleSelect}
+            lang={lang}
+          />
+        ) : currentId ? (
           <NotebookViewer
             notebook={notebook}
             meta={currentMeta}
             loading={loading}
+            isBookmarked={nbm.isBookmarked}
+            toggleBookmark={nbm.toggleBookmark}
+            notes={nbm.notes}
+            saveNote={nbm.saveNote}
+            deleteNote={nbm.deleteNote}
           />
         ) : (
           <Welcome
@@ -339,6 +526,7 @@ function App() {
           />
         )}
       </main>
+
       <GuidedTour
         active={tourActive}
         step={tourSteps[tourStepIndex]}
@@ -349,8 +537,36 @@ function App() {
         onPrev={handleTourPrev}
         onClose={stopTour}
       />
+
+      <SettingsPanel
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        lang={lang}
+      />
+
+      <ChangelogModal
+        isOpen={changelogOpen}
+        onClose={() => setChangelogOpen(false)}
+        lang={lang}
+        commits={CHANGELOG_COMMITS}
+      />
+
+      <WalkingLabsModal
+        isOpen={walkingLabsOpen}
+        onClose={() => setWalkingLabsOpen(false)}
+        lang={lang}
+      />
     </div>
   )
 }
 
-export default App
+export default function App() {
+  const { settings, updateSettings } = useSettings()
+  const { resolvedTheme, toggleTheme } = useTheme(settings.theme)
+
+  return (
+    <SettingsProvider settings={settings} updateSettings={updateSettings} resolvedTheme={resolvedTheme} toggleTheme={toggleTheme}>
+      <AppContent />
+    </SettingsProvider>
+  )
+}

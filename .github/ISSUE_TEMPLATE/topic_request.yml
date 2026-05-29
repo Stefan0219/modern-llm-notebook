@@ -1,0 +1,27 @@
+name: Topic request
+description: Request a new notebook topic or future chapter.
+title: "[Topic]: "
+labels: ["topic request"]
+body:
+  - type: input
+    id: topic
+    attributes:
+      label: Topic
+      description: Example: RAG from scratch, quantization, tool calling, GRPO.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why should this be included?
+      description: Explain what learning gap this topic would fill.
+    validations:
+      required: true
+  - type: textarea
+    id: shape
+    attributes:
+      label: What should the notebook build?
+      description: Describe a small runnable experiment, hand calculation, or implementation target.
+    validations:
+      required: false
+

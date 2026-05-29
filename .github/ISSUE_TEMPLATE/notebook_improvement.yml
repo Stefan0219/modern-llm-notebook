@@ -1,0 +1,27 @@
+name: Notebook improvement
+description: Suggest clearer explanations, better examples, exercises, or visuals.
+title: "[Notebook]: "
+labels: ["notebook", "improvement"]
+body:
+  - type: input
+    id: notebook
+    attributes:
+      label: Notebook
+      description: Example: notebooks-en/part2-training/09-training-loss.ipynb
+    validations:
+      required: true
+  - type: textarea
+    id: improvement
+    attributes:
+      label: What should be improved?
+      description: Tell us what feels unclear, incomplete, too fast, or hard to run.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change
+      description: A concrete rewrite, exercise idea, diagram idea, or code improvement is especially helpful.
+    validations:
+      required: false
+
